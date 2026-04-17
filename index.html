@@ -2484,7 +2484,7 @@ function renderCalc() {
 
   // ── Ingredient list ──
   const ingRow = (name, grams, sub) => {
-    const display = gfmt(S.roundIngredients ? Math.round(grams) : grams);
+    const display = S.roundIngredients ? gfmt(grams) : precise(grams);
     return `<div class="ing-item">
       <div><div class="ing-name">${esc(name)}</div>${sub ? `<div class="ing-sub">${sub}</div>` : ''}</div>
       <div class="ing-grams">${display}<span class="g">g</span></div>
@@ -2493,7 +2493,7 @@ function renderCalc() {
   const ingSumLine = (g) =>
     `<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0 7px;border-top:1px dashed var(--border)">
       <span style="font-size:11px;color:var(--muted);font-style:italic">sum mel</span>
-      <span style="font-size:13px;color:var(--muted);font-weight:600">${gfmt(S.roundIngredients ? roundFlour(g) : g)} g</span>
+      <span style="font-size:13px;color:var(--muted);font-weight:600">${S.roundIngredients ? gfmt(roundFlour(g)) : precise(g)} g</span>
     </div>`;
 
   let html = '';
@@ -2561,7 +2561,7 @@ function renderCalc() {
     html += `<div class="ing-item">
       <div><div class="ing-name">${S.yeastType === 'fresh' ? 'Fersk gjær' : 'Tørrgjær'}</div>
       <div class="ing-sub">${r.yeastPct.toFixed(3)} % av mel${S.override ? ' · overstyrt' : ''}</div></div>
-      <div class="ing-grams">${S.roundIngredients && r.yeastG >= 5 ? roundYeast(r.yeastG).toFixed(1) : fmt1(r.yeastG)}<span class="g">g</span></div>
+      <div class="ing-grams">${S.roundIngredients ? (r.yeastG >= 5 ? roundYeast(r.yeastG).toFixed(1) : fmt1(r.yeastG)) : fmt1(r.yeastG)}<span class="g">g</span></div>
     </div>`;
   }
   if (hasExtra('sukker')) html += ingRow('Sukker', r.sukkerG, `${S.sukkerPct} % av mel`);
@@ -2577,7 +2577,7 @@ function renderCalc() {
     ? gfmt(roundFlour(r.flourG) + roundWater(r.waterG) + roundSalt(r.saltG)
         + (r.yeastG >= 5 ? roundYeast(r.yeastG) : r.yeastG)
         + Math.round(r.sukkerG) + Math.round(r.oljeG))
-    : gfmt(tot);
+    : precise(tot);
   document.getElementById('resultTotal').textContent = totDisplay + ' g';
 
   const modeLabel = S.mode === 'pizza' ? 'pizza' : 'brød';

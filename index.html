@@ -1,0 +1,2760 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pizzapappas deigkalkulator</title>
+  <style>
+    @font-face {
+      font-family: 'TAN Tangkiwood';
+      src: url('TAN-Tangkiwood-Regular.woff2') format('woff2');
+      font-weight: 400;
+      font-style: normal;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #F0E6D8;
+      --surface:     #FDF8F2;
+      --card:        #FFFFFF;
+      --card-alt:    #FFF8F0;
+      --border:      #DDD0BC;
+      --border-light:#C4AE96;
+      --red:         #C42B1C;
+      --red-bright:  #D93020;
+      --orange:      #E8641A;
+      --orange-light:#F07A35;
+      --gold:        #A06800;
+      --cream:       #F5EDD8;
+      --text:        #221608;
+      --muted:       #907A6A;
+      --muted2:      #70604E;
+      --success:     #1E7A3E;
+      --error:       #B82020;
+      --input-bg:    #FFFAF4;
+      --input-border:#D0BAA4;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      padding-bottom: 80px;
+    }
+
+    /* ── Header ── */
+    header {
+      background: #C14233;
+      padding: 20px 20px 16px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(140,40,10,0.35);
+    }
+    header h1 {
+      font-family: 'TAN Tangkiwood', 'Tan Tangkiwood', Georgia, serif;
+      font-size: 26px;
+      font-weight: 400;
+      letter-spacing: 1.5px;
+      color: #fff;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    }
+    header p {
+      color: rgba(255,255,255,0.78);
+      font-size: 12px;
+      margin-top: 3px;
+      letter-spacing: 0.3px;
+    }
+
+    /* ── Mode toggle ── */
+    .mode-toggle {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 13px;
+    }
+    .mode-btn {
+      padding: 6px 24px;
+      border-radius: 20px;
+      border: 2px solid rgba(255,255,255,0.45);
+      background: transparent;
+      color: rgba(255,255,255,0.75);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.18s;
+      letter-spacing: 0.2px;
+    }
+    .mode-btn.active {
+      background: #fff;
+      color: var(--red);
+      border-color: #fff;
+    }
+    .mode-btn:not(.active):hover {
+      border-color: rgba(255,255,255,0.8);
+      color: #fff;
+    }
+    .mode-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .preset-save-btn {
+      width: 28px;
+      height: 28px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 8px;
+      color: rgba(255,255,255,0.7);
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.18s;
+      flex-shrink: 0;
+      padding: 0;
+    }
+    .preset-save-btn:hover {
+      background: rgba(255,255,255,0.25);
+      border-color: rgba(255,255,255,0.6);
+      color: #fff;
+    }
+    .preset-save-btn.saved {
+      background: rgba(91,174,110,0.4);
+      border-color: rgba(91,174,110,0.8);
+      color: #fff;
+    }
+
+    /* ── Layout ── */
+    main {
+      max-width: 580px;
+      margin: 0 auto;
+      padding: 14px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(80,40,10,0.07), 0 1px 3px rgba(80,40,10,0.05);
+    }
+    .card-header {
+      padding: 13px 17px 11px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+    .card-icon { font-size: 18px; }
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: 0.2px;
+    }
+    .card-body { padding: 15px 17px; }
+
+    /* ── Form rows ── */
+    .form-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 13px;
+    }
+    .form-row:last-child { margin-bottom: 0; }
+    .form-label { font-size: 14px; color: var(--text); }
+    .form-hint {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+      line-height: 1.3;
+    }
+
+    /* ── Stepper inputs ── */
+    .stepper {
+      display: flex;
+      align-items: center;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 10px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .step-btn {
+      width: 34px;
+      height: 36px;
+      background: none;
+      border: none;
+      color: var(--orange);
+      font-size: 19px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.12s;
+      line-height: 1;
+    }
+    .step-btn:hover { background: rgba(232,100,26,0.16); }
+    .step-input {
+      width: 58px;
+      height: 36px;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 700;
+      text-align: center;
+      outline: none;
+    }
+    .step-input::-webkit-inner-spin-button,
+    .step-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+    .unit { font-size: 12px; color: var(--muted); margin-left: 5px; flex-shrink: 0; }
+
+    /* ── Stats box ── */
+    .stats-box {
+      background: var(--surface);
+      border-radius: 11px;
+      padding: 10px 14px;
+      margin-top: 13px;
+      border: 1px solid var(--border);
+    }
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-lbl { color: var(--muted2); }
+    .stat-val { color: var(--orange); font-weight: 700; }
+
+    /* ── Flour types ── */
+    .flour-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+    .flour-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 10px;
+      transition: border-color 0.15s;
+    }
+    .flour-item:focus-within { border-color: var(--border-light); }
+    .flour-name-input {
+      flex: 1;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      min-width: 0;
+    }
+    .flour-name-input::placeholder { color: var(--muted); }
+    .flour-pct-wrap { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+    .flour-pct-input {
+      width: 56px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 700;
+      text-align: center;
+      padding: 5px 4px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .flour-pct-input:focus { border-color: var(--orange); }
+    .flour-del-btn {
+      width: 26px;
+      height: 26px;
+      background: none;
+      border: none;
+      color: var(--error);
+      cursor: pointer;
+      border-radius: 6px;
+      font-size: 17px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.12s;
+      flex-shrink: 0;
+      opacity: 0.7;
+    }
+    .flour-del-btn:hover { background: rgba(224,82,82,0.15); opacity: 1; }
+    .flour-sum-badge {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      transition: all 0.2s;
+    }
+    .flour-sum-ok  { background: rgba(91,174,110,0.12); color: var(--success); }
+    .flour-sum-err { background: rgba(224,82,82,0.12); color: var(--error); }
+    .add-flour-btn {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 2px dashed var(--border-light);
+      background: none;
+      color: var(--orange);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.18s;
+      letter-spacing: 0.2px;
+    }
+    .add-flour-btn:hover {
+      border-color: var(--orange);
+      background: rgba(232,100,26,0.07);
+    }
+
+    /* ── Sliders ── */
+    .slider-row { margin-bottom: 15px; }
+    .slider-row:last-child { margin-bottom: 0; }
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 9px;
+      gap: 10px;
+    }
+    .slider-label { font-size: 14px; color: var(--text); flex: 1; }
+    .slider-val-input {
+      width: 62px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 700;
+      text-align: center;
+      padding: 4px 6px;
+      outline: none;
+      flex-shrink: 0;
+      transition: border-color 0.15s;
+    }
+    .slider-val-input:focus { border-color: var(--orange); }
+    input[type=range] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 5px;
+      border-radius: 3px;
+      background: var(--border);
+      outline: none;
+      cursor: pointer;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      background: var(--orange);
+      border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.45);
+      transition: background 0.15s, transform 0.1s;
+    }
+    input[type=range]::-webkit-slider-thumb:hover { background: var(--orange-light); transform: scale(1.1); }
+
+    /* ── Time grid ── */
+    .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+    .time-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 13px 12px;
+      text-align: center;
+    }
+    .time-lbl {
+      font-size: 11px;
+      color: var(--muted2);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 10px;
+    }
+    .time-stepper { justify-content: center; }
+    .time-sub { font-size: 11px; color: var(--muted); margin-top: 7px; margin-bottom: 8px; }
+    .temp-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2px 4px;
+    }
+
+    /* ── Yeast ── */
+    .yeast-toggle {
+      display: flex;
+      background: var(--surface);
+      border-radius: 10px;
+      padding: 3px;
+      margin-bottom: 13px;
+      border: 1px solid var(--border);
+    }
+    .yeast-btn {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      background: none;
+      color: var(--muted2);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.18s;
+    }
+    .yeast-btn.active { background: var(--red); color: #fff; }
+    .yeast-suggestion {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 12px 14px;
+      margin-bottom: 13px;
+    }
+    .yeast-sug-lbl {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 5px;
+    }
+    .yeast-sug-val {
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--orange);
+      letter-spacing: -0.5px;
+    }
+    .yeast-sug-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 5px;
+      line-height: 1.4;
+    }
+    .override-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .check-label {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--muted2);
+      user-select: none;
+    }
+    .check-label input[type=checkbox] {
+      width: 17px;
+      height: 17px;
+      accent-color: var(--orange);
+      cursor: pointer;
+    }
+    .override-input {
+      width: 82px;
+      background: var(--input-bg);
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 700;
+      text-align: center;
+      padding: 6px 8px;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .override-input:not(:disabled) { border-color: var(--orange); }
+    .override-input:disabled { opacity: 0.35; }
+    .override-unit-toggle {
+      display: flex;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2px;
+      opacity: 0.35;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      flex-shrink: 0;
+    }
+    .override-unit-toggle.enabled { opacity: 1; pointer-events: auto; }
+    .override-unit-btn {
+      padding: 4px 10px;
+      border: none;
+      background: none;
+      color: var(--muted2);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.15s;
+    }
+    .override-unit-btn.active { background: var(--orange); color: #fff; }
+
+    /* ── Results card ── */
+    .result-card {
+      border-color: rgba(232,100,26,0.35);
+      background: linear-gradient(160deg, #FFF4EA, #FFF9F4);
+    }
+    .result-header {
+      background: linear-gradient(135deg, var(--red) 0%, var(--orange) 100%);
+      padding: 14px 17px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .result-title { font-size: 15px; font-weight: 800; color: #fff; letter-spacing: 0.2px; }
+
+    .round-toggle {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .round-toggle input[type="checkbox"] { display: none; }
+    .round-toggle-track {
+      width: 34px;
+      height: 19px;
+      border-radius: 10px;
+      background: rgba(0,0,0,0.35);
+      border: 1.5px solid rgba(255,255,255,0.25);
+      position: relative;
+      transition: background 0.2s, border-color 0.2s;
+      flex-shrink: 0;
+    }
+    .round-toggle-track::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.55);
+      transition: transform 0.2s, background 0.2s;
+    }
+    .round-toggle input:checked + .round-toggle-track {
+      background: rgba(255,255,255,0.3);
+      border-color: rgba(255,255,255,0.7);
+    }
+    .round-toggle input:checked + .round-toggle-track::after {
+      transform: translateX(15px);
+      background: #fff;
+    }
+    .round-toggle-lbl {
+      font-size: 12px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.75);
+      letter-spacing: 0.2px;
+    }
+
+    .ing-list { padding: 2px 17px 8px; }
+    .ing-section-label {
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      padding: 10px 0 4px;
+      font-weight: 700;
+    }
+    .ing-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .ing-item:last-child { border-bottom: none; }
+    .ing-name { font-size: 14px; color: var(--text); }
+    .ing-sub  { font-size: 11px; color: var(--muted); margin-top: 1px; }
+    .ing-grams {
+      font-size: 19px;
+      font-weight: 800;
+      color: var(--text);
+      white-space: nowrap;
+    }
+    .ing-grams .g { font-size: 12px; font-weight: 400; color: var(--muted); margin-left: 2px; }
+
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 13px 17px 14px;
+      background: rgba(232,100,26,0.09);
+      border-top: 1.5px solid rgba(232,100,26,0.35);
+    }
+    .total-lbl { font-size: 14px; font-weight: 700; color: var(--orange); }
+    .total-val { font-size: 22px; font-weight: 900; color: var(--orange); }
+
+    /* ── Svinn ── */
+    .svinn-ctrl {
+      display: flex;
+      align-items: center;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 10px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .svinn-val {
+      min-width: 44px;
+      text-align: center;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      padding: 0 2px;
+    }
+
+    /* ── Yeast strikethrough ── */
+    .yeast-sug-strike {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .yeast-sug-strike s { text-decoration-color: var(--error); }
+
+    /* ── Yeast bump ── */
+    .yeast-bump-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+    .bump-btn {
+      padding: 5px 13px;
+      border-radius: 8px;
+      border: 1px solid var(--border-light);
+      background: var(--card);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      letter-spacing: 0.2px;
+    }
+    .bump-btn:hover { border-color: var(--orange); color: var(--orange); }
+    .bump-plus  { color: var(--success); border-color: rgba(91,174,110,0.4); }
+    .bump-plus:hover  { background: rgba(91,174,110,0.1); border-color: var(--success); color: var(--success); }
+    .bump-minus { color: var(--error); border-color: rgba(224,82,82,0.4); }
+    .bump-minus:hover { background: rgba(224,82,82,0.1); border-color: var(--error); color: var(--error); }
+    .bump-label {
+      flex: 1;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted2);
+      transition: color 0.2s;
+    }
+    .bump-label.bumped-up   { color: var(--success); }
+    .bump-label.bumped-down { color: var(--error); }
+
+    /* ── Recipes accordion ── */
+    .recipes-card { border-color: rgba(232,100,26,0.3); }
+    .recipes-card .card-header {
+      cursor: pointer;
+      user-select: none;
+      border-bottom-color: transparent;
+      transition: border-bottom-color 0.2s;
+    }
+    .recipes-card.open .card-header { border-bottom-color: var(--border); }
+    .recipes-card .card-body {
+      display: none;
+      padding-top: 13px;
+    }
+    .recipes-card.open .card-body { display: block; }
+    .recipes-chevron {
+      margin-left: auto;
+      font-size: 11px;
+      color: var(--muted);
+      transition: transform 0.2s;
+    }
+    .recipes-card.open .recipes-chevron { transform: rotate(180deg); }
+    .recipes-empty {
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      padding: 14px 0 6px;
+    }
+    .recipe-list { display: flex; flex-direction: column; gap: 7px; margin-bottom: 12px; }
+    .recipe-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      user-select: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 11px;
+      transition: border-color 0.15s, background 0.15s, transform 0.08s;
+      cursor: pointer;
+    }
+    .recipe-item:hover { border-color: var(--border-light); }
+    .recipe-item:active { transform: scale(0.97); background: rgba(232,100,26,0.1); border-color: var(--orange); }
+    .recipe-item.active-recipe { border-color: var(--orange); background: rgba(232,100,26,0.06); }
+    .recipe-icon { font-size: 16px; flex-shrink: 0; }
+    .recipe-name-text {
+      flex: 1;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
+    }
+    .recipe-name-input {
+      flex: 1;
+      background: var(--input-bg);
+      border: 1px solid var(--orange);
+      border-radius: 7px;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 4px 8px;
+      outline: none;
+      min-width: 0;
+    }
+    .recipe-actions { display: flex; gap: 4px; flex-shrink: 0; }
+    .recipe-btn {
+      width: 28px;
+      height: 28px;
+      background: none;
+      border: none;
+      border-radius: 7px;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.12s;
+      color: var(--muted2);
+    }
+    .recipe-btn:hover { background: rgba(0,0,0,0.06); color: var(--text); }
+    .recipe-btn.del:hover { background: rgba(224,82,82,0.15); color: var(--error); }
+    .recipe-btn.confirm { color: var(--success); }
+    .recipe-btn.confirm:hover { background: rgba(91,174,110,0.15); }
+    /* Save row */
+    .save-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .save-name-input {
+      flex: 1;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 9px;
+      color: var(--text);
+      font-size: 14px;
+      padding: 8px 11px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .save-name-input:focus { border-color: var(--orange); }
+    .save-name-input::placeholder { color: var(--muted); }
+    .save-btn {
+      padding: 8px 16px;
+      border-radius: 9px;
+      border: none;
+      background: var(--red);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+      flex-shrink: 0;
+    }
+    .save-btn:hover { background: var(--red-bright); }
+    .save-btn:disabled { opacity: 0.4; cursor: default; }
+
+    /* ── Temp gradient bar ── */
+    .temp-bar-wrap {
+      position: relative;
+      margin-top: 9px;
+      padding: 6px 0 2px;
+    }
+    .temp-bar {
+      height: 5px;
+      border-radius: 3px;
+      width: 100%;
+    }
+    .temp-bar-rt {
+      background: linear-gradient(to right, #3B82F6 0%, #F59E0B 60%, #EF4444 100%);
+    }
+    .temp-bar-cold {
+      background: linear-gradient(to right, #1E3A8A 0%, #3B82F6 60%, #93C5FD 100%);
+    }
+    .temp-bar-marker {
+      position: absolute;
+      top: 0;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2.5px solid rgba(0,0,0,0.35);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+      transform: translateX(-50%);
+      transition: left 0.12s;
+      cursor: grab;
+      touch-action: none;
+    }
+    .temp-bar-marker.dragging {
+      cursor: grabbing;
+      transition: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+      transform: translateX(-50%) scale(1.2);
+    }
+    .temp-bar-wrap { cursor: pointer; }
+
+    /* ── Tips modal ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.72);
+      z-index: 200;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 0;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-sheet {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px 20px 0 0;
+      width: 100%;
+      max-width: 580px;
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 -8px 40px rgba(0,0,0,0.6);
+    }
+    .modal-header {
+      padding: 16px 18px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .modal-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text);
+    }
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      background: none;
+      border: none;
+      color: var(--muted2);
+      font-size: 20px;
+      cursor: pointer;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.12s;
+    }
+    .modal-close:hover { background: rgba(0,0,0,0.07); color: var(--text); }
+    .modal-tabs {
+      display: flex;
+      padding: 10px 14px 0;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .modal-tab {
+      flex: 1;
+      padding: 9px 10px;
+      border: none;
+      border-radius: 10px 10px 0 0;
+      background: var(--surface);
+      color: var(--muted2);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: 1px solid var(--border);
+      border-bottom: none;
+    }
+    .modal-tab.active {
+      background: var(--card-alt);
+      color: var(--text);
+      border-color: var(--border-light);
+    }
+    .modal-body {
+      overflow-y: auto;
+      padding: 16px 18px 28px;
+      flex: 1;
+    }
+    .tips-panel { display: none; }
+    .tips-panel.active { display: block; }
+    .tip-item {
+      display: flex;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .tip-item:last-child { border-bottom: none; }
+    .tip-num {
+      width: 26px;
+      height: 26px;
+      background: linear-gradient(135deg, var(--red), var(--orange));
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: 800;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .tip-content {}
+    .tip-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 3px;
+    }
+    .tip-desc {
+      font-size: 13px;
+      color: var(--muted2);
+      line-height: 1.5;
+    }
+    .tip-badge {
+      display: inline-block;
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 20px;
+      font-weight: 700;
+      margin-top: 5px;
+      letter-spacing: 0.2px;
+    }
+    .tip-link {
+      display: inline-block;
+      margin-top: 6px;
+      margin-left: 7px;
+      font-size: 11px;
+      color: var(--orange);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .tip-link:hover { text-decoration: underline; }
+    .badge-orange { background: rgba(232,100,26,0.18); color: var(--orange); }
+    .badge-green  { background: rgba(91,174,110,0.15); color: var(--success); }
+    .badge-red    { background: rgba(180,32,32,0.12);  color: var(--error); }
+    .tips-source {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 14px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+      line-height: 1.5;
+    }
+
+    /* Tips trigger button in header */
+    .tips-btn {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.28);
+      border-radius: 16px;
+      color: rgba(255,255,255,0.82);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 5px 12px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: all 0.18s;
+      letter-spacing: 0.2px;
+    }
+    .tips-btn:hover {
+      background: rgba(255,255,255,0.22);
+      color: #fff;
+    }
+
+    /* ── Help tooltips ── */
+    .help-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: var(--border-light);
+      color: var(--muted2);
+      font-size: 9px;
+      font-weight: 800;
+      font-style: normal;
+      cursor: default;
+      vertical-align: middle;
+      margin-left: 5px;
+      flex-shrink: 0;
+      user-select: none;
+      transition: background 0.15s, color 0.15s;
+    }
+    .help-icon:hover, .help-icon.tt-open {
+      background: var(--orange);
+      color: #fff;
+    }
+    /* Global tooltip bubble — appended to body, uses fixed positioning */
+    #globalTooltip {
+      display: none;
+      position: fixed;
+      width: 230px;
+      background: #2a1e10;
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      padding: 9px 11px;
+      font-size: 12px;
+      font-weight: 400;
+      color: #E8DCC8;
+      line-height: 1.5;
+      z-index: 9999;
+      pointer-events: none;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.6);
+      text-align: left;
+      white-space: normal;
+    }
+    #globalTooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: var(--arrow-left, 50%);
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: var(--border-light);
+    }
+
+    /* ── Footer ── */
+    .site-footer {
+      text-align: center;
+      padding: 14px 20px 10px;
+      font-size: 12px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      margin-top: 8px;
+    }
+    .site-footer a {
+      color: var(--orange);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .site-footer a:hover { text-decoration: underline; }
+    .footer-contact-btn {
+      background: #C14233;
+      border: none;
+      border-radius: 20px;
+      padding: 9px 22px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+      margin-top: 7px;
+      display: inline-block;
+      transition: opacity 0.15s;
+      letter-spacing: 0.2px;
+    }
+    .footer-contact-btn:hover { opacity: 0.88; }
+
+    /* ── Contact modal ── */
+    .contact-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 200;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .contact-overlay.open { display: flex; }
+    .contact-sheet {
+      background: var(--card);
+      border-radius: 20px 20px 0 0;
+      width: 100%;
+      max-width: 540px;
+      padding: 22px 22px 32px;
+      box-shadow: 0 -8px 40px rgba(0,0,0,0.3);
+      animation: slideUp 0.22s ease;
+    }
+    .contact-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .contact-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text);
+    }
+    .contact-field { margin-bottom: 12px; }
+    .contact-field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted2);
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .contact-field input,
+    .contact-field textarea {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 10px;
+      padding: 9px 12px;
+      font-size: 14px;
+      color: var(--text);
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .contact-field input:focus,
+    .contact-field textarea:focus { border-color: var(--orange); }
+    .contact-field textarea { height: 100px; resize: vertical; }
+    .contact-send-btn {
+      width: 100%;
+      background: var(--orange);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 4px;
+      transition: opacity 0.15s;
+    }
+    .contact-send-btn:hover { opacity: 0.88; }
+    .contact-send-btn:disabled { opacity: 0.5; cursor: default; }
+    .contact-success {
+      text-align: center;
+      padding: 24px 0 8px;
+      font-size: 15px;
+      color: var(--success);
+      font-weight: 700;
+    }
+    .contact-success span { font-size: 32px; display: block; margin-bottom: 8px; }
+
+    /* ── Minimalist toggle button ── */
+    .min-btn-wrap {
+      position: fixed;
+      bottom: 18px;
+      right: 18px;
+      z-index: 150;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .min-btn-wrap.hidden { opacity: 0; pointer-events: none; transform: translateX(20px); }
+    .min-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 15px;
+      border-radius: 22px;
+      border: none;
+      background: var(--text);
+      color: var(--card);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 3px 14px rgba(0,0,0,0.22);
+      transition: opacity 0.18s;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+    }
+    .min-btn:hover { opacity: 0.85; }
+    .min-btn .min-icon { font-size: 14px; }
+    body.minimalist .min-btn { background: var(--orange); color: #fff; }
+    .min-btn-x {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      border: none;
+      background: #C14233;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: opacity 0.15s;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .min-btn-x:hover { opacity: 0.82; }
+    .min-btn-tab {
+      position: fixed;
+      bottom: 18px;
+      right: 0;
+      z-index: 150;
+      width: 14px;
+      height: 46px;
+      background: var(--text);
+      color: var(--card);
+      border: none;
+      border-radius: 8px 0 0 8px;
+      font-size: 9px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: -2px 2px 10px rgba(0,0,0,0.2);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      transform: translateX(4px);
+    }
+    .min-btn-tab.visible { opacity: 1; pointer-events: auto; transform: translateX(0); }
+    body.minimalist .min-btn-tab { background: var(--orange); }
+
+    /* ── Minimalist mode ── */
+    body.minimalist header p           { display: none; }
+    body.minimalist .form-hint         { display: none; }
+    body.minimalist .stats-box         { display: none; }
+    body.minimalist .ing-sub           { display: none; }
+    body.minimalist .ing-section-label { display: none; }
+    body.minimalist .yeast-sug-sub     { display: none; }
+    body.minimalist .yeast-sug-strike  { display: none; }
+    body.minimalist .time-sub          { display: none; }
+    body.minimalist .flour-sum-badge   { display: none; }
+
+    body.minimalist main               { gap: 5px; padding: 7px; }
+    body.minimalist .card-body         { padding: 8px 11px; }
+    body.minimalist .card-header       { display: none; }
+    body.minimalist .recipes-card .card-header { display: flex; padding: 7px 11px; }
+    body.minimalist .result-header            { display: none; }
+    body.minimalist .form-row          { margin-bottom: 6px; }
+    body.minimalist .slider-row        { margin-bottom: 7px; }
+    body.minimalist .ing-item          { padding: 5px 0; }
+    body.minimalist .ing-list          { padding: 1px 11px 4px; }
+    body.minimalist .total-row         { padding: 8px 11px 9px; }
+    body.minimalist .recipe-list       { gap: 4px; margin-bottom: 6px; }
+    body.minimalist .yeast-suggestion  { padding: 7px 10px; margin-bottom: 7px; }
+    body.minimalist .time-grid         { gap: 6px; }
+    body.minimalist .time-card         { padding: 7px 9px; }
+    body.minimalist .yeast-sug-val     { font-size: 15px; }
+    body.minimalist .bump-label        { display: none; }
+    body.minimalist .yeast-bump-row    { gap: 5px; }
+    body.minimalist .help-icon         { display: none; }
+    body.minimalist .card              { border-radius: 10px; }
+    body.minimalist .stepper           { gap: 3px; }
+    body.minimalist .slider-row + .slider-row { margin-top: 0; }
+
+    /* ── Responsive ── */
+    @media (max-width: 380px) {
+      .step-input { width: 48px; }
+      header h1 { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="globalTooltip"></div>
+
+<div class="min-btn-wrap" id="minBtnWrap">
+  <button class="min-btn-x" onclick="collapseMinBtn()" title="Skjul">×</button>
+  <button class="min-btn" id="minBtn" onclick="toggleMinimalist()">
+    <span class="min-icon">⊡</span> Minimalistisk
+  </button>
+</div>
+<button class="min-btn-tab" id="minBtnTab" onclick="expandMinBtn()" title="Vis">◀</button>
+
+<header>
+  <h1>Pizzapappas deigkalkulator</h1>
+  <p>Baker's percent — brød &amp; pizza</p>
+  <div class="mode-toggle">
+    <button class="mode-btn" onclick="openTips()">💡 Tips</button>
+    <button class="mode-btn active" id="btnPizza" onclick="setMode('pizza')">🍕 Pizza</button>
+    <button class="mode-btn" id="btnBread" onclick="setMode('bread')">🍞 Brød</button>
+  </div>
+</header>
+
+<!-- ── Eltetips modal ── -->
+<div class="modal-overlay" id="tipsModal" onclick="if(event.target===this)closeTips()">
+  <div class="modal-sheet">
+    <div class="modal-header">
+      <span class="modal-title">💡 Tips</span>
+      <button class="modal-close" onclick="closeTips()">✕</button>
+    </div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" id="tabHand" onclick="switchTab('hand')">✋ For hånd</button>
+      <button class="modal-tab" id="tabMachine" onclick="switchTab('machine')">🤖 I maskin</button>
+      <button class="modal-tab" id="tabHeving" onclick="switchTab('heving')">🌱 Heving</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- HEVING -->
+      <div class="tips-panel" id="panelHeving">
+        <div class="tip-item">
+          <div class="tip-num">1</div>
+          <div class="tip-content">
+            <div class="tip-title">CO₂ får deigen til å heve</div>
+            <div class="tip-desc">Gjæren spiser sukker og produserer CO₂-gass. Gassen fanges i glutennettverket og gjør deigen luftig. Uten gluten — ingen heving.</div>
+            <span class="tip-badge badge-orange">Grunnprinsippet</span>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">2</div>
+          <div class="tip-content">
+            <div class="tip-title">Tid er den viktigste ingrediensen</div>
+            <div class="tip-desc">Over mange timer dannes syrer, alkoholer og aromastoffer som gir dybde og smak. Kort hevet deig gir flat, smakløs pizza — lang heving gir luftig bunn med kompleks aroma.</div>
+            <span class="tip-badge badge-green">Smakutvikling</span>
+            <a class="tip-link" href="https://www.pizzapappa.no/post/oppskrift-napolitansk-pizzadeig-med-48-timers-heving" target="_blank" rel="noopener">Les mer på pizzapappa.no →</a>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">3</div>
+          <div class="tip-content">
+            <div class="tip-title">Temperatur styrer hastigheten</div>
+            <div class="tip-desc">Kaldt = sakte heving, varmt = rask heving. Kjøleskapsheving (4 °C) bremser gjæren kraftig og gir mer smak via enzymatisk aktivitet. Gjærens aktivitet dobles for hver 10 °C økning.</div>
+            <span class="tip-badge badge-orange">Q10-effekten</span>
+            <a class="tip-link" href="https://www.pizzapappa.no/post/faq-ofte-spurte-sp%C3%B8rsm%C3%A5l" target="_blank" rel="noopener">Les mer på pizzapappa.no →</a>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">4</div>
+          <div class="tip-content">
+            <div class="tip-title">Glutennettverket holder CO₂</div>
+            <div class="tip-desc">Gluten (glutenin + gliadin) danner et elastisk nettverk rundt gassen. For napolitansk pizza trengs mel med over 12,5 % protein (tipo 00 med høy W-verdi). Lang fermentering gjør nettverket enda mer håndterbart.</div>
+            <span class="tip-badge badge-orange">Tipo 00</span>
+            <a class="tip-link" href="https://www.pizzapappa.no/post/elting-av-deig" target="_blank" rel="noopener">Les mer på pizzapappa.no →</a>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">5</div>
+          <div class="tip-content">
+            <div class="tip-title">Gjærtyper virker likt</div>
+            <div class="tip-desc">Fersk, tørrgjær og instantgjær gir samme resultat. Fersk smuldres i vann; tørrgjær blandes i melet. Kalkulatoren bruker forholdet 1:3 — 1 g tørrgjær = 3 g fersk gjær.</div>
+            <span class="tip-badge badge-green">1:3-regelen</span>
+            <a class="tip-link" href="https://www.pizzapappa.no/post/hva-er-gjaer" target="_blank" rel="noopener">Les mer på pizzapappa.no →</a>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">6</div>
+          <div class="tip-content">
+            <div class="tip-title">Vindusprøven — er deigen klar?</div>
+            <div class="tip-desc">Ta en liten bit deig og strekk forsiktig mellom fingrene. Blir den tynn og nesten gjennomsiktig uten å revne, er glutenet ferdig utviklet og deigen klar for heving.</div>
+            <span class="tip-badge badge-green">Klar-test</span>
+            <a class="tip-link" href="https://www.pizzapappa.no/post/fremgangsm%C3%A5te-for-elting-av-pizzadeig" target="_blank" rel="noopener">Les mer på pizzapappa.no →</a>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">7</div>
+          <div class="tip-content">
+            <div class="tip-title">Mål faktisk temperatur — ikke gå ut fra hva du tror</div>
+            <div class="tip-desc">De fleste kjøleskap holder 6–8 °C, ikke 4 °C. Et rom på 23 °C i stedet for 20 °C halverer nesten hevingstiden. Kalkulatoren beregner gjærmengde ut fra temperaturen du oppgir — stemmer den ikke med virkeligheten, stemmer ikke resultatet heller. Bruk et billig termometer i kjøleskapet og på kjøkkenbenken. Det er den enkle endringen som har størst effekt på konsistente resultater.</div>
+            <span class="tip-badge badge-red">Mål det!</span>
+            <a class="tip-link" href="https://www.pizzapappa.no/post/faq-ofte-spurte-sp%C3%B8rsm%C3%A5l" target="_blank" rel="noopener">Les mer på pizzapappa.no →</a>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">8</div>
+          <div class="tip-content">
+            <div class="tip-title">Bruk mel med riktig styrke</div>
+            <div class="tip-desc">For lang heving (24–72 t) trenger du mel med W300 eller høyere — svakere mel brytes ned av enzymer og gir slapp struktur. Tipo 00 med høyt proteininnhold (12,5 %+) er standarden for napolitansk pizza. Type 0 kan brukes, men gir litt grovere tekstur.</div>
+            <span class="tip-badge badge-orange">W300+</span>
+            <a class="tip-link" href="https://www.pizzapappa.no/post/melstyrke-og-w-faktor" target="_blank" rel="noopener">Les mer på pizzapappa.no →</a>
+            <a class="tip-link" href="https://www.pizzapappa.no/post/hva-betyr-tipo-0-og-tipo-00" target="_blank" rel="noopener">Tipo 00 →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- HÅND -->
+      <div class="tips-panel active" id="panelHand">
+        <div class="tip-item">
+          <div class="tip-num">1</div>
+          <div class="tip-content">
+            <div class="tip-title">Brett–trykk–roter-teknikk</div>
+            <div class="tip-desc">Brett deigen mot deg, trykk bort med hælen av håndflaten, roter 90°. Gjenta rytmisk. Denne bevegelsen strekker glutennettverket effektivt og er grunnteknikken fra King Arthur Baking.</div>
+            <span class="tip-badge badge-orange">8–15 min</span>
+            <a class="tip-link" href="https://www.pizzapappa.no/post/fremgangsm%C3%A5te-for-elting-av-pizzadeig" target="_blank" rel="noopener">Les mer på pizzapappa.no →</a>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">2</div>
+          <div class="tip-content">
+            <div class="tip-title">Ikke tilsett for mye mel</div>
+            <div class="tip-desc">Klissete deig er normalt — motstå fristelsen til å strø på mer mel. Ekstra mel endrer bakerens prosent og gir tettere krumme. Bruk heller en deigskrape.</div>
+            <span class="tip-badge badge-red">Vanlig feil</span>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">3</div>
+          <div class="tip-content">
+            <div class="tip-title">Hvil deigen underveis</div>
+            <div class="tip-desc">Stopp etter 5–6 min, legg en bolle over deigen og hvil 10–20 min. Glutenet slapper av, deigen blir mykere og de siste minuttene med elting blir langt enklere.</div>
+            <span class="tip-badge badge-green">Spare krefter</span>
+            <a class="tip-link" href="https://www.pizzapappa.no/post/fremgangsm%C3%A5te-for-elting-av-pizzadeig" target="_blank" rel="noopener">Les mer på pizzapappa.no →</a>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">4</div>
+          <div class="tip-content">
+            <div class="tip-title">Slap &amp; fold for våt deig</div>
+            <div class="tip-desc">For deig over ~70 % hydrering: løft deigen, sleng den ned på benken, brett over. Gjenta ca. 50–60 ganger. Teknikken bygger glutenstruktur uten at deigen setter seg fast.</div>
+            <span class="tip-badge badge-orange">Høy hydrering</span>
+            <a class="tip-link" href="https://www.pizzapappa.no/post/hydrasjon-i-pizzadeig" target="_blank" rel="noopener">Les mer på pizzapappa.no →</a>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">5</div>
+          <div class="tip-content">
+            <div class="tip-title">Vindusprøven (windowpane test)</div>
+            <div class="tip-desc">Ta en liten bit deig og strekk forsiktig mellom fingrene. Hvis den blir tynn og nesten gjennomsiktig uten å revne, er glutenet ferdig utviklet. Er den ferdig kjenner du det også — glatt, spenstig, spretter tilbake.</div>
+            <span class="tip-badge badge-green">Klar-test</span>
+            <a class="tip-link" href="https://www.pizzapappa.no/post/fremgangsm%C3%A5te-for-elting-av-pizzadeig" target="_blank" rel="noopener">Les mer på pizzapappa.no →</a>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">6</div>
+          <div class="tip-content">
+            <div class="tip-title">Hold riktig deigtemperatur</div>
+            <div class="tip-desc">Ferdig elt deig bør holde ca. 23–25 °C (napolitansk pizza). Bruk kaldere vann på varme dager — vann er det enkleste å justere. Er det veldig kaldt, forvarm melet lett.</div>
+            <span class="tip-badge badge-orange">Mål-temp 23–25 °C</span>
+            <a class="tip-link" href="https://www.pizzapappa.no/post/oppskrift-napolitansk-pizzadeig-med-8-timer-heving" target="_blank" rel="noopener">Les mer på pizzapappa.no →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- MASKIN -->
+      <div class="tips-panel" id="panelMachine">
+        <div class="tip-item">
+          <div class="tip-num">1</div>
+          <div class="tip-content">
+            <div class="tip-title">Bruk alltid lav hastighet</div>
+            <div class="tip-desc">Elt alltid på lav hastighet (KitchenAid trinn 2, eller tilsvarende). Høyere hastighet gir for mye friksjonvarme, overelter raskt og kan skade miksermotoren.</div>
+            <span class="tip-badge badge-red">Maks trinn 2</span>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">2</div>
+          <div class="tip-content">
+            <div class="tip-title">Eltetid: 5–10 minutter</div>
+            <div class="tip-desc">Maskin elter raskere enn hånd — det som tar 15–25 min for hånd tar 5–10 min i maskin. Stiv deig trenger kortere tid enn myk. Stol mer på feel enn klokken.</div>
+            <span class="tip-badge badge-orange">5–10 min @ trinn 2</span>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">3</div>
+          <div class="tip-content">
+            <div class="tip-title">Maskin varmer opp deigen — bruk kaldere vann</div>
+            <div class="tip-desc">Friksjon fra deigkroken hever deigtemperaturen merkbart. Bruk 3–5 °C kaldere vann enn du ville brukt til håndelt deig. Stopp og sett bollen i kjøleskapet i 10 min hvis deigen overvarmes.</div>
+            <span class="tip-badge badge-orange">Mål-temp &lt; 27 °C</span>
+            <a class="tip-link" href="https://www.pizzapappa.no/post/elting-av-deig" target="_blank" rel="noopener">Les mer på pizzapappa.no →</a>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">4</div>
+          <div class="tip-content">
+            <div class="tip-title">Unngå overelting</div>
+            <div class="tip-desc">Overeltet deig blir stram, seig og vanskelig å forme — det er vanskeligere å redde enn undereltet. Tegn: deigen blir grå, tapper av, og mister elastisiteten. Maskin kan overelte på under 15 min ved feil hastighet.</div>
+            <span class="tip-badge badge-red">Vanlig feil i maskin</span>
+            <a class="tip-link" href="https://www.pizzapappa.no/post/elting-av-deig" target="_blank" rel="noopener">Les mer på pizzapappa.no →</a>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">5</div>
+          <div class="tip-content">
+            <div class="tip-title">Skrap ned bollen</div>
+            <div class="tip-desc">Stopp mikseren etter 2–3 min og skrap ned sider og bunn med slikkepott. Sikrer jevn innblanding og hindrer tørre lommer.</div>
+            <span class="tip-badge badge-green">Gjør dette alltid</span>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">6</div>
+          <div class="tip-content">
+            <div class="tip-title">Deigen er klar når den renser bollen</div>
+            <div class="tip-desc">Ferdig elt deig sitter rundt deigkroken og renser sidene av bollen. Den skal være glatt, litt klissete men ikke sticky, og sprette tilbake når du trykker med fingeren. Bruk vindusprøven til å bekrefte.</div>
+            <span class="tip-badge badge-green">Klar-tegn</span>
+            <a class="tip-link" href="https://www.pizzapappa.no/post/fremgangsm%C3%A5te-for-elting-av-pizzadeig" target="_blank" rel="noopener">Les mer på pizzapappa.no →</a>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">7</div>
+          <div class="tip-content">
+            <div class="tip-title">Start på lav — tilsett ingredienser gradvis</div>
+            <div class="tip-desc">Bland mel og vann kort på laveste hastighet til alt er samlet, deretter øk til trinn 2. Tilsett salt etter at deigen er samlet. Tilsett smør/olje (om brukt) i terninger mot slutten av eltingen.</div>
+            <span class="tip-badge badge-orange">Rekkefølge teller</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- ── 0. Oppskrifter ── -->
+  <div class="card recipes-card" id="recipesCard">
+    <div class="card-header" onclick="toggleRecipes()">
+      <span class="card-icon">📋</span>
+      <span class="card-title">Oppskrifter</span>
+      <span class="recipes-chevron">▼</span>
+    </div>
+    <div class="card-body">
+      <div class="recipe-list" id="recipeList"></div>
+      <div style="font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:7px">Lagre ny preset</div>
+      <div class="save-row">
+        <input class="save-name-input" id="saveNameInput" type="text"
+               placeholder="Navn på preset…"
+               onkeydown="if(event.key==='Enter')saveRecipe()">
+        <button class="save-btn" id="saveBtnEl" onclick="saveRecipe()">Lagre ny preset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 1. Emner og vekt ── -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-icon">⚖️</span>
+      <span class="card-title">Emner og vekt</span>
+    </div>
+    <div class="card-body">
+
+      <div class="form-row">
+        <div class="form-label">
+          Antall deiger
+          <div class="form-hint">Porsjoner/runder deig</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div class="stepper">
+            <button class="step-btn" onclick="adj('numDoughs',-1)">−</button>
+            <input  class="step-input" id="numDoughs" type="number" value="1" min="1" max="50" onchange="upd('numDoughs',this.value)">
+            <button class="step-btn" onclick="adj('numDoughs',1)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-label">
+          Emner per deig
+          <div class="form-hint">Biter / pizza per porsjon</div>
+        </div>
+        <div class="stepper">
+          <button class="step-btn" onclick="adj('piecesPerDough',-1)">−</button>
+          <input  class="step-input" id="piecesPerDough" type="number" value="4" min="1" max="100" onchange="upd('piecesPerDough',this.value)">
+          <button class="step-btn" onclick="adj('piecesPerDough',1)">+</button>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-label">
+          Vekt i gram per emne
+          <i class="help-icon" data-tooltip="Ønsket vekt på ferdig produkt per stykke — f.eks. 250–280 g for en napolitansk pizzabunn. Rådeigvekten justeres automatisk opp om svinn er satt.">?</i>
+          <div class="form-hint">Gram ferdig deig per stykke</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div class="stepper">
+            <button class="step-btn" onclick="adj('weightPerPiece',-10)">−</button>
+            <input  class="step-input" id="weightPerPiece" type="number" value="265" min="50" max="3000" style="width:68px" onchange="upd('weightPerPiece',this.value)">
+            <button class="step-btn" onclick="adj('weightPerPiece',10)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-box">
+        <div class="stat-row">
+          <span class="stat-lbl">Totalt antall emner</span>
+          <span class="stat-val" id="sTotalPieces">4</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-lbl">Total deigvekt</span>
+          <span class="stat-val" id="sTotalDough">1 120 g</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-lbl">Melvekt (100 %)</span>
+          <span class="stat-val" id="sTotalFlour">— g</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── 2. Meltyper ── -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-icon">🌾</span>
+      <span class="card-title">Meltyper</span>
+    </div>
+    <div class="card-body">
+      <div class="flour-list" id="flourList"></div>
+      <div class="flour-sum-badge flour-sum-ok" id="flourSumBadge">
+        <span>Sum melprosent</span>
+        <span id="flourSumVal">100 %</span>
+      </div>
+      <button class="add-flour-btn" onclick="addFlour()">+ Legg til meltype</button>
+    </div>
+  </div>
+
+  <!-- ── 3. Hydrering og salt ── -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-icon">💧</span>
+      <span class="card-title">Hydrering og salt</span>
+    </div>
+    <div class="card-body">
+
+      <div class="slider-row">
+        <div class="slider-header">
+          <span class="slider-label">💧 Vann <i class="help-icon" data-tooltip="Baker's percent: vann måles som % av melvekt. 65 % = 650 g vann per 1 000 g mel. Høyere % gir luftigere skorpe og mer sprø pizza, men er vanskeligere å håndtere og må stekes på lavere temperatur.">?</i></span>
+          <input class="slider-val-input" id="waterInput" type="number" value="65" min="40" max="100" step="0.5" onchange="sliderInput('water',this.value)">
+          <span class="unit">%</span>
+        </div>
+        <input type="range" id="waterSlider" min="40" max="100" value="65" step="0.5" oninput="sliderDrag('water',this.value)">
+      </div>
+
+      <div class="slider-row">
+        <div class="slider-header">
+          <span class="slider-label">🧂 Salt <i class="help-icon" data-tooltip="Baker's percent: salt som % av melvekt. Typisk 2–3 % for pizza, 1,8–2 % for brød. Salt styrker glutennettverket og gir smak.">?</i></span>
+          <input class="slider-val-input" id="saltInput" type="number" value="2.5" min="0" max="6" step="0.1" onchange="sliderInput('salt',this.value)">
+          <span class="unit">%</span>
+        </div>
+        <input type="range" id="saltSlider" min="0" max="6" value="2.5" step="0.1" oninput="sliderDrag('salt',this.value)">
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── 4. Hevetid ── -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-icon">⏱️</span>
+      <span class="card-title">Hevetid</span>
+    </div>
+    <div class="card-body">
+      <div class="time-grid">
+
+        <div class="time-card">
+          <div class="time-lbl">🌡️ Romtemp (RT) <i class="help-icon" data-tooltip="Heving ved romtemperatur før eventuell kjøling. Lengre tid og høyere temp = mer gjæraktivitet = kalkulatoren foreslår mindre gjær.">?</i></div>
+          <div class="stepper time-stepper">
+            <button class="step-btn" onclick="adj('rtHours',-1)">−</button>
+            <input  class="step-input" id="rtHours" type="number" value="2" min="0" max="72" onchange="upd('rtHours',this.value)">
+            <button class="step-btn" onclick="adj('rtHours',1)">+</button>
+          </div>
+          <div class="time-sub">timer</div>
+          <div class="temp-row">
+            <button class="step-btn" onclick="adj('rtTemp',-1)" style="width:28px;height:28px;font-size:16px">−</button>
+            <input  class="step-input" id="rtTemp" type="number" value="20" min="10" max="40" style="width:44px;font-size:14px" onchange="upd('rtTemp',this.value)">
+            <button class="step-btn" onclick="adj('rtTemp',1)"  style="width:28px;height:28px;font-size:16px">+</button>
+            <span style="font-size:12px;color:var(--muted)">°C</span>
+          </div>
+          <div class="temp-bar-wrap" id="rtTempWrap">
+            <div class="temp-bar temp-bar-rt" id="rtTempBar"></div>
+            <div class="temp-bar-marker" id="rtTempMarker"></div>
+          </div>
+        </div>
+
+        <div class="time-card">
+          <div class="time-lbl">❄️ Kjøleskap (KT) <i class="help-icon" data-tooltip="Kaldheving i kjøleskap bremser gjæren og gir mer smak via enzymatisk aktivitet. Typisk 3–5 °C i 12–72 timer. Sett 0 timer om du ikke bruker kjøleskap.">?</i></div>
+          <div class="stepper time-stepper">
+            <button class="step-btn" onclick="adj('coldHours',-1)">−</button>
+            <input  class="step-input" id="coldHours" type="number" value="24" min="0" max="120" onchange="upd('coldHours',this.value)">
+            <button class="step-btn" onclick="adj('coldHours',1)">+</button>
+          </div>
+          <div class="time-sub">timer</div>
+          <div class="temp-row">
+            <button class="step-btn" onclick="adj('coldTemp',-1)" style="width:28px;height:28px;font-size:16px">−</button>
+            <input  class="step-input" id="coldTemp" type="number" value="4" min="0" max="15" style="width:44px;font-size:14px" onchange="upd('coldTemp',this.value)">
+            <button class="step-btn" onclick="adj('coldTemp',1)"  style="width:28px;height:28px;font-size:16px">+</button>
+            <span style="font-size:12px;color:var(--muted)">°C</span>
+          </div>
+          <div class="temp-bar-wrap" id="coldTempWrap">
+            <div class="temp-bar temp-bar-cold" id="coldTempBar"></div>
+            <div class="temp-bar-marker" id="coldTempMarker"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 5. Gjær ── -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-icon">🌿</span>
+      <span class="card-title">Gjær <i class="help-icon" data-tooltip="Gjærmengden beregnes automatisk fra hevetid og temperatur. Modellen bruker Q10-faktoren (gjærens aktivitet dobles per 10 °C) og er kalibrert mot AVPN-standarder for pizza og tradisjonelle brødoppskrifter.">?</i></span>
+    </div>
+    <div class="card-body">
+
+      <div class="yeast-toggle">
+        <button class="yeast-btn active" id="btnFresh" onclick="setYeastType('fresh')">Fersk gjær</button>
+        <button class="yeast-btn"        id="btnDry"   onclick="setYeastType('dry')">Tørrgjær</button>
+      </div>
+
+      <div class="yeast-suggestion" id="yeastSuggestion"><!-- rendered by JS --></div>
+
+      <div class="override-row">
+        <label class="check-label">
+          <input type="checkbox" id="overrideCheck" onchange="toggleOverride(this.checked)">
+          Overstyr gjær <i class="help-icon" data-tooltip="Skriv inn ønsket gjærmengde manuelt — f.eks. fra en ferdig oppskrift — i stedet for den beregnede verdien.">?</i>
+        </label>
+        <div class="override-unit-toggle" id="overrideUnitToggle">
+          <button class="override-unit-btn active" id="btnOvGram" onclick="setOverrideUnit('gram')">g</button>
+          <button class="override-unit-btn"        id="btnOvPct"  onclick="setOverrideUnit('pct')">%</button>
+        </div>
+        <input class="override-input" id="overrideInput" type="number" min="0" step="0.1"
+               placeholder="—" disabled oninput="overrideChanged(this.value)">
+        <span class="unit" id="overrideUnitLbl">g</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── 6. Svinn ── -->
+  <div class="card">
+    <div class="card-body" style="padding: 12px 17px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+        <span class="form-label">Svinn</span>
+        <div class="svinn-ctrl">
+          <button class="step-btn" onclick="adj('svinnPct',-1)">−</button>
+          <span class="svinn-val" id="svinnVal">0 %</span>
+          <button class="step-btn" onclick="adj('svinnPct',1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 7. Ingredienser ── -->
+  <div class="card result-card">
+    <div class="result-header">
+      <div class="result-title" id="resultTitle">🍕 Ingredienser</div>
+      <label class="round-toggle">
+        <input type="checkbox" id="roundCheck" onchange="S.roundIngredients=this.checked;renderCalc()">
+        <span class="round-toggle-track"></span>
+        <span class="round-toggle-lbl">Rund av</span>
+      </label>
+    </div>
+    <div class="ing-list" id="ingList"></div>
+    <div class="total-row">
+      <span class="total-lbl">Total deigvekt</span>
+      <span style="display:flex;align-items:baseline;gap:10px">
+        <span class="total-val" id="resultTotal">— g</span>
+      </span>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════
+const S = {
+  mode:          'pizza',
+  numDoughs:     1,
+  piecesPerDough:4,
+  weightPerPiece:265,
+  flourTypes:    [{ id:1, name:'Hvetemel tipo 00', pct:100 }],
+  waterPct:      65,
+  saltPct:       2.5,
+  rtHours:       2,
+  rtTemp:        20,
+  coldHours:     24,
+  coldTemp:      4,
+  yeastType:     'fresh',   // 'fresh' | 'dry'
+  yeastBumpPct:  0,         // additive baker's % bump on top of calculated value
+  override:      false,
+  overrideUnit:  'gram',    // 'gram' | 'pct'
+  overrideVal:   null,      // grams or %, depending on overrideUnit
+  svinnPct:      0,         // baking weight-loss %
+  roundIngredients: false   // round displayed ingredient amounts
+};
+
+let _fid = 2;  // next flour id
+
+// ═══════════════════════════════════════════════════════
+//  PRESETS  (with localStorage persistence)
+// ═══════════════════════════════════════════════════════
+const PRESETS_KEY = 'deigkalkulator_presets';
+
+const PRESETS = {
+  pizza: {
+    piecesPerDough: 4, weightPerPiece: 265,
+    flourTypes: [{ id:1, name:'Hvetemel tipo 00', pct:100 }],
+    waterPct: 65, saltPct: 2.5,
+    rtHours: 2, rtTemp: 20, coldHours: 24, coldTemp: 4
+  },
+  bread: {
+    piecesPerDough: 1, weightPerPiece: 900,
+    flourTypes: [
+      { id:1, name:'Hvetemel',      pct: 80 },
+      { id:2, name:'Sammalt hvete', pct: 20 }
+    ],
+    waterPct: 72, saltPct: 2.0,
+    rtHours: 8, rtTemp: 20, coldHours: 0, coldTemp: 4
+  }
+};
+
+function savePreset(mode) {
+  PRESETS[mode] = {
+    piecesPerDough: S.piecesPerDough,
+    weightPerPiece: S.weightPerPiece,
+    flourTypes: S.flourTypes.map(f => ({...f})),
+    waterPct: S.waterPct,
+    saltPct: S.saltPct,
+    rtHours: S.rtHours, rtTemp: S.rtTemp,
+    coldHours: S.coldHours, coldTemp: S.coldTemp
+  };
+  try {
+    localStorage.setItem(PRESETS_KEY, JSON.stringify({
+      pizza: PRESETS.pizza,
+      bread: PRESETS.bread
+    }));
+  } catch {}
+  // Flash confirmation
+  const btn = document.getElementById('savePreset' + mode.charAt(0).toUpperCase() + mode.slice(1));
+  if (btn) {
+    btn.classList.add('saved');
+    btn.textContent = '✓';
+    setTimeout(() => { btn.classList.remove('saved'); btn.textContent = '💾'; }, 1200);
+  }
+}
+
+function loadStoredPresets() {
+  try {
+    const raw = localStorage.getItem(PRESETS_KEY);
+    if (!raw) return;
+    const stored = JSON.parse(raw);
+    if (stored.pizza) PRESETS.pizza = stored.pizza;
+    if (stored.bread) PRESETS.bread = stored.bread;
+  } catch {}
+}
+
+// ═══════════════════════════════════════════════════════
+//  YEAST ALGORITHM
+//  Model: freshPct = A · e^(−B · effH)
+//  effH = equivalent hours at 22 °C using Q10 = 2 (Arrhenius, Ea ≈ 53 kJ/mol)
+//
+//  Mode-specific constants calibrated against:
+//  Pizza — AVPN 2024 Disciplinare + fond.kitchen table (Neapolitan)
+//  Bread — MENY.no + King Arthur + Norwegian home-baking standards
+//
+//  Q10 = 2 applies to CO₂ production (fermentation), not cell division.
+//  Published Ea for S. cerevisiae fermentation: 40–65 kJ/mol → Q10 ≈ 2.0–2.5.
+//  Q10 = 2 is the conservative / bread-friendly end of that range.
+// ═══════════════════════════════════════════════════════
+const YEAST_PARAMS = {
+  pizza: { A: 0.15,  B: 0.043, maxPct: 0.8,  minPct: 0.001 },
+  bread: { A: 2.1,   B: 0.136, maxPct: 7.0,  minPct: 0.05  }
+};
+
+function calcYeast(rtH, coldH) {
+  const Q10 = 2;
+  const actRT   = Math.pow(Q10, (S.rtTemp   - 22) / 10);
+  const actCold = Math.pow(Q10, (S.coldTemp - 22) / 10);
+  const effH = Math.max(0.5, rtH * actRT + coldH * actCold);
+  const { A, B, maxPct, minPct } = YEAST_PARAMS[S.mode] || YEAST_PARAMS.bread;
+  const freshPct = Math.max(minPct, Math.min(maxPct, A * Math.exp(-B * effH)));
+  const dryPct   = freshPct / 3;
+  return { freshPct, dryPct, effH };
+}
+
+// ═══════════════════════════════════════════════════════
+//  CALCULATE INGREDIENTS
+// ═══════════════════════════════════════════════════════
+function calc() {
+  const totalPieces     = S.numDoughs * S.piecesPerDough;
+  // svinn: increase raw dough weight so finished piece hits target after baking loss
+  const svinnFactor     = S.svinnPct > 0 ? 1 / (1 - S.svinnPct / 100) : 1;
+  const totalDoughWt    = totalPieces * S.weightPerPiece * svinnFactor;
+  const yc              = calcYeast(S.rtHours, S.coldHours);
+
+  let flourG, yeastG, yeastPct;
+
+  if (S.override && S.overrideVal != null && S.overrideVal > 0) {
+    if (S.overrideUnit === 'pct') {
+      yeastPct = S.overrideVal;
+      const div = 1 + S.waterPct/100 + S.saltPct/100 + yeastPct/100;
+      flourG   = totalDoughWt / div;
+      yeastG   = flourG * yeastPct / 100;
+    } else {
+      const div = 1 + S.waterPct/100 + S.saltPct/100;
+      flourG   = (totalDoughWt - S.overrideVal) / div;
+      yeastG   = S.overrideVal;
+      yeastPct = (yeastG / flourG) * 100;
+    }
+  } else {
+    yeastPct = (S.yeastType === 'fresh' ? yc.freshPct : yc.dryPct) + S.yeastBumpPct;
+    yeastPct = Math.max(0.001, yeastPct);
+    const div = 1 + S.waterPct/100 + S.saltPct/100 + yeastPct/100;
+    flourG   = totalDoughWt / div;
+    yeastG   = flourG * yeastPct / 100;
+  }
+
+  const waterG = flourG * S.waterPct / 100;
+  const saltG  = flourG * S.saltPct  / 100;
+
+  // Normalize flour percentages (guard against bad sum)
+  const rawSum = S.flourTypes.reduce((s,f) => s + (f.pct||0), 0) || 100;
+  const flourBreakdown = S.flourTypes.map(f => ({
+    name: f.name,
+    pct:  f.pct,
+    normalizedPct: (f.pct / rawSum) * 100,
+    grams: flourG * (f.pct / rawSum)
+  }));
+
+  // Suggestion for display (always calculated, regardless of override)
+  const sugFreshG = flourG * yc.freshPct / 100;
+  const sugDryG   = flourG * yc.dryPct   / 100;
+
+  return { totalPieces, totalDoughWt, flourG, waterG, saltG,
+           yeastG, yeastPct, yc, flourBreakdown, sugFreshG, sugDryG };
+}
+
+// ═══════════════════════════════════════════════════════
+//  RENDER — split into parts so flour inputs keep focus
+// ═══════════════════════════════════════════════════════
+
+// Full render (use when adding/removing flour, switching mode, etc.)
+function render() {
+  renderFlourList();   // rebuilds flour inputs — only call when structure changes
+  renderCalc();
+}
+
+// Partial render — never rebuilds flour inputs (safe to call on every keystroke)
+function renderCalc() {
+  const r = calc();
+
+  // Stats
+  document.getElementById('sTotalPieces').textContent = r.totalPieces;
+  document.getElementById('sTotalDough').textContent  = gfmt(r.totalDoughWt) + ' g';
+  document.getElementById('sTotalFlour').textContent  = gfmt(r.flourG)       + ' g';
+
+  // Temp gradient markers
+  document.getElementById('rtTempMarker').style.left =
+    ((S.rtTemp - 10) / (40 - 10) * 100).toFixed(1) + '%';
+  document.getElementById('coldTempMarker').style.left =
+    ((S.coldTemp - 0) / (15 - 0) * 100).toFixed(1) + '%';
+
+  // Sliders fill
+  fillSlider('waterSlider', S.waterPct, 40, 100);
+  fillSlider('saltSlider',  S.saltPct,  0,  6);
+
+  // Flour sum badge only (not the inputs themselves)
+  renderFlourSumBadge();
+
+  // Yeast suggestion box (fully dynamic)
+  const overrideActive = S.override && S.overrideVal != null && S.overrideVal > 0;
+  const sugG   = S.yeastType === 'fresh' ? r.sugFreshG : r.sugDryG;
+  const sugPct = S.yeastType === 'fresh' ? r.yc.freshPct : r.yc.dryPct;
+  const yName  = S.yeastType === 'fresh' ? 'fersk gjær' : 'tørrgjær';
+  const displayPct = overrideActive ? r.yeastPct : (sugPct + S.yeastBumpPct);
+  const subLine = displayPct.toFixed(3) + ' % av mel  ·  ' +
+    S.rtHours + ' t @ ' + S.rtTemp + ' °C  +  ' +
+    S.coldHours + ' t @ ' + S.coldTemp + ' °C' +
+    '  →  eff. ' + r.yc.effH.toFixed(1) + ' t';
+
+  let sugBoxHtml;
+  if (overrideActive) {
+    sugBoxHtml = `
+      <div class="yeast-sug-lbl" style="color:var(--orange)">Overstyrt</div>
+      <div class="yeast-sug-val">${fmt1(r.yeastG)} g ${yName}</div>
+      <div class="yeast-sug-strike">
+        Beregnet: <s>${fmt1(sugG)} g</s> &nbsp;<s style="font-size:12px;color:var(--muted)">${sugPct.toFixed(3)} %</s>
+      </div>
+      <div class="yeast-sug-sub">${subLine}</div>`;
+  } else {
+    const bumpSign  = S.yeastBumpPct > 0 ? '+' : '';
+    const bumpClass = S.yeastBumpPct > 0 ? 'bumped-up' : S.yeastBumpPct < 0 ? 'bumped-down' : '';
+    const bumpText  = S.yeastBumpPct === 0 ? 'Forslag' : bumpSign + S.yeastBumpPct.toFixed(1) + ' %';
+    sugBoxHtml = `
+      <div class="yeast-sug-lbl">Beregnet forslag</div>
+      <div class="yeast-sug-val">${fmt1(Math.max(0, sugG + (S.yeastBumpPct/100)*(r.flourG)))} g ${yName}</div>
+      <div class="yeast-sug-sub">${subLine}</div>
+      <div class="yeast-bump-row">
+        <button class="bump-btn bump-minus" onclick="bumpYeast(-0.2)" title="−0.2 % av mel">−0.2 %</button>
+        <span class="bump-label ${bumpClass}">${bumpText}</span>
+        <button class="bump-btn bump-plus"  onclick="bumpYeast(0.2)"  title="+0.2 % av mel">+0.2 %</button>
+      </div>`;
+  }
+  document.getElementById('yeastSuggestion').innerHTML = sugBoxHtml;
+
+  if (!overrideActive) {
+    document.getElementById('overrideInput').placeholder =
+      S.overrideUnit === 'gram' ? fmt1(sugG) : sugPct.toFixed(3);
+  }
+
+  // Ingredient list
+  let html = '<div class="ing-section-label">Mel</div>';
+  const multi = r.flourBreakdown.length > 1;
+  r.flourBreakdown.forEach(f => {
+    html += `
+      <div class="ing-item">
+        <div>
+          <div class="ing-name">${esc(f.name)}</div>
+          ${multi ? `<div class="ing-sub">${f.pct} % av mel</div>` : ''}
+        </div>
+        <div class="ing-grams">${S.roundIngredients ? gfmt(roundFlour(f.grams)) : gfmt(f.grams)}<span class="g">g</span></div>
+      </div>`;
+  });
+
+  if (multi) {
+    html += `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0 8px;border-top:1px dashed var(--border)">
+        <span style="font-size:11px;color:var(--muted);font-style:italic">sum mel</span>
+        <span style="font-size:13px;color:var(--muted);font-weight:600">${S.roundIngredients ? gfmt(roundFlour(r.flourG)) : gfmt(r.flourG)} g</span>
+      </div>`;
+  }
+
+  html += '<div class="ing-section-label">Øvrig</div>';
+  html += `
+    <div class="ing-item">
+      <div>
+        <div class="ing-name">Vann</div>
+        <div class="ing-sub">${S.waterPct} % av mel</div>
+      </div>
+      <div class="ing-grams">${S.roundIngredients ? gfmt(roundWater(r.waterG)) : gfmt(r.waterG)}<span class="g">g</span></div>
+    </div>
+    <div class="ing-item">
+      <div>
+        <div class="ing-name">Salt</div>
+        <div class="ing-sub">${S.saltPct} % av mel</div>
+      </div>
+      <div class="ing-grams">${S.roundIngredients ? gfmt(roundSalt(r.saltG)) : gfmt(r.saltG)}<span class="g">g</span></div>
+    </div>
+    <div class="ing-item">
+      <div>
+        <div class="ing-name">${S.yeastType === 'fresh' ? 'Fersk gjær' : 'Tørrgjær'}</div>
+        <div class="ing-sub">${r.yeastPct.toFixed(3)} % av mel${S.override ? ' · overstyrt' : ''}</div>
+      </div>
+      <div class="ing-grams">${S.roundIngredients && r.yeastG >= 5 ? roundYeast(r.yeastG).toFixed(1) : fmt1(r.yeastG)}<span class="g">g</span></div>
+    </div>`;
+
+  document.getElementById('ingList').innerHTML = html;
+
+  // Svinn display
+  document.getElementById('svinnVal').textContent = S.svinnPct + ' %';
+
+  const tot = r.flourG + r.waterG + r.saltG + r.yeastG;
+  const totDisplay = S.roundIngredients
+    ? gfmt(roundFlour(r.flourG) + roundWater(r.waterG) + roundSalt(r.saltG) + (r.yeastG >= 5 ? roundYeast(r.yeastG) : r.yeastG))
+    : gfmt(tot);
+  document.getElementById('resultTotal').textContent = totDisplay + ' g';
+
+  const modeLabel = S.mode === 'pizza' ? 'pizza' : 'brød';
+  const modeIcon  = S.mode === 'pizza' ? '🍕' : '🍞';
+  document.getElementById('resultTitle').textContent =
+    `${modeIcon} Ingredienser — ${r.totalPieces} ${modeLabel}`;
+}
+
+function renderFlourSumBadge() {
+  const sum = S.flourTypes.reduce((s,f) => s + (parseFloat(f.pct)||0), 0);
+  const ok  = Math.abs(sum - 100) < 0.05;
+  document.getElementById('flourSumBadge').className =
+    'flour-sum-badge ' + (ok ? 'flour-sum-ok' : 'flour-sum-err');
+  document.getElementById('flourSumVal').textContent =
+    Math.round(sum * 10)/10 + ' %' + (ok ? ' ✓' : ' ⚠ må bli 100 %');
+}
+
+function renderFlourList() {
+  const container = document.getElementById('flourList');
+  container.innerHTML = S.flourTypes.map(f => `
+    <div class="flour-item">
+      <input class="flour-name-input" type="text" value="${esc(f.name)}"
+             placeholder="Navn på mel"
+             oninput="setFlourName(${f.id}, this.value)">
+      <div class="flour-pct-wrap">
+        <input class="flour-pct-input" type="number" value="${f.pct}"
+               min="0" max="100" step="1"
+               oninput="setFlourPct(${f.id}, this.value)">
+        <span style="color:var(--muted);font-size:13px;margin-left:2px">%</span>
+      </div>
+      ${S.flourTypes.length > 1
+        ? `<button class="flour-del-btn" onclick="removeFlour(${f.id})" title="Fjern">×</button>`
+        : '<div style="width:26px"></div>'}
+    </div>`).join('');
+  renderFlourSumBadge();
+}
+
+// ═══════════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════════
+function gfmt(g) {
+  // 0 decimals, thin-space thousands separator
+  return Math.round(g).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '\u202f');
+}
+function roundFlour(g)  { return Math.round(g / 10) * 10; }
+function roundWater(g)  { return Math.round(g / 10) * 10; }
+function roundSalt(g)   { return Math.round(g / 5) * 5; }
+function roundYeast(g)  { return Math.round(g / 0.5) * 0.5; }
+function fmtR(g) { return gfmt(g); }
+function fmt1(g) {
+  // 1 decimal (for yeast)
+  return (Math.round(g * 10) / 10).toFixed(1);
+}
+function precise(g) {
+  if (g >= 100) return Math.round(g).toString();
+  if (g >= 10)  return (Math.round(g * 10)  / 10).toString();
+  return (Math.round(g * 100) / 100).toString();
+}
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function fillSlider(id, val, min, max) {
+  const el = document.getElementById(id);
+  const pct = ((val - min) / (max - min)) * 100;
+  el.style.background =
+    `linear-gradient(to right, var(--orange) 0%, var(--orange) ${pct}%, var(--border-light) ${pct}%, var(--border-light) 100%)`;
+}
+
+// ═══════════════════════════════════════════════════════
+//  EVENT HANDLERS
+// ═══════════════════════════════════════════════════════
+const LIMITS = {
+  numDoughs:    [1, 50],
+  piecesPerDough:[1,100],
+  weightPerPiece:[50,3000],
+  rtHours:      [0, 72],
+  rtTemp:       [10, 40],
+  coldHours:    [0, 120],
+  coldTemp:     [0, 15],
+  svinnPct:     [0, 50]
+};
+
+function adj(field, delta) {
+  const [mn, mx] = LIMITS[field];
+  S[field] = Math.max(mn, Math.min(mx, (S[field]||0) + delta));
+  const el = document.getElementById(field); if (el) el.value = S[field];
+  render();
+}
+function upd(field, val) {
+  const [mn, mx] = LIMITS[field];
+  S[field] = Math.max(mn, Math.min(mx, parseFloat(val) || 0));
+  render();
+}
+
+function sliderDrag(type, val) {
+  const v = parseFloat(val);
+  if (type === 'water') { S.waterPct = v; document.getElementById('waterInput').value = v; }
+  else                  { S.saltPct  = v; document.getElementById('saltInput').value  = v; }
+  render();
+}
+function sliderInput(type, val) {
+  let v = parseFloat(val) || 0;
+  if (type === 'water') {
+    v = Math.max(40, Math.min(100, v));
+    S.waterPct = v;
+    document.getElementById('waterSlider').value = v;
+    document.getElementById('waterInput').value  = v;
+  } else {
+    v = Math.max(0, Math.min(6, v));
+    S.saltPct = v;
+    document.getElementById('saltSlider').value = v;
+    document.getElementById('saltInput').value  = v;
+  }
+  render();
+}
+
+function setMode(mode) {
+  S.mode = mode;
+  const p = PRESETS[mode];
+  Object.assign(S, {
+    piecesPerDough: p.piecesPerDough,
+    weightPerPiece: p.weightPerPiece,
+    flourTypes:     p.flourTypes.map(f => ({...f})),
+    waterPct:       p.waterPct,
+    saltPct:        p.saltPct,
+    rtHours:        p.rtHours,
+    rtTemp:         p.rtTemp  ?? 20,
+    coldHours:      p.coldHours,
+    coldTemp:       p.coldTemp ?? 4
+  });
+  _fid = S.flourTypes.length + 1;
+  // Sync DOM
+  document.getElementById('piecesPerDough').value = S.piecesPerDough;
+  document.getElementById('weightPerPiece').value = S.weightPerPiece;
+  document.getElementById('waterInput').value     = S.waterPct;
+  document.getElementById('waterSlider').value    = S.waterPct;
+  document.getElementById('saltInput').value      = S.saltPct;
+  document.getElementById('saltSlider').value     = S.saltPct;
+  document.getElementById('rtHours').value        = S.rtHours;
+  document.getElementById('rtTemp').value         = S.rtTemp;
+  document.getElementById('coldHours').value      = S.coldHours;
+  document.getElementById('coldTemp').value       = S.coldTemp;
+  document.getElementById('btnPizza').className = 'mode-btn' + (mode==='pizza' ? ' active' : '');
+  document.getElementById('btnBread').className = 'mode-btn' + (mode==='bread' ? ' active' : '');
+  activeId = null;
+  render();
+  renderRecipes();
+}
+
+function setYeastType(t) {
+  S.yeastType = t;
+  S.yeastBumpPct = 0;
+  document.getElementById('btnFresh').className = 'yeast-btn' + (t==='fresh' ? ' active' : '');
+  document.getElementById('btnDry').className   = 'yeast-btn' + (t==='dry'   ? ' active' : '');
+  renderCalc();
+}
+
+function bumpYeast(delta) {
+  S.yeastBumpPct = Math.max(-10, Math.round((S.yeastBumpPct + delta) * 10) / 10);
+  renderCalc();
+}
+
+function toggleRecipes() {
+  document.getElementById('recipesCard').classList.toggle('open');
+}
+
+function toggleOverride(checked) {
+  S.override = checked;
+  if (checked) S.yeastBumpPct = 0;
+  const inp    = document.getElementById('overrideInput');
+  const toggle = document.getElementById('overrideUnitToggle');
+  inp.disabled = !checked;
+  toggle.classList.toggle('enabled', checked);
+  if (!checked) { S.overrideVal = null; inp.value = ''; }
+  renderCalc();
+}
+function overrideChanged(val) {
+  S.overrideVal = parseFloat(val) || null;
+  renderCalc();
+}
+function setOverrideUnit(unit) {
+  S.overrideUnit = unit;
+  S.overrideVal  = null;
+  document.getElementById('overrideInput').value = '';
+  document.getElementById('overrideUnitLbl').textContent = unit === 'gram' ? 'g' : '%';
+  document.getElementById('btnOvGram').className = 'override-unit-btn' + (unit === 'gram' ? ' active' : '');
+  document.getElementById('btnOvPct').className  = 'override-unit-btn' + (unit === 'pct'  ? ' active' : '');
+  renderCalc();
+}
+
+function addFlour() {
+  const id = _fid++;
+  // Add new type with 0% — existing percentages unchanged
+  S.flourTypes.push({ id, name: 'Ny meltype', pct: 0 });
+  renderFlourList();
+  setTimeout(() => {
+    const inputs = document.querySelectorAll('.flour-name-input');
+    const last = inputs[inputs.length - 1];
+    last && (last.focus(), last.select());
+  }, 30);
+  renderCalc();
+}
+function removeFlour(id) {
+  if (S.flourTypes.length <= 1) return;
+  const removed = S.flourTypes.find(f => f.id === id);
+  S.flourTypes = S.flourTypes.filter(f => f.id !== id);
+  // Give removed percent back to first remaining
+  if (removed && S.flourTypes.length > 0) {
+    S.flourTypes[0].pct = Math.min(100, S.flourTypes[0].pct + removed.pct);
+  }
+  render();
+}
+function setFlourName(id, val) {
+  const f = S.flourTypes.find(f => f.id === id);
+  if (f) { f.name = val; renderCalc(); }   // no flour list rebuild — keeps focus
+}
+function setFlourPct(id, val) {
+  const f = S.flourTypes.find(f => f.id === id);
+  if (f) { f.pct = parseFloat(val) || 0; renderCalc(); }  // same
+}
+
+// ═══════════════════════════════════════════════════════
+//  RECIPES  (localStorage)
+// ═══════════════════════════════════════════════════════
+const LS_KEY = 'deigkalkulator_recipes_v2';
+let recipes   = [];
+let activeId  = null;
+let renamingId = null;
+
+const DEFAULT_RECIPES = [
+  // ── Pizza ──
+  { id:1, name:'🍕 Napolitansk Pizzadeig 8t', mode:'pizza', snap:{
+    mode:'pizza', numDoughs:1, piecesPerDough:6, weightPerPiece:265,
+    flourTypes:[{id:1,name:'Hvetemel tipo 00',pct:100}],
+    waterPct:65, saltPct:2.5, rtHours:8, rtTemp:20, coldHours:0, coldTemp:4,
+    yeastType:'fresh', svinnPct:0 }},
+  { id:2, name:'🍕 Napolitansk Pizzadeig 24t', mode:'pizza', snap:{
+    mode:'pizza', numDoughs:1, piecesPerDough:6, weightPerPiece:265,
+    flourTypes:[{id:1,name:'Hvetemel tipo 00',pct:100}],
+    waterPct:65, saltPct:2.5, rtHours:18, rtTemp:20, coldHours:6, coldTemp:4,
+    yeastType:'fresh', svinnPct:0 }},
+  { id:3, name:'🍕 Napolitansk Pizzadeig 48t', mode:'pizza', snap:{
+    mode:'pizza', numDoughs:1, piecesPerDough:6, weightPerPiece:265,
+    flourTypes:[{id:1,name:'Hvetemel tipo 00',pct:100}],
+    waterPct:65, saltPct:2.5, rtHours:14, rtTemp:20, coldHours:34, coldTemp:4,
+    yeastType:'fresh', svinnPct:0 }},
+  { id:4, name:'🍕 Napolitansk Pizzadeig 24t kun RT', mode:'pizza', snap:{
+    mode:'pizza', numDoughs:1, piecesPerDough:6, weightPerPiece:265,
+    flourTypes:[{id:1,name:'Hvetemel tipo 00',pct:100}],
+    waterPct:65, saltPct:2.5, rtHours:24, rtTemp:20, coldHours:0, coldTemp:4,
+    yeastType:'fresh', svinnPct:0 }},
+  // ── Brød ──
+  { id:5, name:'🍞 Klassisk Loff', mode:'bread', snap:{
+    mode:'bread', numDoughs:1, piecesPerDough:1, weightPerPiece:850,
+    flourTypes:[{id:1,name:'Hvetemel',pct:100}],
+    waterPct:67, saltPct:1.5, rtHours:3, rtTemp:20, coldHours:0, coldTemp:4,
+    yeastType:'fresh', svinnPct:12 }},
+  { id:6, name:'🍞 Grovt Hverdagsbrød', mode:'bread', snap:{
+    mode:'bread', numDoughs:1, piecesPerDough:1, weightPerPiece:850,
+    flourTypes:[{id:1,name:'Fullkornshvetemel',pct:70},{id:2,name:'Sammalt hvete grov',pct:30}],
+    waterPct:68, saltPct:1.8, rtHours:2, rtTemp:20, coldHours:0, coldTemp:4,
+    yeastType:'fresh', svinnPct:12 }},
+  { id:7, name:'🍞 Eltefritt Brød', mode:'bread', snap:{
+    mode:'bread', numDoughs:1, piecesPerDough:1, weightPerPiece:900,
+    flourTypes:[{id:1,name:'Hvetemel',pct:70},{id:2,name:'Sammalt hvete',pct:30}],
+    waterPct:78, saltPct:2, rtHours:9, rtTemp:20, coldHours:0, coldTemp:4,
+    yeastType:'fresh', svinnPct:13 }},
+  { id:8, name:'🍞 Mellomgrovt hverdagsbrød', mode:'bread', snap:{
+    mode:'bread', numDoughs:1, piecesPerDough:1, weightPerPiece:850,
+    flourTypes:[{id:1,name:'Hvetemel',pct:60},{id:2,name:'Sammalt hvete grov',pct:40}],
+    waterPct:70, saltPct:1.8, rtHours:2, rtTemp:20, coldHours:0, coldTemp:4,
+    yeastType:'fresh', svinnPct:12 }},
+];
+
+function recipesLoad() {
+  try { recipes = JSON.parse(localStorage.getItem(LS_KEY)) || []; }
+  catch { recipes = []; }
+  if (recipes.length === 0)
+    recipes = DEFAULT_RECIPES.map(r => ({...r, snap:{...r.snap, flourTypes:r.snap.flourTypes.map(f=>({...f}))}}));
+}
+
+function recipesSave() {
+  localStorage.setItem(LS_KEY, JSON.stringify(recipes));
+}
+
+function snapshotState() {
+  return {
+    mode: S.mode,
+    numDoughs: S.numDoughs,
+    piecesPerDough: S.piecesPerDough,
+    weightPerPiece: S.weightPerPiece,
+    flourTypes: S.flourTypes.map(f => ({...f})),
+    waterPct: S.waterPct,
+    saltPct: S.saltPct,
+    rtHours: S.rtHours, rtTemp: S.rtTemp,
+    coldHours: S.coldHours, coldTemp: S.coldTemp,
+    yeastType: S.yeastType,
+    svinnPct: S.svinnPct
+  };
+}
+
+function saveRecipe() {
+  const inp = document.getElementById('saveNameInput');
+  const name = inp.value.trim();
+  if (!name) { inp.focus(); return; }
+
+  // Always create new
+  recipes.unshift({ id: Date.now(), name, mode: S.mode, snap: snapshotState() });
+  activeId = recipes[0].id;
+  recipesSave();
+  inp.value = '';
+  renderRecipes();
+}
+
+function loadRecipe(id) {
+  const r = recipes.find(r => r.id === id);
+  if (!r) return;
+  activeId = id;
+  const p = r.snap;
+
+  // Apply snapshot to state
+  Object.assign(S, {
+    mode: p.mode,
+    numDoughs: p.numDoughs,
+    piecesPerDough: p.piecesPerDough,
+    weightPerPiece: p.weightPerPiece,
+    flourTypes: p.flourTypes.map(f => ({...f})),
+    waterPct: p.waterPct,
+    saltPct: p.saltPct,
+    rtHours: p.rtHours, rtTemp: p.rtTemp ?? 20,
+    coldHours: p.coldHours, coldTemp: p.coldTemp ?? 4,
+    yeastType: p.yeastType ?? 'fresh',
+    override: false, overrideVal: null,
+    svinnPct: p.svinnPct ?? 0
+  });
+  _fid = Math.max(...S.flourTypes.map(f => f.id)) + 1;
+
+  // Sync all DOM inputs
+  document.getElementById('numDoughs').value      = S.numDoughs;
+  document.getElementById('piecesPerDough').value = S.piecesPerDough;
+  document.getElementById('weightPerPiece').value = S.weightPerPiece;
+  document.getElementById('waterInput').value     = S.waterPct;
+  document.getElementById('waterSlider').value    = S.waterPct;
+  document.getElementById('saltInput').value      = S.saltPct;
+  document.getElementById('saltSlider').value     = S.saltPct;
+  document.getElementById('rtHours').value        = S.rtHours;
+  document.getElementById('rtTemp').value         = S.rtTemp;
+  document.getElementById('coldHours').value      = S.coldHours;
+  document.getElementById('coldTemp').value       = S.coldTemp;
+  document.getElementById('overrideCheck').checked = false;
+  document.getElementById('overrideInput').disabled = true;
+  document.getElementById('overrideInput').value  = '';
+  document.getElementById('btnPizza').className = 'mode-btn' + (S.mode==='pizza' ? ' active' : '');
+  document.getElementById('btnBread').className = 'mode-btn' + (S.mode==='bread' ? ' active' : '');
+  document.getElementById('btnFresh').className = 'yeast-btn' + (S.yeastType==='fresh' ? ' active' : '');
+  document.getElementById('btnDry').className   = 'yeast-btn' + (S.yeastType==='dry'   ? ' active' : '');
+
+  render();
+}
+
+function updateRecipe(id) {
+  const r = recipes.find(r => r.id === id);
+  if (!r) return;
+  r.snap = snapshotState();
+  r.mode = S.mode;
+  activeId = id;
+  recipesSave();
+  renderRecipes();
+  // Brief flash on the button
+  const btns = document.querySelectorAll(`[onclick*="updateRecipe(${id})"]`);
+  btns.forEach(btn => {
+    const orig = btn.textContent;
+    btn.textContent = '✓';
+    btn.style.color = 'var(--success)';
+    setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 900);
+  });
+}
+
+function deleteRecipe(id) {
+  recipes = recipes.filter(r => r.id !== id);
+  if (activeId === id) { activeId = null; document.getElementById('saveNameInput').value = ''; }
+  recipesSave();
+  renderRecipes();
+}
+
+function startRename(id) {
+  renamingId = id;
+  renderRecipes();
+  setTimeout(() => {
+    const inp = document.getElementById('renameInput_' + id);
+    if (inp) { inp.focus(); inp.select(); }
+  }, 20);
+}
+
+function confirmRename(id) {
+  const inp = document.getElementById('renameInput_' + id);
+  const name = inp ? inp.value.trim() : '';
+  if (name) {
+    const r = recipes.find(r => r.id === id);
+    if (r) r.name = name;
+    if (activeId === id) document.getElementById('saveNameInput').value = name;
+  }
+  renamingId = null;
+  recipesSave();
+  renderRecipes();
+}
+
+function renderRecipes() {
+  const container = document.getElementById('recipeList');
+  const visible = recipes.filter(r => r.mode === S.mode);
+  if (!visible.length) {
+    container.innerHTML = '<div class="recipes-empty">Ingen lagrede oppskrifter ennå</div>';
+    return;
+  }
+  container.innerHTML = visible.map(r => {
+    const icon    = r.mode === 'pizza' ? '🍕' : '🍞';
+    const isActive = r.id === activeId;
+    const isRenaming = r.id === renamingId;
+    const nameHtml = isRenaming
+      ? `<input class="recipe-name-input" id="renameInput_${r.id}"
+               value="${esc(r.name)}"
+               onkeydown="if(event.key==='Enter')confirmRename(${r.id});if(event.key==='Escape'){renamingId=null;renderRecipes();}"
+               onclick="event.stopPropagation()">`
+      : `<span class="recipe-name-text">${esc(r.name)}</span>`;
+    const actionsHtml = isRenaming
+      ? `<div class="recipe-actions">
+           <button class="recipe-btn confirm" onclick="event.stopPropagation();confirmRename(${r.id})" title="Bekreft">✓</button>
+         </div>`
+      : `<div class="recipe-actions">
+           <button class="recipe-btn" onclick="event.stopPropagation();updateRecipe(${r.id})" title="Oppdater med gjeldende innstillinger">💾</button>
+           <button class="recipe-btn" onclick="event.stopPropagation();startRename(${r.id})" title="Gi nytt navn">✏️</button>
+           <button class="recipe-btn del" onclick="event.stopPropagation();deleteRecipe(${r.id})" title="Slett">🗑️</button>
+         </div>`;
+    return `
+      <div class="recipe-item${isActive ? ' active-recipe' : ''}" onclick="loadRecipe(${r.id})">
+        <span class="recipe-icon">${icon}</span>
+        ${nameHtml}
+        ${actionsHtml}
+      </div>`;
+  }).join('');
+}
+
+
+// ═══════════════════════════════════════════════════════
+//  STATE PERSISTENCE  (localStorage)
+// ═══════════════════════════════════════════════════════
+const STATE_KEY = 'deigkalkulator_state';
+const STATE_FIELDS = ['mode','numDoughs','piecesPerDough','weightPerPiece',
+  'flourTypes','waterPct','saltPct','rtHours','rtTemp','coldHours','coldTemp',
+  'yeastType','yeastBumpPct','svinnPct',
+  'override','overrideUnit','overrideVal','roundIngredients'];
+
+function saveState() {
+  const snap = {};
+  STATE_FIELDS.forEach(k => { snap[k] = S[k]; });
+  snap._activeId = activeId;
+  try { localStorage.setItem(STATE_KEY, JSON.stringify(snap)); } catch {}
+}
+
+function restoreState() {
+  try {
+    const raw = localStorage.getItem(STATE_KEY);
+    if (!raw) return;
+    const snap = JSON.parse(raw);
+    STATE_FIELDS.forEach(k => { if (snap[k] !== undefined) S[k] = snap[k]; });
+    _fid = Math.max(...S.flourTypes.map(f => f.id), 0) + 1;
+    // Sync all DOM inputs
+    ['numDoughs','piecesPerDough','weightPerPiece','rtHours','rtTemp','coldHours','coldTemp']
+      .forEach(id => { const el = document.getElementById(id); if (el) el.value = S[id]; });
+    document.getElementById('waterInput').value  = S.waterPct;
+    document.getElementById('waterSlider').value = S.waterPct;
+    document.getElementById('saltInput').value   = S.saltPct;
+    document.getElementById('saltSlider').value  = S.saltPct;
+    document.getElementById('btnPizza').className = 'mode-btn' + (S.mode==='pizza' ? ' active' : '');
+    document.getElementById('btnBread').className = 'mode-btn' + (S.mode==='bread' ? ' active' : '');
+    document.getElementById('btnFresh').className = 'yeast-btn' + (S.yeastType==='fresh' ? ' active' : '');
+    document.getElementById('btnDry').className   = 'yeast-btn' + (S.yeastType==='dry'   ? ' active' : '');
+    // Override
+    document.getElementById('overrideCheck').checked = S.override;
+    document.getElementById('overrideInput').disabled = !S.override;
+    document.getElementById('overrideUnitToggle').classList.toggle('enabled', S.override);
+    if (S.override && S.overrideVal !== null) document.getElementById('overrideInput').value = S.overrideVal;
+    document.getElementById('overrideUnitLbl').textContent = S.overrideUnit === 'gram' ? 'g' : '%';
+    document.getElementById('btnOvGram').className = 'override-unit-btn' + (S.overrideUnit === 'gram' ? ' active' : '');
+    document.getElementById('btnOvPct').className  = 'override-unit-btn' + (S.overrideUnit === 'pct'  ? ' active' : '');
+    // Round toggle
+    const rc = document.getElementById('roundCheck');
+    if (rc) rc.checked = !!S.roundIngredients;
+    if (snap._activeId != null) activeId = snap._activeId;
+  } catch {}
+}
+
+// Hook saveState into renderCalc so every change is persisted
+const _origRenderCalc = renderCalc;
+renderCalc = function() { _origRenderCalc(); saveState(); };
+
+// ═══════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+//  TIPS MODAL
+// ═══════════════════════════════════════════════════════
+function openTips() {
+  document.getElementById('tipsModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeTips() {
+  document.getElementById('tipsModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function switchTab(tab) {
+  ['heving','hand','machine'].forEach(t => {
+    document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('active', tab === t);
+    document.getElementById('panel' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('active', tab === t);
+  });
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTips(); });
+
+// ═══════════════════════════════════════════════════════
+//  TEMP BAR DRAG
+// ═══════════════════════════════════════════════════════
+function initTempDrag(barId, markerId, field, min, max) {
+  const bar    = document.getElementById(barId);
+  const marker = document.getElementById(markerId);
+  let dragging = false;
+
+  function applyX(clientX) {
+    const rect = bar.getBoundingClientRect();
+    const pct  = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    const val  = Math.round(min + pct * (max - min));
+    S[field] = val;
+    document.getElementById(field).value = val;
+    renderCalc();
+  }
+
+  // Click anywhere on the wrap to jump
+  bar.parentElement.addEventListener('click', e => {
+    if (e.target === marker) return;
+    applyX(e.clientX);
+  });
+
+  // Drag the marker
+  marker.addEventListener('mousedown', e => { dragging = true; marker.classList.add('dragging'); e.preventDefault(); });
+  marker.addEventListener('touchstart', e => { dragging = true; marker.classList.add('dragging'); e.preventDefault(); }, { passive: false });
+
+  document.addEventListener('mousemove', e => { if (dragging) applyX(e.clientX); });
+  document.addEventListener('touchmove', e => { if (dragging) applyX(e.touches[0].clientX); }, { passive: false });
+
+  function stopDrag() { dragging = false; marker.classList.remove('dragging'); }
+  document.addEventListener('mouseup',  stopDrag);
+  document.addEventListener('touchend', stopDrag);
+}
+
+loadStoredPresets();
+recipesLoad();
+const _hadSavedState = !!localStorage.getItem(STATE_KEY);
+restoreState();
+// On first ever load (no saved state): auto-load first recipe
+if (!_hadSavedState && recipes.length > 0) loadRecipe(recipes[0].id);
+renderRecipes();
+render();
+initTempDrag('rtTempBar',   'rtTempMarker',   'rtTemp',   10, 40);
+initTempDrag('coldTempBar', 'coldTempMarker', 'coldTemp',  0, 15);
+
+// ── Minimalist mode ─────────────────────────────────────
+const MIN_KEY    = 'deigkalkulator_minimalist';
+const COLLAPSED_KEY = 'deigkalkulator_btn_collapsed';
+function toggleMinimalist() {
+  const on = document.body.classList.toggle('minimalist');
+  try { localStorage.setItem(MIN_KEY, on ? '1' : ''); } catch {}
+  document.getElementById('minBtn').innerHTML = on
+    ? '<span class="min-icon">⊞</span> Fullversjon'
+    : '<span class="min-icon">⊡</span> Minimalistisk';
+}
+function collapseMinBtn() {
+  document.getElementById('minBtnWrap').classList.add('hidden');
+  document.getElementById('minBtnTab').classList.add('visible');
+  try { localStorage.setItem(COLLAPSED_KEY, '1'); } catch {}
+}
+function expandMinBtn() {
+  document.getElementById('minBtnWrap').classList.remove('hidden');
+  document.getElementById('minBtnTab').classList.remove('visible');
+  try { localStorage.removeItem(COLLAPSED_KEY); } catch {}
+}
+(function() {
+  if (localStorage.getItem(MIN_KEY)) {
+    document.body.classList.add('minimalist');
+    document.getElementById('minBtn').innerHTML = '<span class="min-icon">⊞</span> Fullversjon';
+  }
+  if (localStorage.getItem(COLLAPSED_KEY)) {
+    document.getElementById('minBtnWrap').classList.add('hidden');
+    document.getElementById('minBtnTab').classList.add('visible');
+  }
+})();
+
+// ── Global tooltip ──────────────────────────────────────
+(function() {
+  const tip = document.getElementById('globalTooltip');
+  const PAD = 10; // min distance from viewport edge
+
+  document.addEventListener('mouseover', e => {
+    const icon = e.target.closest('.help-icon[data-tooltip]');
+    if (!icon) return;
+    tip.textContent = icon.dataset.tooltip;
+    tip.style.display = 'block';
+    position(icon);
+  });
+  document.addEventListener('mouseout', e => {
+    if (!e.target.closest('.help-icon[data-tooltip]')) return;
+    tip.style.display = 'none';
+  });
+  document.addEventListener('scroll', () => { tip.style.display = 'none'; }, true);
+
+  function position(icon) {
+    const r   = icon.getBoundingClientRect();
+    const tw  = tip.offsetWidth;
+    const th  = tip.offsetHeight;
+    const vw  = window.innerWidth;
+
+    // Prefer above; fall back to below if not enough room
+    let top = r.top - th - 8;
+    if (top < PAD) top = r.bottom + 8;
+
+    // Horizontally centre on icon, then clamp to viewport
+    let left = r.left + r.width / 2 - tw / 2;
+    left = Math.max(PAD, Math.min(left, vw - tw - PAD));
+
+    tip.style.top  = top  + 'px';
+    tip.style.left = left + 'px';
+
+    // Arrow horizontal offset relative to tooltip
+    const arrowLeft = (r.left + r.width / 2) - left;
+    tip.style.setProperty('--arrow-left', arrowLeft + 'px');
+  }
+})();
+
+// ── Contact modal ──
+function openContact() {
+  document.getElementById('contactOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeContact() {
+  document.getElementById('contactOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+async function submitContact(e) {
+  e.preventDefault();
+  const btn = document.getElementById('contactSendBtn');
+  btn.disabled = true;
+  btn.textContent = 'Sender…';
+  const form = e.target;
+  const data = new FormData(form);
+  try {
+    await fetch('/', { method: 'POST', headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body: new URLSearchParams(data).toString() });
+    document.getElementById('contactBody').innerHTML =
+      '<div class="contact-success"><span>🙏</span>Takk for tilbakemeldingen!</div>';
+  } catch {
+    btn.disabled = false;
+    btn.textContent = 'Send inn';
+    alert('Noe gikk galt — prøv igjen.');
+  }
+}
+</script>
+
+<!-- ── Footer ── -->
+<footer class="site-footer">
+  Laget av <a href="https://pizzapappa.no" target="_blank" rel="noopener">Vegard / pizzapappa.no</a>
+  <br>
+  <button class="footer-contact-btn" onclick="openContact()">💬 Tips og ønsker til kalkulatoren</button>
+</footer>
+
+<!-- ── Contact modal ── -->
+<div class="contact-overlay" id="contactOverlay" onclick="if(event.target===this)closeContact()">
+  <div class="contact-sheet">
+    <div class="contact-header">
+      <span class="contact-title">Tips og ønsker</span>
+      <button class="modal-close" onclick="closeContact()">✕</button>
+    </div>
+    <div id="contactBody">
+      <form name="kalkulator-tilbakemelding" netlify data-netlify="true" onsubmit="submitContact(event)">
+        <input type="hidden" name="form-name" value="kalkulator-tilbakemelding">
+        <input type="hidden" name="_subject" value="Ny tilbakemelding til deigkalkulatoren">
+        <div class="contact-field">
+          <label>Navn</label>
+          <input type="text" name="navn" placeholder="Ditt navn…" autocomplete="name" required>
+        </div>
+        <div class="contact-field">
+          <label>E-post</label>
+          <input type="email" name="epost" placeholder="din@epost.no…" autocomplete="email" required>
+        </div>
+        <div class="contact-field">
+          <label>Melding</label>
+          <textarea name="melding" placeholder="Hva kan gjøres bedre? Mangler du en funksjon?" required></textarea>
+        </div>
+        <button class="contact-send-btn" type="submit" id="contactSendBtn">Send inn</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

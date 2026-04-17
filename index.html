@@ -295,6 +295,18 @@
       opacity: 0.7;
     }
     .flour-del-btn:hover { background: rgba(224,82,82,0.15); opacity: 1; }
+    .flour-add-mini {
+      width: 26px; height: 26px;
+      background: none; border: 1.5px solid var(--border);
+      color: var(--orange); cursor: pointer;
+      border-radius: 6px; font-size: 17px; font-weight: 700;
+      display: none; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: background 0.12s, border-color 0.12s;
+    }
+    .flour-add-mini:hover { background: rgba(232,100,26,0.12); border-color: var(--orange); }
+    body.minimalist .flour-add-mini { display: flex; }
+    body.minimalist .add-flour-btn  { display: none; }
+    body.minimalist .flour-sum-badge { display: none; }
     .flour-sum-badge {
       display: flex;
       justify-content: space-between;
@@ -2593,6 +2605,7 @@ function renderFlourSumBadge() {
 
 function renderFlourList() {
   const container = document.getElementById('flourList');
+  const last = S.flourTypes[S.flourTypes.length - 1];
   container.innerHTML = S.flourTypes.map(f => `
     <div class="flour-item">
       <input class="flour-name-input" type="text" value="${esc(f.name)}"
@@ -2606,7 +2619,7 @@ function renderFlourList() {
       </div>
       ${S.flourTypes.length > 1
         ? `<button class="flour-del-btn" onclick="removeFlour(${f.id})" title="Fjern">×</button>`
-        : '<div style="width:26px"></div>'}
+        : `<button class="flour-add-mini" onclick="addFlour()" title="Legg til meltype">+</button>`}
     </div>`).join('');
   renderFlourSumBadge();
 }

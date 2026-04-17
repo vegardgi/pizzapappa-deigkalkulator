@@ -1980,7 +1980,7 @@
         </div>
         <div class="slider-row" style="margin-bottom:0">
           <div class="slider-header">
-            <span class="slider-label" style="flex:1;font-size:13px">% av mel</span>
+            <span class="slider-label" style="flex:1;font-size:13px">baker's %</span>
             <input class="slider-val-input" id="sukkerInput" type="number" value="2" min="0" max="10" step="0.5" onchange="extraSliderInput('sukker',this.value)">
             <span class="unit">%</span>
           </div>
@@ -1996,7 +1996,7 @@
         </div>
         <div class="slider-row" style="margin-bottom:0">
           <div class="slider-header">
-            <span class="slider-label" style="flex:1;font-size:13px">% av mel</span>
+            <span class="slider-label" style="flex:1;font-size:13px">baker's %</span>
             <input class="slider-val-input" id="oljeInput" type="number" value="3" min="0" max="15" step="0.5" onchange="extraSliderInput('olje',this.value)">
             <span class="unit">%</span>
           </div>
@@ -2011,13 +2011,12 @@
           <button class="extra-remove" onclick="toggleExtra('poolish')" title="Fjern poolish">×</button>
         </div>
         <div class="pref-row">
-          <span class="pref-lbl">Andel mel</span>
           <div class="stepper">
             <button class="step-btn" onclick="adjExtra('poolishPct',-5,5,80)">−</button>
             <input class="step-input" id="poolishPctInput" type="number" value="30" min="5" max="80" style="width:46px" onchange="updExtra('poolishPct',this.value,5,80)">
             <button class="step-btn" onclick="adjExtra('poolishPct',5,5,80)">+</button>
           </div>
-          <span style="font-size:12px;color:var(--muted)">% av mel</span>
+          <span style="font-size:12px;color:var(--muted)">baker's %</span>
         </div>
       </div>
 
@@ -2028,13 +2027,12 @@
           <button class="extra-remove" onclick="toggleExtra('biga')" title="Fjern biga">×</button>
         </div>
         <div class="pref-row">
-          <span class="pref-lbl">Andel mel</span>
           <div class="stepper">
             <button class="step-btn" onclick="adjExtra('bigaPct',-5,5,80)">−</button>
             <input class="step-input" id="bigaPctInput" type="number" value="40" min="5" max="80" style="width:46px" onchange="updExtra('bigaPct',this.value,5,80)">
             <button class="step-btn" onclick="adjExtra('bigaPct',5,5,80)">+</button>
           </div>
-          <span style="font-size:12px;color:var(--muted)">% av mel</span>
+          <span style="font-size:12px;color:var(--muted)">baker's %</span>
         </div>
         <div class="pref-row">
           <span class="pref-lbl">Hydrering</span>
@@ -2123,13 +2121,12 @@
       <!-- Surdeig settings — shown when surdeig is selected -->
       <div id="surdeigSettings" style="display:none;margin-bottom:10px">
         <div class="pref-row">
-          <span class="pref-lbl">Andel mel <i class="help-icon" data-tooltip="Andel av total melvekt som inngår i surdeigstarteren. Typisk 15–30 % for pizza, 20–40 % for brød. Mel og vann i starteren trekkes fra hoved-deigen.">?</i></span>
           <div class="stepper">
             <button class="step-btn" onclick="adjExtra('surdeigPct',-5,5,80)">−</button>
             <input class="step-input" id="surdeigPctInput" type="number" value="20" min="5" max="80" style="width:46px" onchange="updExtra('surdeigPct',this.value,5,80)">
             <button class="step-btn" onclick="adjExtra('surdeigPct',5,5,80)">+</button>
           </div>
-          <span style="font-size:12px;color:var(--muted)">% av mel</span>
+          <span style="font-size:12px;color:var(--muted)">baker's % <i class="help-icon" data-tooltip="Andel av total melvekt som inngår i surdeigstarteren. Typisk 15–30 % for pizza, 20–40 % for brød. Mel og vann i starteren trekkes fra hoved-deigen.">?</i></span>
         </div>
         <div class="pref-row">
           <span class="pref-lbl">Hydrering <i class="help-icon" data-tooltip="Hydreringsprosenten til surdeigstarteren din. 100 % = like deler mel og vann (mest vanlig). En stivere starter ligger på 50–80 %, en flytende på 100–125 %.">?</i></span>

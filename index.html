@@ -2841,10 +2841,14 @@ function syncPrefTypeUI() {
   const pc = document.getElementById('prefTimeCard');
   if (pc) {
     pc.style.display = t !== 'none' ? '' : 'none';
-    if (t === 'none') {
+    const body = document.getElementById('prefTimeBody');
+    const chev = document.getElementById('prefTimeChevron');
+    if (t !== 'none') {
+      // Auto-open when poolish/biga selected
+      if (body) body.style.display = '';
+      if (chev) chev.classList.add('open');
+    } else {
       // Collapse when hidden
-      const body = document.getElementById('prefTimeBody');
-      const chev = document.getElementById('prefTimeChevron');
       if (body) body.style.display = 'none';
       if (chev) chev.classList.remove('open');
     }

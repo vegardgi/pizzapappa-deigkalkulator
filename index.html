@@ -1399,6 +1399,32 @@
       cursor: pointer; transition: border-color 0.15s, color 0.15s;
     }
     .extras-add-btn:hover { border-color: var(--orange); color: var(--orange); }
+
+    /* ── Fordeig accordion ── */
+    .pref-accordion { border-top: 1px solid var(--border); margin-top: 12px; }
+    .pref-acc-hdr {
+      width: 100%; display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 0; background: none; border: none; cursor: pointer;
+      font-size: 11px; font-weight: 700; color: var(--muted2);
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .pref-acc-hdr:hover { color: var(--text); }
+    .pref-acc-right { display: flex; align-items: center; gap: 8px; }
+    .pref-acc-badge { font-size: 12px; font-weight: 700; color: var(--orange); text-transform: none; letter-spacing: 0; }
+    .pref-acc-chevron { font-size: 16px; color: var(--orange); transition: transform 0.2s; line-height: 1; }
+    .pref-acc-chevron.open { transform: rotate(90deg); }
+    .pref-acc-body { padding-bottom: 10px; }
+    .pref-type-row {
+      display: flex; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 3px; margin-bottom: 10px; gap: 3px;
+    }
+    .pref-type-btn {
+      flex: 1; padding: 7px 4px; border: none; border-radius: 7px; background: none;
+      cursor: pointer; font-size: 13px; font-weight: 600; color: var(--muted2); transition: all 0.15s;
+    }
+    .pref-type-btn.active { background: var(--orange); color: #fff; }
+    .pref-settings { display: none; }
+    .pref-settings.visible { display: block; }
     .extras-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.45);
       z-index: 200; display: flex; align-items: flex-end; justify-content: center;
@@ -1893,8 +1919,7 @@
     <div class="extras-chips">
       <button class="extra-chip" id="chipSukker" onclick="toggleExtra('sukker')">🍯 Sukker</button>
       <button class="extra-chip" id="chipOlje" onclick="toggleExtra('olje')">🫒 Olje</button>
-      <button class="extra-chip" id="chipPoolish" onclick="toggleExtra('poolish')">🫙 Poolish</button>
-      <button class="extra-chip" id="chipBiga" onclick="toggleExtra('biga')">🧊 Biga</button>
+      <button class="extra-chip" id="chipAnnet" onclick="closeExtras()" style="border-style:dashed;color:var(--muted)">+ Annet</button>
     </div>
   </div>
 </div>
@@ -2061,49 +2086,56 @@
         </div>
       </div>
 
-      <!-- Extra: Poolish -->
-      <div class="extra-field" id="extraPoolish">
-        <div class="extra-field-header">
-          <span class="extra-field-lbl">🫙 Poolish <i class="help-icon" data-tooltip="Flytende fordeig med 100 % hydrering (like deler mel og vann). Fermenteres 12–16 t ved romtemp. Typisk 20–40 % av melet. Gir luftig krumme og mild syrlig aroma.">?</i></span>
-          <button class="extra-remove" onclick="toggleExtra('poolish')" title="Fjern poolish">×</button>
-        </div>
-        <div class="pref-row">
-          <div class="stepper">
-            <button class="step-btn" onclick="adjExtra('poolishPct',-5,5,80)">−</button>
-            <input class="step-input" id="poolishPctInput" type="number" value="30" min="5" max="80" style="width:46px" onchange="updExtra('poolishPct',this.value,5,80)">
-            <button class="step-btn" onclick="adjExtra('poolishPct',5,5,80)">+</button>
+      <!-- Fordeig accordion -->
+      <div class="pref-accordion">
+        <button class="pref-acc-hdr" onclick="togglePrefAcc()">
+          <span>Fordeig</span>
+          <span class="pref-acc-right">
+            <span class="pref-acc-badge" id="prefAccBadge"></span>
+            <span class="pref-acc-chevron" id="prefAccChevron">›</span>
+          </span>
+        </button>
+        <div class="pref-acc-body" id="prefAccBody" style="display:none">
+          <div class="pref-type-row">
+            <button class="pref-type-btn active" id="btnPrefNone"    onclick="setPrefType('none')">Ingen</button>
+            <button class="pref-type-btn"        id="btnPrefPoolish" onclick="setPrefType('poolish')">🫙 Poolish</button>
+            <button class="pref-type-btn"        id="btnPrefBiga"    onclick="setPrefType('biga')">🧊 Biga</button>
           </div>
-          <span style="font-size:16px;color:var(--muted)">%</span>
+          <div class="pref-settings" id="extraPoolish">
+            <div class="pref-row">
+              <span class="pref-lbl" style="font-size:11px;color:var(--muted)">Andel mel <i class="help-icon" data-tooltip="Flytende fordeig med 100 % hydrering (like deler mel og vann). Fermenteres 12–16 t ved romtemp. Typisk 20–40 % av melet. Gir luftig krumme og mild syrlig aroma.">?</i></span>
+              <div class="stepper">
+                <button class="step-btn" onclick="adjExtra('poolishPct',-5,5,80)">−</button>
+                <input class="step-input" id="poolishPctInput" type="number" value="30" min="5" max="80" style="width:46px" onchange="updExtra('poolishPct',this.value,5,80)">
+                <button class="step-btn" onclick="adjExtra('poolishPct',5,5,80)">+</button>
+              </div>
+              <span style="font-size:16px;color:var(--muted)">%</span>
+            </div>
+          </div>
+          <div class="pref-settings" id="extraBiga">
+            <div class="pref-row">
+              <span class="pref-lbl" style="font-size:11px;color:var(--muted)">Andel mel <i class="help-icon" data-tooltip="Stiv italiensk fordeig (45–55 % hydrering) med svært lite gjær. Settes i kjøleskap 16–24 t. Typisk 30–60 % av melet. Gir seig, åpen krumme og nøtteaktig smak.">?</i></span>
+              <div class="stepper">
+                <button class="step-btn" onclick="adjExtra('bigaPct',-5,5,80)">−</button>
+                <input class="step-input" id="bigaPctInput" type="number" value="40" min="5" max="80" style="width:46px" onchange="updExtra('bigaPct',this.value,5,80)">
+                <button class="step-btn" onclick="adjExtra('bigaPct',5,5,80)">+</button>
+              </div>
+              <span style="font-size:16px;color:var(--muted)">%</span>
+            </div>
+            <div class="pref-row">
+              <span class="pref-lbl">Hydrering</span>
+              <div class="stepper">
+                <button class="step-btn" onclick="adjExtra('bigaHydration',-5,40,65)">−</button>
+                <input class="step-input" id="bigaHydrationInput" type="number" value="50" min="40" max="65" style="width:46px" onchange="updExtra('bigaHydration',this.value,40,65)">
+                <button class="step-btn" onclick="adjExtra('bigaHydration',5,40,65)">+</button>
+              </div>
+              <span style="font-size:12px;color:var(--muted)">%</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Extra: Biga -->
-      <div class="extra-field" id="extraBiga">
-        <div class="extra-field-header">
-          <span class="extra-field-lbl">🧊 Biga <i class="help-icon" data-tooltip="Stiv italiensk fordeig (45–55 % hydrering) med svært lite gjær. Settes i kjøleskap 16–24 t. Typisk 30–60 % av melet. Gir seig, åpen krumme og nøtteaktig smak.">?</i></span>
-          <button class="extra-remove" onclick="toggleExtra('biga')" title="Fjern biga">×</button>
-        </div>
-        <div class="pref-row">
-          <div class="stepper">
-            <button class="step-btn" onclick="adjExtra('bigaPct',-5,5,80)">−</button>
-            <input class="step-input" id="bigaPctInput" type="number" value="40" min="5" max="80" style="width:46px" onchange="updExtra('bigaPct',this.value,5,80)">
-            <button class="step-btn" onclick="adjExtra('bigaPct',5,5,80)">+</button>
-          </div>
-          <span style="font-size:16px;color:var(--muted)">%</span>
-        </div>
-        <div class="pref-row">
-          <span class="pref-lbl">Hydrering</span>
-          <div class="stepper">
-            <button class="step-btn" onclick="adjExtra('bigaHydration',-5,40,65)">−</button>
-            <input class="step-input" id="bigaHydrationInput" type="number" value="50" min="40" max="65" style="width:46px" onchange="updExtra('bigaHydration',this.value,40,65)">
-            <button class="step-btn" onclick="adjExtra('bigaHydration',5,40,65)">+</button>
-          </div>
-          <span style="font-size:12px;color:var(--muted)">%</span>
-        </div>
-      </div>
-
-
-      <button class="extras-add-btn" onclick="openExtras()">⊕ Legg til ingrediens</button>
+      <button class="extras-add-btn" onclick="openExtras()" style="margin-top:12px">⊕ Legg til ingrediens</button>
 
     </div>
   </div>
@@ -2157,6 +2189,40 @@
           </div>
         </div>
 
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 4b. Fordeig heving — vises kun når poolish/biga er valgt ── -->
+  <div class="card" id="prefTimeCard" style="display:none">
+    <div class="card-header" style="cursor:pointer" onclick="togglePrefTimeCard()">
+      <span class="card-icon" id="prefCardIcon">🫙</span>
+      <span class="card-title" id="prefCardTitle">Poolish — heving</span>
+      <i class="help-icon" style="margin-left:4px" data-tooltip="Poolish fermenteres typisk 12–16 t ved romtemperatur (18–22 °C). Biga fermenteres 8–12 t ved romtemperatur eller 16–24 t i kjøleskap (4–8 °C)." onclick="event.stopPropagation()">?</i>
+      <span class="pref-acc-chevron" id="prefTimeChevron" style="margin-left:auto">›</span>
+    </div>
+    <div id="prefTimeBody" style="display:none">
+      <div class="card-body">
+        <div class="time-grid" style="grid-template-columns:1fr 1fr">
+          <div class="time-card">
+            <div class="time-lbl">⏱️ Fermentering</div>
+            <div class="stepper time-stepper">
+              <button class="step-btn" onclick="adj('prefHours',-1)">−</button>
+              <input  class="step-input" id="prefHours" type="number" value="14" min="1" max="48" onchange="upd('prefHours',this.value)">
+              <button class="step-btn" onclick="adj('prefHours',1)">+</button>
+              <span class="time-unit">t</span>
+            </div>
+          </div>
+          <div class="time-card">
+            <div class="time-lbl">🌡️ Temperatur</div>
+            <div class="temp-row">
+              <button class="step-btn" onclick="adj('prefTemp',-1)">−</button>
+              <input  class="step-input" id="prefTemp" type="number" value="20" min="0" max="40" onchange="upd('prefTemp',this.value)">
+              <button class="step-btn" onclick="adj('prefTemp',1)">+</button>
+              <span class="temp-unit">°C</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -2282,7 +2348,9 @@ const S = {
   bigaPct:          40,
   bigaHydration:    50,
   surdeigPct:       20,
-  surdeigHydration: 100
+  surdeigHydration: 100,
+  prefHours:        14,
+  prefTemp:         20
 };
 
 let _fid = 2;  // next flour id
@@ -2722,6 +2790,63 @@ function fillSlider(id, val, min, max) {
 // ═══════════════════════════════════════════════════════
 //  EXTRAS
 // ═══════════════════════════════════════════════════════
+function togglePrefTimeCard() {
+  const body    = document.getElementById('prefTimeBody');
+  const chevron = document.getElementById('prefTimeChevron');
+  const open    = body.style.display !== 'none';
+  body.style.display = open ? 'none' : '';
+  chevron.classList.toggle('open', !open);
+}
+
+function togglePrefAcc() {
+  const body    = document.getElementById('prefAccBody');
+  const chevron = document.getElementById('prefAccChevron');
+  const open    = body.style.display !== 'none';
+  body.style.display = open ? 'none' : '';
+  chevron.classList.toggle('open', !open);
+}
+
+function setPrefType(t) {
+  if (!S.extras) S.extras = [];
+  S.extras = S.extras.filter(e => e !== 'poolish' && e !== 'biga');
+  if (t === 'poolish') S.extras.push('poolish');
+  if (t === 'biga')    S.extras.push('biga');
+  syncPrefTypeUI();
+  renderExtras();
+  renderCalc();
+  saveState();
+}
+
+function syncPrefTypeUI() {
+  const t = hasExtra('poolish') ? 'poolish' : hasExtra('biga') ? 'biga' : 'none';
+  ['None','Poolish','Biga'].forEach(n => {
+    const btn = document.getElementById('btnPref' + n);
+    if (btn) btn.classList.toggle('active', t === n.toLowerCase());
+  });
+  const ps = document.getElementById('extraPoolish');
+  const bs = document.getElementById('extraBiga');
+  if (ps) ps.classList.toggle('visible', t === 'poolish');
+  if (bs) bs.classList.toggle('visible', t === 'biga');
+  const badge = document.getElementById('prefAccBadge');
+  if (badge) badge.textContent = t === 'poolish' ? '🫙 Poolish' : t === 'biga' ? '🧊 Biga' : '';
+  // Show/hide preferment time card
+  const pc = document.getElementById('prefTimeCard');
+  if (pc) {
+    pc.style.display = t !== 'none' ? '' : 'none';
+    if (t === 'none') {
+      // Collapse when hidden
+      const body = document.getElementById('prefTimeBody');
+      const chev = document.getElementById('prefTimeChevron');
+      if (body) body.style.display = 'none';
+      if (chev) chev.classList.remove('open');
+    }
+  }
+  const icon  = document.getElementById('prefCardIcon');
+  const title = document.getElementById('prefCardTitle');
+  if (icon)  icon.textContent  = t === 'biga' ? '🧊' : '🫙';
+  if (title) title.textContent = t === 'biga' ? 'Biga — heving' : 'Poolish — heving';
+}
+
 function toggleExtra(name) {
   if (!S.extras) S.extras = [];
   const idx = S.extras.indexOf(name);
@@ -2740,13 +2865,14 @@ function closeExtras() {
   document.body.style.overflow = '';
 }
 function renderExtras() {
-  ['sukker','olje','poolish','biga'].forEach(n => {
+  ['sukker','olje'].forEach(n => {
     const cap = n.charAt(0).toUpperCase() + n.slice(1);
     const field = document.getElementById('extra' + cap);
     if (field) field.classList.toggle('visible', hasExtra(n));
     const chip  = document.getElementById('chip'  + cap);
     if (chip)  chip.classList.toggle('active', hasExtra(n));
   });
+  syncPrefTypeUI();
   // Sync input values
   const sync = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
   sync('sukkerInput',        S.sukkerPct);
@@ -2794,7 +2920,9 @@ const LIMITS = {
   rtTemp:       [10, 40],
   coldHours:    [0, 120],
   coldTemp:     [0, 15],
-  svinnPct:     [0, 50]
+  svinnPct:     [0, 50],
+  prefHours:    [1, 48],
+  prefTemp:     [0, 40]
 };
 
 function adj(field, delta) {
@@ -2857,6 +2985,8 @@ function setMode(mode) {
   document.getElementById('rtTemp').value         = S.rtTemp;
   document.getElementById('coldHours').value      = S.coldHours;
   document.getElementById('coldTemp').value       = S.coldTemp;
+  document.getElementById('prefHours').value      = S.prefHours;
+  document.getElementById('prefTemp').value       = S.prefTemp;
   document.getElementById('btnPizza').className = 'mode-btn' + (mode==='pizza' ? ' active' : '');
   document.getElementById('btnBread').className = 'mode-btn' + (mode==='bread' ? ' active' : '');
   activeId = null;
@@ -3090,6 +3220,8 @@ function loadRecipe(id) {
   document.getElementById('rtTemp').value         = S.rtTemp;
   document.getElementById('coldHours').value      = S.coldHours;
   document.getElementById('coldTemp').value       = S.coldTemp;
+  document.getElementById('prefHours').value      = S.prefHours;
+  document.getElementById('prefTemp').value       = S.prefTemp;
   document.getElementById('overrideCheck').checked = false;
   document.getElementById('overrideInput').disabled = true;
   document.getElementById('overrideInput').value  = '';
@@ -3197,7 +3329,8 @@ const STATE_FIELDS = ['mode','numDoughs','piecesPerDough','weightPerPiece',
   'flourTypes','waterPct','saltPct','rtHours','rtTemp','coldHours','coldTemp',
   'yeastType','yeastBumpPct','svinnPct',
   'override','overrideUnit','overrideVal','roundIngredients',
-  'extras','sukkerPct','oljePct','poolishPct','bigaPct','bigaHydration','surdeigPct','surdeigHydration'];
+  'extras','sukkerPct','oljePct','poolishPct','bigaPct','bigaHydration','surdeigPct','surdeigHydration',
+  'prefHours','prefTemp'];
 
 function saveState() {
   const snap = {};

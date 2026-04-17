@@ -1889,7 +1889,7 @@
           </div>
           <div class="stepper">
             <button class="step-btn" onclick="adj('piecesPerDough',-1)">−</button>
-            <input  class="step-input" id="piecesPerDough" type="number" value="4" min="1" max="100" onchange="upd('piecesPerDough',this.value)">
+            <input  class="step-input" id="piecesPerDough" type="number" value="4" min="1" max="100" style="width:68px" onchange="upd('piecesPerDough',this.value)">
             <button class="step-btn" onclick="adj('piecesPerDough',1)">+</button>
           </div>
         </div>
@@ -1899,12 +1899,10 @@
             Vekt i gram per emne
             <i class="help-icon" data-tooltip="Ønsket vekt på ferdig produkt per stykke — f.eks. 250–280 g for en napolitansk pizzabunn. Rådeigvekten justeres automatisk opp om svinn er satt.">?</i>
           </div>
-          <div style="display:flex;align-items:center;gap:6px">
-            <div class="stepper">
-              <button class="step-btn" onclick="adj('weightPerPiece',-5)">−</button>
-              <input  class="step-input" id="weightPerPiece" type="number" value="265" min="50" max="3000" style="width:68px" onchange="upd('weightPerPiece',this.value)">
-              <button class="step-btn" onclick="adj('weightPerPiece',5)">+</button>
-            </div>
+          <div class="stepper">
+            <button class="step-btn" onclick="adj('weightPerPiece',-5)">−</button>
+            <input  class="step-input" id="weightPerPiece" type="number" value="265" min="50" max="3000" style="width:68px" onchange="upd('weightPerPiece',this.value)">
+            <button class="step-btn" onclick="adj('weightPerPiece',5)">+</button>
           </div>
         </div>
       </div>

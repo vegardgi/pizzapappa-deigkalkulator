@@ -671,6 +671,12 @@
     .bump-plus:hover  { background: rgba(91,174,110,0.1); border-color: var(--success); color: var(--success); }
     .bump-minus { color: var(--error); border-color: rgba(224,82,82,0.4); }
     .bump-minus:hover { background: rgba(224,82,82,0.1); border-color: var(--error); color: var(--error); }
+    /* Inline bump buttons — hidden in normal mode, shown in minimalist */
+    .bump-inline { display: none; padding: 3px 9px; font-size: 15px; font-weight: 800; }
+    .bump-val-inline { font-size: 16px; font-weight: 700; }
+    body.minimalist .bump-inline { display: inline-flex; }
+    body.minimalist .yeast-bump-row { display: none; }
+    body.minimalist .yeast-sug-val { display: flex; align-items: center; gap: 6px; }
     .bump-label {
       flex: 1;
       text-align: center;
@@ -1272,7 +1278,12 @@
     body.minimalist .time-card         { padding: 7px 9px; }
     body.minimalist .yeast-sug-val     { font-size: 15px; }
     body.minimalist .bump-label        { display: none; }
-    body.minimalist .yeast-bump-row    { gap: 5px; }
+    body.minimalist .yeast-bump-row    { gap: 5px; flex-direction: row; align-items: center; }
+    body.minimalist .yeast-sug-val     { display: flex; align-items: center; gap: 6px; }
+    body.minimalist .yeast-sug-val .bump-btn { padding: 3px 10px; font-size: 12px; }
+    body.minimalist .yeast-bump-row .bump-label { order: 2; }
+    body.minimalist .yeast-bump-row .bump-minus { order: 1; }
+    body.minimalist .yeast-bump-row .bump-plus  { order: 3; }
     body.minimalist .help-icon         { display: none; }
     body.minimalist .card              { border-radius: 10px; }
     body.minimalist .stepper           { gap: 3px; }
@@ -1284,11 +1295,83 @@
     body.minimalist .water-salt-group .slider-row input[type="range"] { display: none; }
     body.minimalist .water-salt-group .slider-header { flex-wrap: wrap; }
 
-    /* Antall emner + vekt side om side */
-    body.minimalist .pieces-weight-group     { display: flex; gap: 8px; align-items: flex-start; }
-    body.minimalist .pieces-weight-group .form-row { flex: 1; margin-bottom: 0; flex-direction: column; align-items: flex-start; gap: 5px; }
-    body.minimalist .pieces-weight-group .form-row .form-label { font-size: 11px; }
-    body.minimalist .pieces-weight-group .form-row .form-hint  { display: none; }
+    /* Antall emner + vekt side om side — kompakt som vann/salt */
+    body.minimalist .pieces-weight-group     { display: flex; gap: 8px; align-items: stretch; }
+    body.minimalist .pieces-weight-group .form-row {
+      flex: 1; margin-bottom: 0;
+      background: var(--input-bg); border: 1px solid var(--input-border);
+      border-radius: 10px; padding: 7px 10px;
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    body.minimalist .pieces-weight-group .form-row .form-label {
+      font-size: 11px; font-weight: 700; color: var(--muted2);
+      text-transform: uppercase; letter-spacing: 0.4px;
+    }
+    body.minimalist .pieces-weight-group .form-row .form-hint   { display: none; }
+    body.minimalist .pieces-weight-group .form-row .help-icon   { display: none; }
+    body.minimalist .pieces-weight-group .stepper               { background: none; border: none; padding: 0; overflow: visible; justify-content: flex-start; }
+    body.minimalist .pieces-weight-group .step-input            { width: 52px; font-size: 16px; font-weight: 700; padding: 0; text-align: left; }
+    body.minimalist .pieces-weight-group .step-btn              { width: 26px; height: 28px; font-size: 17px; }
+    body.minimalist .pieces-weight-group > div > div[style]     { display: contents; }
+
+    /* Time + temp på samme linje i minimalist */
+    body.minimalist .time-card        { display: flex; align-items: center; gap: 6px; padding: 6px 9px; }
+    body.minimalist .time-card .time-lbl      { display: none; }
+    body.minimalist .time-card .time-stepper  { flex: 1; justify-content: flex-start; }
+    body.minimalist .time-card .temp-row      { margin-top: 0; width: auto; flex: 0 0 auto; }
+    body.minimalist .time-card .temp-bar-wrap { display: none; }
+
+    /* ── Extras ── */
+    .extras-add-btn {
+      display: flex; align-items: center; justify-content: center; gap: 7px;
+      width: 100%; padding: 9px 14px; margin-top: 12px;
+      background: none; border: 1.5px dashed var(--border);
+      border-radius: 10px; color: var(--muted2); font-size: 13px; font-weight: 700;
+      cursor: pointer; transition: border-color 0.15s, color 0.15s;
+    }
+    .extras-add-btn:hover { border-color: var(--orange); color: var(--orange); }
+    .extras-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+      z-index: 200; display: flex; align-items: flex-end; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    }
+    .extras-overlay.open { opacity: 1; pointer-events: auto; }
+    .extras-sheet {
+      background: var(--card); border-radius: 20px 20px 0 0;
+      width: 100%; max-width: 540px;
+      padding: 18px 18px 36px;
+      transform: translateY(100%); transition: transform 0.28s cubic-bezier(0.32,0,0.67,0);
+    }
+    .extras-overlay.open .extras-sheet { transform: translateY(0); }
+    .extras-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .extra-chip {
+      padding: 8px 16px; border-radius: 20px;
+      border: 1.5px solid var(--border); background: var(--surface);
+      color: var(--muted2); font-size: 14px; font-weight: 700;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .extra-chip.active { border-color: var(--orange); background: rgba(232,100,26,0.09); color: var(--text); }
+    .extra-field { display: none; margin-top: 10px; }
+    .extra-field.visible { display: block; }
+    .extra-field-header {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;
+    }
+    .extra-field-lbl {
+      font-size: 11px; font-weight: 700; color: var(--muted2);
+      text-transform: uppercase; letter-spacing: 0.5px;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .extra-remove {
+      background: none; border: none; color: var(--muted);
+      font-size: 18px; cursor: pointer; padding: 0 2px; line-height: 1;
+    }
+    .extra-remove:hover { color: var(--red); }
+    .pref-row {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 5px;
+    }
+    .pref-lbl { font-size: 12px; color: var(--muted2); font-weight: 600; min-width: 68px; }
+    .ing-section-label.pref-label { color: var(--orange); }
+    .ing-pref-note { font-size: 11px; color: var(--muted); padding: 0 0 6px; line-height: 1.4; }
 
     /* ── Responsive ── */
     @media (max-width: 380px) {
@@ -1304,7 +1387,7 @@
 <div class="min-btn-wrap" id="minBtnWrap">
   <button class="min-btn-x" onclick="collapseMinBtn()" title="Skjul">×</button>
   <button class="min-btn" id="minBtn" onclick="toggleMinimalist()">
-    <span class="min-icon">⊡</span> Minimalistisk
+    <span class="min-icon">⊡</span> Minimalistisk visning
   </button>
 </div>
 <button class="min-btn-tab" id="minBtnTab" onclick="expandMinBtn()" title="Vis">◀</button>
@@ -1331,6 +1414,7 @@
       <button class="modal-tab" id="tabMachine" onclick="switchTab('machine')">🤖 I maskin</button>
       <button class="modal-tab" id="tabHeving" onclick="switchTab('heving')">🍞 Heving</button>
       <button class="modal-tab" id="tabEltefritt" onclick="switchTab('eltefritt')">🙌 Eltefritt</button>
+      <button class="modal-tab" id="tabFordeig" onclick="switchTab('fordeig')">🫙 Fordeig</button>
       <button class="modal-tab" id="tabSteking" onclick="switchTab('steking')">🔥 Steking</button>
     </div>
     <div class="modal-body">
@@ -1531,13 +1615,77 @@
         </div>
       </div>
 
+      <!-- FORDEIG -->
+      <div class="tips-panel" id="panelFordeig">
+        <div class="tip-item">
+          <div class="tip-num">1</div>
+          <div class="tip-content">
+            <div class="tip-title">Hva er en fordeig — og hvorfor?</div>
+            <div class="tip-desc">En fordeig er en liten del av oppskriften som fermenteres separat i forveien. Enzymer og gjær får mer tid til å jobbe, noe som gir mer kompleks smak, bedre glutenstruktur og lengre holdbarhet. Vanligste typer: poolish (flytende), biga (stiv), levain (surdeig-basert).</div>
+            <span class="tip-badge badge-green">Mer smak og struktur</span>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">2</div>
+          <div class="tip-content">
+            <div class="tip-title">Poolish — flytende og enkel</div>
+            <div class="tip-desc">Poolish er 100 % hydrering: like deler mel og vann + veldig lite gjær (0,1–0,2 %). Fermenteres 12–16 t ved romtemp, eller opptil 24 t i kjøleskap. Typisk 20–40 % av total melvekt. Klar når overflaten er bubbly og lett hvelvd. Gir luftig, lett krumme og mild syrlig aroma.</div>
+            <span class="tip-badge badge-orange">100 % hydrering · 12–16 t</span>
+            <a class="tip-link" href="https://www.pizzapappa.no/post/faq-ofte-spurte-sp%C3%B8rsm%C3%A5l" target="_blank" rel="noopener">Les mer på pizzapappa.no →</a>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">3</div>
+          <div class="tip-content">
+            <div class="tip-title">Biga — stiv og smakfull</div>
+            <div class="tip-desc">Biga er en stiv italiensk fordeig med 45–55 % hydrering og svært lite gjær (0,1–0,5 %). Den blandes til en klumpete masse og settes i kjøleskap i 16–24 t. Typisk 30–60 % av melet. Brukes mye i napolitansk pizza og ciabatta. Gir seig, åpen krumme og nøtteaktig, kompleks smak.</div>
+            <span class="tip-badge badge-orange">45–55 % hydrering · kjøleskap</span>
+            <a class="tip-link" href="https://www.pizzapappa.no/post/elting-av-deig" target="_blank" rel="noopener">Les mer på pizzapappa.no →</a>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">4</div>
+          <div class="tip-content">
+            <div class="tip-title">Regnestykket: mel og vann i fordeigen trekkes fra hoved-deigen</div>
+            <div class="tip-desc">Melet og vannet i fordeigen er en del av den totale oppskriften — ikke noe ekstra. Bruker du f.eks. 30 % poolish av 500 g mel, tar du 150 g mel + 150 g vann til poolishen. Hoved-deigen får da 350 g mel og resten av vannet. Kalkulatoren beregner dette automatisk.</div>
+            <span class="tip-badge badge-green">Innbakt i kalkulatoren</span>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">5</div>
+          <div class="tip-content">
+            <div class="tip-title">Levain — surdeig-basert fordeig</div>
+            <div class="tip-desc">Levain er en fordeig basert på surdeigsstarter i stedet for gjær. Bygges vanligvis i 1–3 steg over 6–12 t. Typisk 20–35 % av melet. Gir naturlig syre, kompleks smak og lang holdbarhet. Kalkulatoren støtter surdeig som ekstra ingrediens — melet og vannet i starteren trekkes da fra hoved-deigen.</div>
+            <span class="tip-badge badge-green">Naturlig heving</span>
+            <a class="tip-link" href="https://www.pizzapappa.no/post/faq-ofte-spurte-sp%C3%B8rsm%C3%A5l" target="_blank" rel="noopener">Les mer på pizzapappa.no →</a>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">6</div>
+          <div class="tip-content">
+            <div class="tip-title">Tegn på at fordeigen er klar</div>
+            <div class="tip-desc">Poolish: bubbly overflate, lett hvelvd, lukter søtt og litt gjærbasert. Biga: fast, luftbobler synlig innvendig, lukter tydelig syrlig. Surdeig/levain: dobler seg og har en kuppel på toppen — "peak"-testen. Bruker du fordeigen for tidlig eller for sent gir det svakere resultat.</div>
+            <span class="tip-badge badge-orange">Les fordeigen, ikke klokken</span>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">7</div>
+          <div class="tip-content">
+            <div class="tip-title">Autolyse kombinert med fordeig</div>
+            <div class="tip-desc">Bland fordeigen med resten av melet og vannet og la hvile 20–60 min (autolyse) før du tilsetter salt og elter. Kombinasjonen gir maksimal glutenutvikling med minimalt arbeid — ekstra effektivt for høyhydrert deig. Salt tilsettes alltid etter autolysen.</div>
+            <span class="tip-badge badge-green">Kombiner for best resultat</span>
+            <a class="tip-link" href="https://www.pizzapappa.no/post/elting-av-deig" target="_blank" rel="noopener">Les mer på pizzapappa.no →</a>
+          </div>
+        </div>
+      </div>
+
       <!-- STEKING -->
       <div class="tips-panel" id="panelSteking">
         <div class="tip-item">
           <div class="tip-num">1</div>
           <div class="tip-content">
             <div class="tip-title">Temperatur etter pizzastil</div>
-            <div class="tip-desc">Napolitansk: 430–500 °C i en ekte vedfyrt ovn, 60–90 sekunder. Hjemmeovn med stål/stein: maks temp (250–300 °C) i 5–8 min. NY style: 260–280 °C i 8–12 min — lavere temp gir mørere skorpe og bedre karamellisering. Detroit/pan: 230–250 °C i 15–20 min. Høyere temp = kortere tid = sprøere bunn.</div>
+            <div class="tip-desc">Napolitansk: 430–500 °C i en ekte vedfyrt ovn, 60–90 sekunder. Hjemmeovn med stål/stein: maks temp (250–300 °C) i 5–8 min. NY style: 260–280 °C i 8–12 min — lavere temp gir mørere skorpe og bedre karamellisering.</div>
             <span class="tip-badge badge-red">Temp styrer alt</span>
             <a class="tip-link" href="https://www.pizzapappa.no/post/steking-av-pizza-i-hjemmeovn" target="_blank" rel="noopener">Les mer på pizzapappa.no →</a>
           </div>
@@ -1660,6 +1808,24 @@
         </div>
       </div>
 
+    </div>
+  </div>
+</div>
+
+<!-- ── Extras popup ── -->
+<div class="extras-overlay" id="extrasOverlay" onclick="if(event.target===this)closeExtras()">
+  <div class="extras-sheet">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:15px;font-weight:800;color:var(--text)">Legg til ingrediens</span>
+      <button onclick="closeExtras()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);padding:0 4px">✕</button>
+    </div>
+    <div style="font-size:13px;color:var(--muted);margin:5px 0 0">Klikk for å aktivere — feltet vises i kalkulatoren</div>
+    <div class="extras-chips">
+      <button class="extra-chip" id="chipSukker" onclick="toggleExtra('sukker')">🍯 Sukker</button>
+      <button class="extra-chip" id="chipOlje" onclick="toggleExtra('olje')">🫒 Olje</button>
+      <button class="extra-chip" id="chipPoolish" onclick="toggleExtra('poolish')">🫙 Poolish</button>
+      <button class="extra-chip" id="chipBiga" onclick="toggleExtra('biga')">🧊 Biga</button>
+      <button class="extra-chip" id="chipSurdeig" onclick="toggleExtra('surdeig')">🌾 Surdeig</button>
     </div>
   </div>
 </div>
@@ -1798,6 +1964,109 @@
         </div>
       </div>
 
+      <!-- Extra: Sukker -->
+      <div class="extra-field" id="extraSukker">
+        <div class="extra-field-header">
+          <span class="extra-field-lbl">🍯 Sukker <i class="help-icon" data-tooltip="Baker's prosent. Sukker hjelper bruning ved lavere steketemperatur og gir litt søtere smak. Typisk 1–3 % for NY-pizza og loff, 3–5 % for brioche.">?</i></span>
+          <button class="extra-remove" onclick="toggleExtra('sukker')" title="Fjern sukker">×</button>
+        </div>
+        <div class="slider-row" style="margin-bottom:0">
+          <div class="slider-header">
+            <span class="slider-label" style="flex:1;font-size:13px">% av mel</span>
+            <input class="slider-val-input" id="sukkerInput" type="number" value="2" min="0" max="10" step="0.5" onchange="extraSliderInput('sukker',this.value)">
+            <span class="unit">%</span>
+          </div>
+          <input type="range" id="sukkerSlider" min="0" max="10" value="2" step="0.5" oninput="extraSliderDrag('sukker',this.value)">
+        </div>
+      </div>
+
+      <!-- Extra: Olje -->
+      <div class="extra-field" id="extraOlje">
+        <div class="extra-field-header">
+          <span class="extra-field-lbl">🫒 Olje <i class="help-icon" data-tooltip="Baker's prosent. Olje gir mørere krumme, bedre holdbarhet og hjelper deigen å slippe formen. Typisk 2–3 % for NY-pizza, 5–8 % for focaccia. Tilsettes mot slutten av eltingen.">?</i></span>
+          <button class="extra-remove" onclick="toggleExtra('olje')" title="Fjern olje">×</button>
+        </div>
+        <div class="slider-row" style="margin-bottom:0">
+          <div class="slider-header">
+            <span class="slider-label" style="flex:1;font-size:13px">% av mel</span>
+            <input class="slider-val-input" id="oljeInput" type="number" value="3" min="0" max="15" step="0.5" onchange="extraSliderInput('olje',this.value)">
+            <span class="unit">%</span>
+          </div>
+          <input type="range" id="oljeSlider" min="0" max="15" value="3" step="0.5" oninput="extraSliderDrag('olje',this.value)">
+        </div>
+      </div>
+
+      <!-- Extra: Poolish -->
+      <div class="extra-field" id="extraPoolish">
+        <div class="extra-field-header">
+          <span class="extra-field-lbl">🫙 Poolish <i class="help-icon" data-tooltip="Flytende fordeig med 100 % hydrering (like deler mel og vann). Fermenteres 12–16 t ved romtemp. Typisk 20–40 % av melet. Gir luftig krumme og mild syrlig aroma.">?</i></span>
+          <button class="extra-remove" onclick="toggleExtra('poolish')" title="Fjern poolish">×</button>
+        </div>
+        <div class="pref-row">
+          <span class="pref-lbl">Andel mel</span>
+          <div class="stepper">
+            <button class="step-btn" onclick="adjExtra('poolishPct',-5,5,80)">−</button>
+            <input class="step-input" id="poolishPctInput" type="number" value="30" min="5" max="80" style="width:46px" onchange="updExtra('poolishPct',this.value,5,80)">
+            <button class="step-btn" onclick="adjExtra('poolishPct',5,5,80)">+</button>
+          </div>
+          <span style="font-size:12px;color:var(--muted)">% av mel</span>
+        </div>
+      </div>
+
+      <!-- Extra: Biga -->
+      <div class="extra-field" id="extraBiga">
+        <div class="extra-field-header">
+          <span class="extra-field-lbl">🧊 Biga <i class="help-icon" data-tooltip="Stiv italiensk fordeig (45–55 % hydrering) med svært lite gjær. Settes i kjøleskap 16–24 t. Typisk 30–60 % av melet. Gir seig, åpen krumme og nøtteaktig smak.">?</i></span>
+          <button class="extra-remove" onclick="toggleExtra('biga')" title="Fjern biga">×</button>
+        </div>
+        <div class="pref-row">
+          <span class="pref-lbl">Andel mel</span>
+          <div class="stepper">
+            <button class="step-btn" onclick="adjExtra('bigaPct',-5,5,80)">−</button>
+            <input class="step-input" id="bigaPctInput" type="number" value="40" min="5" max="80" style="width:46px" onchange="updExtra('bigaPct',this.value,5,80)">
+            <button class="step-btn" onclick="adjExtra('bigaPct',5,5,80)">+</button>
+          </div>
+          <span style="font-size:12px;color:var(--muted)">% av mel</span>
+        </div>
+        <div class="pref-row">
+          <span class="pref-lbl">Hydrering</span>
+          <div class="stepper">
+            <button class="step-btn" onclick="adjExtra('bigaHydration',-5,40,65)">−</button>
+            <input class="step-input" id="bigaHydrationInput" type="number" value="50" min="40" max="65" style="width:46px" onchange="updExtra('bigaHydration',this.value,40,65)">
+            <button class="step-btn" onclick="adjExtra('bigaHydration',5,40,65)">+</button>
+          </div>
+          <span style="font-size:12px;color:var(--muted)">%</span>
+        </div>
+      </div>
+
+      <!-- Extra: Surdeig -->
+      <div class="extra-field" id="extraSurdeig">
+        <div class="extra-field-header">
+          <span class="extra-field-lbl">🌾 Surdeig <i class="help-icon" data-tooltip="Surdeig erstatter gjær. Oppgi andelen av total melvekt i starteren. Typisk 15–30 % for pizza, 20–40 % for brød. Mel og vann i starteren trekkes fra hoved-deigen.">?</i></span>
+          <button class="extra-remove" onclick="toggleExtra('surdeig')" title="Fjern surdeig">×</button>
+        </div>
+        <div class="pref-row">
+          <span class="pref-lbl">Andel mel</span>
+          <div class="stepper">
+            <button class="step-btn" onclick="adjExtra('surdeigPct',-5,5,80)">−</button>
+            <input class="step-input" id="surdeigPctInput" type="number" value="20" min="5" max="80" style="width:46px" onchange="updExtra('surdeigPct',this.value,5,80)">
+            <button class="step-btn" onclick="adjExtra('surdeigPct',5,5,80)">+</button>
+          </div>
+          <span style="font-size:12px;color:var(--muted)">% av mel</span>
+        </div>
+        <div class="pref-row">
+          <span class="pref-lbl">Hydrering</span>
+          <div class="stepper">
+            <button class="step-btn" onclick="adjExtra('surdeigHydration',-10,50,200)">−</button>
+            <input class="step-input" id="surdeigHydrationInput" type="number" value="100" min="50" max="200" style="width:46px" onchange="updExtra('surdeigHydration',this.value,50,200)">
+            <button class="step-btn" onclick="adjExtra('surdeigHydration',10,50,200)">+</button>
+          </div>
+          <span style="font-size:12px;color:var(--muted)">%</span>
+        </div>
+      </div>
+
+      <button class="extras-add-btn" onclick="openExtras()">⊕ Legg til ingrediens</button>
+
     </div>
   </div>
 
@@ -1888,7 +2157,7 @@
   <div class="card">
     <div class="card-body" style="padding: 12px 17px;">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-        <span class="form-label">Svinn</span>
+        <span class="form-label">Svinn <i class="help-icon" data-tooltip="En liten del av deigen går alltid tapt — noe setter seg fast i bollen, noe henger igjen i hevekassen, og litt fordamper under steking. For pizza er svinn typisk 0 %, men for brød kan du regne 10–15 % siden mye vann damper av i ovnen.">?</i></span>
         <div class="svinn-ctrl">
           <button class="step-btn" onclick="adj('svinnPct',-1)">−</button>
           <span class="svinn-val" id="svinnVal">0 %</span>
@@ -1941,7 +2210,16 @@ const S = {
   overrideUnit:  'gram',    // 'gram' | 'pct'
   overrideVal:   null,      // grams or %, depending on overrideUnit
   svinnPct:      0,         // baking weight-loss %
-  roundIngredients: false   // round displayed ingredient amounts
+  roundIngredients: false,  // round displayed ingredient amounts
+  // ── Extras ──
+  extras:           [],     // enabled: 'sukker','olje','poolish','biga','surdeig'
+  sukkerPct:        2,
+  oljePct:          3,
+  poolishPct:       30,
+  bigaPct:          40,
+  bigaHydration:    50,
+  surdeigPct:       20,
+  surdeigHydration: 100
 };
 
 let _fid = 2;  // next flour id
@@ -2036,23 +2314,28 @@ function calcYeast(rtH, coldH) {
 // ═══════════════════════════════════════════════════════
 //  CALCULATE INGREDIENTS
 // ═══════════════════════════════════════════════════════
+function hasExtra(n) { return (S.extras||[]).includes(n); }
+
 function calc() {
-  const totalPieces     = S.numDoughs * S.piecesPerDough;
-  // svinn: increase raw dough weight so finished piece hits target after baking loss
-  const svinnFactor     = S.svinnPct > 0 ? 1 / (1 - S.svinnPct / 100) : 1;
-  const totalDoughWt    = totalPieces * S.weightPerPiece * svinnFactor;
-  const yc              = calcYeast(S.rtHours, S.coldHours);
+  const totalPieces  = S.numDoughs * S.piecesPerDough;
+  const svinnFactor  = S.svinnPct > 0 ? 1 / (1 - S.svinnPct / 100) : 1;
+  const totalDoughWt = totalPieces * S.weightPerPiece * svinnFactor;
+  const yc           = calcYeast(S.rtHours, S.coldHours);
+
+  // Extra % that add to total dough weight
+  const xSukker = hasExtra('sukker') ? (S.sukkerPct||0)/100 : 0;
+  const xOlje   = hasExtra('olje')   ? (S.oljePct||0)/100   : 0;
 
   let flourG, yeastG, yeastPct;
 
   if (S.override && S.overrideVal != null && S.overrideVal > 0) {
     if (S.overrideUnit === 'pct') {
       yeastPct = S.overrideVal;
-      const div = 1 + S.waterPct/100 + S.saltPct/100 + yeastPct/100;
+      const div = 1 + S.waterPct/100 + S.saltPct/100 + yeastPct/100 + xSukker + xOlje;
       flourG   = totalDoughWt / div;
       yeastG   = flourG * yeastPct / 100;
     } else {
-      const div = 1 + S.waterPct/100 + S.saltPct/100;
+      const div = 1 + S.waterPct/100 + S.saltPct/100 + xSukker + xOlje;
       flourG   = (totalDoughWt - S.overrideVal) / div;
       yeastG   = S.overrideVal;
       yeastPct = (yeastG / flourG) * 100;
@@ -2060,29 +2343,52 @@ function calc() {
   } else {
     yeastPct = (S.yeastType === 'fresh' ? yc.freshPct : yc.dryPct) + S.yeastBumpPct;
     yeastPct = Math.max(0.001, yeastPct);
-    const div = 1 + S.waterPct/100 + S.saltPct/100 + yeastPct/100;
+    const div = 1 + S.waterPct/100 + S.saltPct/100 + yeastPct/100 + xSukker + xOlje;
     flourG   = totalDoughWt / div;
     yeastG   = flourG * yeastPct / 100;
   }
 
-  const waterG = flourG * S.waterPct / 100;
-  const saltG  = flourG * S.saltPct  / 100;
+  const waterG  = flourG * S.waterPct / 100;
+  const saltG   = flourG * S.saltPct  / 100;
+  const sukkerG = flourG * xSukker;
+  const oljeG   = flourG * xOlje;
 
-  // Normalize flour percentages (guard against bad sum)
+  // Preferment partitioning (poolish, biga, surdeig are subsets of flour+water — no change to totals)
+  let poolishFlourG = 0, poolishWaterG = 0;
+  if (hasExtra('poolish')) {
+    poolishFlourG = flourG * (S.poolishPct||30) / 100 / 2; // 100% hydration
+    poolishWaterG = poolishFlourG;
+  }
+  let bigaFlourG = 0, bigaWaterG = 0;
+  if (hasExtra('biga')) {
+    const bh = (S.bigaHydration||50) / 100;
+    bigaFlourG = flourG * (S.bigaPct||40) / 100 / (1 + bh);
+    bigaWaterG = bigaFlourG * bh;
+  }
+  let surdeigFlourG = 0, surdeigWaterG = 0;
+  if (hasExtra('surdeig')) {
+    const sh = (S.surdeigHydration||100) / 100;
+    surdeigFlourG = flourG * (S.surdeigPct||20) / 100 / (1 + sh);
+    surdeigWaterG = surdeigFlourG * sh;
+  }
+
+  // Normalize flour percentages
   const rawSum = S.flourTypes.reduce((s,f) => s + (f.pct||0), 0) || 100;
   const flourBreakdown = S.flourTypes.map(f => ({
-    name: f.name,
-    pct:  f.pct,
+    name: f.name, pct: f.pct,
     normalizedPct: (f.pct / rawSum) * 100,
     grams: flourG * (f.pct / rawSum)
   }));
 
-  // Suggestion for display (always calculated, regardless of override)
   const sugFreshG = flourG * yc.freshPct / 100;
   const sugDryG   = flourG * yc.dryPct   / 100;
 
   return { totalPieces, totalDoughWt, flourG, waterG, saltG,
-           yeastG, yeastPct, yc, flourBreakdown, sugFreshG, sugDryG };
+           yeastG, yeastPct, yc, flourBreakdown, sugFreshG, sugDryG,
+           sukkerG, oljeG,
+           poolishFlourG, poolishWaterG,
+           bigaFlourG, bigaWaterG,
+           surdeigFlourG, surdeigWaterG };
 }
 
 // ═══════════════════════════════════════════════════════
@@ -2092,6 +2398,7 @@ function calc() {
 // Full render (use when adding/removing flour, switching mode, etc.)
 function render() {
   renderFlourList();   // rebuilds flour inputs — only call when structure changes
+  renderExtras();
   renderCalc();
 }
 
@@ -2141,9 +2448,14 @@ function renderCalc() {
     const bumpSign  = S.yeastBumpPct > 0 ? '+' : '';
     const bumpClass = S.yeastBumpPct > 0 ? 'bumped-up' : S.yeastBumpPct < 0 ? 'bumped-down' : '';
     const bumpText  = S.yeastBumpPct === 0 ? 'Forslag' : bumpSign + S.yeastBumpPct.toFixed(1) + ' %';
+    const yeastValG = fmt1(Math.max(0, sugG + (S.yeastBumpPct/100)*(r.flourG)));
     sugBoxHtml = `
       <div class="yeast-sug-lbl">Beregnet forslag</div>
-      <div class="yeast-sug-val">${fmt1(Math.max(0, sugG + (S.yeastBumpPct/100)*(r.flourG)))} g ${yName}</div>
+      <div class="yeast-sug-val">
+        <button class="bump-btn bump-minus bump-inline" onclick="bumpYeast(-0.2)" title="−0.2 %">−</button>
+        <span class="bump-val-inline">${yeastValG} g ${yName}</span>
+        <button class="bump-btn bump-plus bump-inline"  onclick="bumpYeast(0.2)"  title="+0.2 %">+</button>
+      </div>
       <div class="yeast-sug-sub">${subLine}</div>
       <div class="yeast-bump-row">
         <button class="bump-btn bump-minus" onclick="bumpYeast(-0.2)" title="−0.2 % av mel">−0.2 %</button>
@@ -2158,60 +2470,96 @@ function renderCalc() {
       S.overrideUnit === 'gram' ? fmt1(sugG) : sugPct.toFixed(3);
   }
 
-  // Ingredient list
-  let html = '<div class="ing-section-label">Mel</div>';
-  const multi = r.flourBreakdown.length > 1;
-  r.flourBreakdown.forEach(f => {
-    html += `
-      <div class="ing-item">
-        <div>
-          <div class="ing-name">${esc(f.name)}</div>
-          ${multi ? `<div class="ing-sub">${f.pct} % av mel</div>` : ''}
-        </div>
-        <div class="ing-grams">${S.roundIngredients ? gfmt(roundFlour(f.grams)) : gfmt(f.grams)}<span class="g">g</span></div>
-      </div>`;
-  });
+  // ── Ingredient list ──
+  const ingRow = (name, grams, sub) => {
+    const display = gfmt(S.roundIngredients ? Math.round(grams) : grams);
+    return `<div class="ing-item">
+      <div><div class="ing-name">${esc(name)}</div>${sub ? `<div class="ing-sub">${sub}</div>` : ''}</div>
+      <div class="ing-grams">${display}<span class="g">g</span></div>
+    </div>`;
+  };
+  const ingSumLine = (g) =>
+    `<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0 7px;border-top:1px dashed var(--border)">
+      <span style="font-size:11px;color:var(--muted);font-style:italic">sum mel</span>
+      <span style="font-size:13px;color:var(--muted);font-weight:600">${gfmt(S.roundIngredients ? roundFlour(g) : g)} g</span>
+    </div>`;
 
-  if (multi) {
-    html += `
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0 8px;border-top:1px dashed var(--border)">
-        <span style="font-size:11px;color:var(--muted);font-style:italic">sum mel</span>
-        <span style="font-size:13px;color:var(--muted);font-weight:600">${S.roundIngredients ? gfmt(roundFlour(r.flourG)) : gfmt(r.flourG)} g</span>
-      </div>`;
+  let html = '';
+  const multi = r.flourBreakdown.length > 1;
+  const hasPref = hasExtra('poolish') || hasExtra('biga') || hasExtra('surdeig');
+
+  if (hasExtra('poolish')) {
+    html += '<div class="ing-section-label pref-label">🫙 Poolish — forbered 12–16 t i forveien</div>';
+    r.flourBreakdown.forEach(f => {
+      const pg = r.poolishFlourG * (f.normalizedPct / 100);
+      html += ingRow(f.name, pg, multi ? `${f.pct} % av mel` : null);
+    });
+    html += ingRow('Vann', r.poolishWaterG, '100 % av poolish-mel');
+    html += '<div class="ing-section-label">🍞 Hoved-deig — mel</div>';
+    r.flourBreakdown.forEach(f => {
+      const mg = f.grams - r.poolishFlourG * (f.normalizedPct / 100);
+      html += ingRow(f.name, mg, multi ? `${f.pct} % av mel` : null);
+    });
+    if (multi) html += ingSumLine(r.flourG - r.poolishFlourG);
+    html += '<div class="ing-section-label">Øvrig — hoved-deig</div>';
+    html += ingRow('Vann', r.waterG - r.poolishWaterG, `${S.waterPct} % av mel`);
+  } else if (hasExtra('biga')) {
+    html += `<div class="ing-section-label pref-label">🧊 Biga — sett i kjøleskap 16–24 t (${S.bigaHydration} % hydrering)</div>`;
+    r.flourBreakdown.forEach(f => {
+      const bg = r.bigaFlourG * (f.normalizedPct / 100);
+      html += ingRow(f.name, bg, multi ? `${f.pct} % av mel` : null);
+    });
+    html += ingRow('Vann', r.bigaWaterG, `${S.bigaHydration} % av biga-mel`);
+    html += '<div class="ing-section-label">🍞 Hoved-deig — mel</div>';
+    r.flourBreakdown.forEach(f => {
+      const mg = f.grams - r.bigaFlourG * (f.normalizedPct / 100);
+      html += ingRow(f.name, mg, multi ? `${f.pct} % av mel` : null);
+    });
+    if (multi) html += ingSumLine(r.flourG - r.bigaFlourG);
+    html += '<div class="ing-section-label">Øvrig — hoved-deig</div>';
+    html += ingRow('Vann', r.waterG - r.bigaWaterG, `${S.waterPct} % av mel`);
+  } else if (hasExtra('surdeig')) {
+    const surTot = r.surdeigFlourG + r.surdeigWaterG;
+    html += `<div class="ing-section-label pref-label">🌾 Surdeig starter — ${S.surdeigPct} % av mel · ${S.surdeigHydration} % hydrering</div>`;
+    html += ingRow('Surdeig', surTot, `${gfmt(r.surdeigFlourG)} g mel + ${gfmt(r.surdeigWaterG)} g vann`);
+    html += '<div class="ing-section-label">Mel — hoved-deig</div>';
+    r.flourBreakdown.forEach(f => {
+      const mg = f.grams - r.surdeigFlourG * (f.normalizedPct / 100);
+      html += ingRow(f.name, mg, multi ? `${f.pct} % av mel` : null);
+    });
+    if (multi) html += ingSumLine(r.flourG - r.surdeigFlourG);
+    html += '<div class="ing-section-label">Øvrig — hoved-deig</div>';
+    html += ingRow('Vann', r.waterG - r.surdeigWaterG, `${S.waterPct} % av mel`);
+  } else {
+    html += '<div class="ing-section-label">Mel</div>';
+    r.flourBreakdown.forEach(f => {
+      html += ingRow(f.name, f.grams, multi ? `${f.pct} % av mel` : null);
+    });
+    if (multi) html += ingSumLine(r.flourG);
+    html += '<div class="ing-section-label">Øvrig</div>';
+    html += ingRow('Vann', r.waterG, `${S.waterPct} % av mel`);
   }
 
-  html += '<div class="ing-section-label">Øvrig</div>';
-  html += `
-    <div class="ing-item">
-      <div>
-        <div class="ing-name">Vann</div>
-        <div class="ing-sub">${S.waterPct} % av mel</div>
-      </div>
-      <div class="ing-grams">${S.roundIngredients ? gfmt(roundWater(r.waterG)) : gfmt(r.waterG)}<span class="g">g</span></div>
-    </div>
-    <div class="ing-item">
-      <div>
-        <div class="ing-name">Salt</div>
-        <div class="ing-sub">${S.saltPct} % av mel</div>
-      </div>
-      <div class="ing-grams">${S.roundIngredients ? gfmt(roundSalt(r.saltG)) : gfmt(r.saltG)}<span class="g">g</span></div>
-    </div>
-    <div class="ing-item">
-      <div>
-        <div class="ing-name">${S.yeastType === 'fresh' ? 'Fersk gjær' : 'Tørrgjær'}</div>
-        <div class="ing-sub">${r.yeastPct.toFixed(3)} % av mel${S.override ? ' · overstyrt' : ''}</div>
-      </div>
-      <div class="ing-grams">${S.roundIngredients && r.yeastG >= 5 ? roundYeast(r.yeastG).toFixed(1) : fmt1(r.yeastG)}<span class="g">g</span></div>
-    </div>`;
+  // Salt, yeast always shown
+  html += ingRow('Salt', r.saltG, `${S.saltPct} % av mel`);
+  html += `<div class="ing-item">
+    <div><div class="ing-name">${S.yeastType === 'fresh' ? 'Fersk gjær' : 'Tørrgjær'}</div>
+    <div class="ing-sub">${r.yeastPct.toFixed(3)} % av mel${S.override ? ' · overstyrt' : ''}</div></div>
+    <div class="ing-grams">${S.roundIngredients && r.yeastG >= 5 ? roundYeast(r.yeastG).toFixed(1) : fmt1(r.yeastG)}<span class="g">g</span></div>
+  </div>`;
+  if (hasExtra('sukker')) html += ingRow('Sukker', r.sukkerG, `${S.sukkerPct} % av mel`);
+  if (hasExtra('olje'))   html += ingRow('Olje',   r.oljeG,   `${S.oljePct} % av mel`);
 
   document.getElementById('ingList').innerHTML = html;
 
   // Svinn display
   document.getElementById('svinnVal').textContent = S.svinnPct + ' %';
 
-  const tot = r.flourG + r.waterG + r.saltG + r.yeastG;
+  const tot = r.flourG + r.waterG + r.saltG + r.yeastG + r.sukkerG + r.oljeG;
   const totDisplay = S.roundIngredients
-    ? gfmt(roundFlour(r.flourG) + roundWater(r.waterG) + roundSalt(r.saltG) + (r.yeastG >= 5 ? roundYeast(r.yeastG) : r.yeastG))
+    ? gfmt(roundFlour(r.flourG) + roundWater(r.waterG) + roundSalt(r.saltG)
+        + (r.yeastG >= 5 ? roundYeast(r.yeastG) : r.yeastG)
+        + Math.round(r.sukkerG) + Math.round(r.oljeG))
     : gfmt(tot);
   document.getElementById('resultTotal').textContent = totDisplay + ' g';
 
@@ -2228,6 +2576,11 @@ function renderFlourSumBadge() {
     'flour-sum-badge ' + (ok ? 'flour-sum-ok' : 'flour-sum-err');
   document.getElementById('flourSumVal').textContent =
     Math.round(sum * 10)/10 + ' %' + (ok ? ' ✓' : ' ⚠ må bli 100 %');
+  // Highlight pct inputs red when sum is off
+  document.querySelectorAll('.flour-pct-input').forEach(el => {
+    el.style.borderColor = ok ? '' : 'var(--error)';
+    el.style.color       = ok ? '' : 'var(--error)';
+  });
 }
 
 function renderFlourList() {
@@ -2279,6 +2632,70 @@ function fillSlider(id, val, min, max) {
   const pct = ((val - min) / (max - min)) * 100;
   el.style.background =
     `linear-gradient(to right, var(--orange) 0%, var(--orange) ${pct}%, var(--border-light) ${pct}%, var(--border-light) 100%)`;
+}
+
+// ═══════════════════════════════════════════════════════
+//  EXTRAS
+// ═══════════════════════════════════════════════════════
+function toggleExtra(name) {
+  if (!S.extras) S.extras = [];
+  const idx = S.extras.indexOf(name);
+  if (idx >= 0) S.extras.splice(idx, 1);
+  else S.extras.push(name);
+  renderExtras();
+  renderCalc();
+  saveState();
+}
+function openExtras() {
+  document.getElementById('extrasOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeExtras() {
+  document.getElementById('extrasOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function renderExtras() {
+  ['sukker','olje','poolish','biga','surdeig'].forEach(n => {
+    const cap = n.charAt(0).toUpperCase() + n.slice(1);
+    const field = document.getElementById('extra' + cap);
+    if (field) field.classList.toggle('visible', hasExtra(n));
+    const chip  = document.getElementById('chip'  + cap);
+    if (chip)  chip.classList.toggle('active', hasExtra(n));
+  });
+  // Sync input values
+  const sync = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+  sync('sukkerInput',        S.sukkerPct);
+  sync('oljeInput',          S.oljePct);
+  sync('poolishPctInput',    S.poolishPct);
+  sync('bigaPctInput',       S.bigaPct);
+  sync('bigaHydrationInput', S.bigaHydration);
+  sync('surdeigPctInput',    S.surdeigPct);
+  sync('surdeigHydrationInput', S.surdeigHydration);
+  if (hasExtra('sukker')) fillSlider('sukkerSlider', S.sukkerPct, 0, 10);
+  if (hasExtra('olje'))   fillSlider('oljeSlider',   S.oljePct,   0, 15);
+}
+function adjExtra(field, delta, min, max) {
+  S[field] = Math.max(min, Math.min(max, (S[field]||0) + delta));
+  const el = document.getElementById(field + 'Input');
+  if (el) el.value = S[field];
+  renderCalc(); saveState();
+}
+function updExtra(field, val, min, max) {
+  S[field] = Math.max(min, Math.min(max, parseFloat(val)||0));
+  renderCalc(); saveState();
+}
+function extraSliderDrag(name, val) {
+  S[name + 'Pct'] = parseFloat(val);
+  const el = document.getElementById(name + 'Input');
+  if (el) el.value = val;
+  renderCalc();
+}
+function extraSliderInput(name, val) {
+  const maxMap = { sukker: 10, olje: 15 };
+  S[name + 'Pct'] = Math.max(0, Math.min(maxMap[name]||15, parseFloat(val)||0));
+  const sl = document.getElementById(name + 'Slider');
+  if (sl) { sl.value = S[name + 'Pct']; fillSlider(name + 'Slider', S[name + 'Pct'], 0, maxMap[name]||15); }
+  renderCalc(); saveState();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -2678,7 +3095,8 @@ const STATE_KEY = 'deigkalkulator_state';
 const STATE_FIELDS = ['mode','numDoughs','piecesPerDough','weightPerPiece',
   'flourTypes','waterPct','saltPct','rtHours','rtTemp','coldHours','coldTemp',
   'yeastType','yeastBumpPct','svinnPct',
-  'override','overrideUnit','overrideVal','roundIngredients'];
+  'override','overrideUnit','overrideVal','roundIngredients',
+  'extras','sukkerPct','oljePct','poolishPct','bigaPct','bigaHydration','surdeigPct','surdeigHydration'];
 
 function saveState() {
   const snap = {};
@@ -2739,7 +3157,7 @@ function closeTips() {
   document.body.style.overflow = '';
 }
 function switchTab(tab) {
-  ['heving','hand','machine','eltefritt','steking'].forEach(t => {
+  ['heving','hand','machine','eltefritt','fordeig','steking'].forEach(t => {
     document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('active', tab === t);
     document.getElementById('panel' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('active', tab === t);
   });
@@ -2799,8 +3217,8 @@ function toggleMinimalist() {
   const on = document.body.classList.toggle('minimalist');
   try { localStorage.setItem(MIN_KEY, on ? '1' : ''); } catch {}
   document.getElementById('minBtn').innerHTML = on
-    ? '<span class="min-icon">⊞</span> Fullversjon'
-    : '<span class="min-icon">⊡</span> Minimalistisk';
+    ? '<span class="min-icon">⊞</span> Til fullversjon'
+    : '<span class="min-icon">⊡</span> Minimalistisk visning';
 }
 function collapseMinBtn() {
   document.getElementById('minBtnWrap').classList.add('hidden');
@@ -2813,10 +3231,7 @@ function expandMinBtn() {
   try { localStorage.removeItem(COLLAPSED_KEY); } catch {}
 }
 (function() {
-  if (localStorage.getItem(MIN_KEY)) {
-    document.body.classList.add('minimalist');
-    document.getElementById('minBtn').innerHTML = '<span class="min-icon">⊞</span> Fullversjon';
-  }
+  // Always start in full version — minimalist mode is NOT restored on reload
   if (localStorage.getItem(COLLAPSED_KEY)) {
     document.getElementById('minBtnWrap').classList.add('hidden');
     document.getElementById('minBtnTab').classList.add('visible');

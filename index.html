@@ -2178,7 +2178,7 @@
   <div class="card">
     <div class="card-header">
       <span class="card-icon">⏱️</span>
-      <span class="card-title">Hevetid</span>
+      <span class="card-title" id="hevetidTitle">Hevetid</span>
     </div>
     <div class="card-body">
       <div class="time-grid">
@@ -2811,6 +2811,8 @@ function setPrefType(t) {
   S.extras = S.extras.filter(e => e !== 'poolish' && e !== 'biga');
   if (t === 'poolish') S.extras.push('poolish');
   if (t === 'biga')    S.extras.push('biga');
+  // If surdeig was active, switch to dry yeast when poolish/biga selected
+  if (t !== 'none' && S.yeastType === 'surdeig') setYeastType('dry');
   syncPrefTypeUI();
   renderExtras();
   renderCalc();
@@ -2832,6 +2834,12 @@ function syncPrefTypeUI() {
   // Show/hide inline fermentation time block
   const ptc = document.getElementById('prefTimeContent');
   if (ptc) ptc.style.display = t !== 'none' ? '' : 'none';
+  // Hide surdeig option when poolish/biga active
+  const btnSurdeig = document.getElementById('btnSurdeig');
+  if (btnSurdeig) btnSurdeig.style.display = t !== 'none' ? 'none' : '';
+  // Update Hevetid title
+  const hevetidTitle = document.getElementById('hevetidTitle');
+  if (hevetidTitle) hevetidTitle.textContent = t !== 'none' ? 'Hevetid (etter tilsatt poolish/biga)' : 'Hevetid';
 }
 
 function toggleExtra(name) {

@@ -307,10 +307,10 @@
     body.minimalist .flour-add-mini { display: flex; }
     body.minimalist .add-flour-btn  { display: none; }
     .flour-sum-badge { display: none; }
-    /* flour-pct-wrap gets colour-coded background */
-    .flour-pct-wrap { display: flex; align-items: center; border-radius: 9px; padding: 1px 4px 1px 2px; transition: background 0.2s; }
-    .flour-pct-wrap.pct-ok  { background: rgba(91,174,110,0.14); }
-    .flour-pct-wrap.pct-err { background: rgba(224,82,82,0.12); }
+    /* flour-pct-wrap gets colour-coded background on the input only */
+    .flour-pct-wrap { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+    .flour-pct-wrap.pct-ok  .flour-pct-input { background: rgba(91,174,110,0.14); border-radius: 8px; }
+    .flour-pct-wrap.pct-err .flour-pct-input { background: rgba(224,82,82,0.12);  border-radius: 8px; }
     .add-flour-btn {
       width: 100%;
       padding: 10px;

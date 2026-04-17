@@ -383,7 +383,9 @@
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 13px 12px;
-      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
     }
     .time-lbl {
       font-size: 11px;
@@ -391,14 +393,14 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.6px;
-      margin-bottom: 10px;
       display: flex;
       align-items: center;
       gap: 4px;
       white-space: nowrap;
     }
     .time-stepper {
-      justify-content: center; width: 100%;
+      justify-content: center;
+      flex-shrink: 1;
       background: var(--card) !important;
       border: 1px solid var(--border) !important;
       border-radius: 8px !important;
@@ -418,8 +420,6 @@
       border: 1px solid var(--border);
       border-radius: 8px;
       padding: 2px 0;
-      margin-top: 5px;
-      width: 100%;
       overflow: hidden;
     }
     .temp-row .step-btn { width: 34px; height: 32px; font-size: 18px; }
@@ -619,6 +619,47 @@
       white-space: nowrap;
     }
     .ing-grams .g { font-size: 12px; font-weight: 400; color: var(--muted); margin-left: 2px; }
+
+    /* ── Preferment block ── */
+    .pref-block {
+      background: rgba(232,100,26,0.05);
+      border: 1px solid rgba(232,100,26,0.2);
+      border-radius: 10px;
+      margin: 4px 0 10px;
+      padding: 0 12px;
+    }
+    .pref-block .ing-item {
+      border-bottom: 1px solid rgba(232,100,26,0.12);
+    }
+    .pref-block-hdr {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--orange);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      padding: 9px 0 3px;
+    }
+    .pref-block-hint {
+      font-weight: 400;
+      color: var(--muted);
+      text-transform: none;
+      letter-spacing: 0;
+      font-size: 11px;
+    }
+    .pref-block-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px 0 8px;
+      border-top: 1px dashed rgba(232,100,26,0.25);
+      font-size: 12px;
+      color: var(--orange);
+      font-weight: 700;
+    }
+    .pref-block-total .pref-total-g {
+      font-size: 16px;
+      font-weight: 800;
+    }
 
     .total-row {
       display: flex;
@@ -1305,8 +1346,10 @@
     body.minimalist .slider-row + .slider-row { margin-top: 0; }
 
     /* Vann + salt side om side */
+    .water-salt-group .slider-val-input { width: 124px; }
     body.minimalist .water-salt-group        { display: flex; gap: 8px; align-items: flex-start; }
     body.minimalist .water-salt-group .slider-row { flex: 1; margin-bottom: 0; }
+    body.minimalist .water-salt-group .slider-val-input { width: 62px; }
     body.minimalist .water-salt-group .slider-row input[type="range"] { display: none; }
     body.minimalist .extra-field input[type="range"] { display: none; }
     body.minimalist .water-salt-group .slider-header { flex-wrap: wrap; }
@@ -1332,11 +1375,20 @@
     body.minimalist .pieces-weight-group > div > div[style]     { display: contents; }
 
     /* Time + temp på samme linje i minimalist */
-    body.minimalist .time-card        { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; padding: 6px 9px; }
-    body.minimalist .time-card .time-lbl      { width: 100%; margin-bottom: 0; font-size: 10px; }
-    body.minimalist .time-card .time-stepper  { flex: 0 0 auto; justify-content: flex-start; background: var(--card) !important; border: 1px solid var(--border) !important; border-radius: 8px !important; padding: 2px 0 !important; }
-    body.minimalist .time-card .temp-row      { margin-top: 0; flex: 0 0 auto; width: auto; }
+    body.minimalist .time-card        { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 4px 6px; padding: 6px 9px; }
+    body.minimalist .time-card .time-lbl      { width: 100%; font-size: 10px; }
+    body.minimalist .time-card .time-stepper  { flex: 0 0 auto; justify-content: flex-start; }
+    body.minimalist .time-card .temp-row      { flex: 0 0 auto; width: auto; }
     body.minimalist .time-card .temp-bar-wrap { display: none; }
+
+    /* Surdeig settings — same compact style as pieces-weight-group in minimalist */
+    body.minimalist #surdeigSettings                     { display: flex; gap: 6px; align-items: stretch; margin-bottom: 8px; }
+    body.minimalist #surdeigSettings .pref-row           { flex: 1; margin-bottom: 0; background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 8px; padding: 4px 8px; display: flex; flex-direction: row; align-items: center; gap: 4px; }
+    body.minimalist #surdeigSettings .pref-lbl           { font-size: 10px; font-weight: 700; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.3px; flex: 1; min-width: auto; }
+    body.minimalist #surdeigSettings .stepper            { background: none; border: none; padding: 0; overflow: visible; flex-shrink: 0; }
+    body.minimalist #surdeigSettings .step-input         { width: 36px; font-size: 14px; font-weight: 700; padding: 0; text-align: center; height: 26px; }
+    body.minimalist #surdeigSettings .step-btn           { width: 22px; height: 26px; font-size: 16px; }
+    body.minimalist #surdeigSettings [style*="font-size:16px"] { display: none; }
 
     /* ── Extras ── */
     .extras-add-btn {
@@ -2506,35 +2558,43 @@ function renderCalc() {
   const hasPref = hasExtra('poolish') || hasExtra('biga') || hasExtra('surdeig');
 
   if (hasExtra('poolish')) {
-    html += '<div class="ing-section-label pref-label">🫙 Poolish — forbered 12–16 t i forveien</div>';
+    const prefTot = r.poolishFlourG + r.poolishWaterG;
+    const prefTotFmt = S.roundIngredients ? gfmt(prefTot) : precise(prefTot);
+    html += `<div class="pref-block">`;
+    html += `<div class="pref-block-hdr">🫙 Poolish<span class="pref-block-hint"> — forbered 12–16 t i forveien</span></div>`;
     r.flourBreakdown.forEach(f => {
       const pg = r.poolishFlourG * (f.normalizedPct / 100);
       html += ingRow(f.name, pg, multi ? `${f.pct} % av mel` : null);
     });
-    html += ingRow('Vann', r.poolishWaterG, '100 % av poolish-mel');
-    html += '<div class="ing-section-label">🍞 Hoved-deig — mel</div>';
+    html += ingRow('Vann', r.poolishWaterG, '100 % hydrering');
+    html += `<div class="pref-block-total"><span>Totalt</span><span class="pref-total-g">${prefTotFmt} g</span></div>`;
+    html += `</div>`;
+    html += '<div class="ing-section-label">Hoved-deig</div>';
     r.flourBreakdown.forEach(f => {
       const mg = f.grams - r.poolishFlourG * (f.normalizedPct / 100);
       html += ingRow(f.name, mg, multi ? `${f.pct} % av mel` : null);
     });
     if (multi) html += ingSumLine(r.flourG - r.poolishFlourG);
-    html += '<div class="ing-section-label">Øvrig — hoved-deig</div>';
-    html += ingRow('Vann', r.waterG - r.poolishWaterG, `${S.waterPct} % av mel`);
+    html += ingRow('Vann', r.waterG - r.poolishWaterG, null);
   } else if (hasExtra('biga')) {
-    html += `<div class="ing-section-label pref-label">🧊 Biga — sett i kjøleskap 16–24 t (${S.bigaHydration} % hydrering)</div>`;
+    const prefTot = r.bigaFlourG + r.bigaWaterG;
+    const prefTotFmt = S.roundIngredients ? gfmt(prefTot) : precise(prefTot);
+    html += `<div class="pref-block">`;
+    html += `<div class="pref-block-hdr">🧊 Biga<span class="pref-block-hint"> — sett i kjøleskap 16–24 t · ${S.bigaHydration} % hydrering</span></div>`;
     r.flourBreakdown.forEach(f => {
       const bg = r.bigaFlourG * (f.normalizedPct / 100);
       html += ingRow(f.name, bg, multi ? `${f.pct} % av mel` : null);
     });
-    html += ingRow('Vann', r.bigaWaterG, `${S.bigaHydration} % av biga-mel`);
-    html += '<div class="ing-section-label">🍞 Hoved-deig — mel</div>';
+    html += ingRow('Vann', r.bigaWaterG, null);
+    html += `<div class="pref-block-total"><span>Totalt</span><span class="pref-total-g">${prefTotFmt} g</span></div>`;
+    html += `</div>`;
+    html += '<div class="ing-section-label">Hoved-deig</div>';
     r.flourBreakdown.forEach(f => {
       const mg = f.grams - r.bigaFlourG * (f.normalizedPct / 100);
       html += ingRow(f.name, mg, multi ? `${f.pct} % av mel` : null);
     });
     if (multi) html += ingSumLine(r.flourG - r.bigaFlourG);
-    html += '<div class="ing-section-label">Øvrig — hoved-deig</div>';
-    html += ingRow('Vann', r.waterG - r.bigaWaterG, `${S.waterPct} % av mel`);
+    html += ingRow('Vann', r.waterG - r.bigaWaterG, null);
   } else if (hasExtra('surdeig')) {
     const surTot = r.surdeigFlourG + r.surdeigWaterG;
     html += `<div class="ing-section-label pref-label">Surdeig starter — ${S.surdeigPct} % av mel · ${S.surdeigHydration} % hydrering</div>`;

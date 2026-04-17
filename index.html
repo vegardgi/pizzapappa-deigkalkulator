@@ -2532,7 +2532,7 @@ function renderCalc() {
     html += ingRow('Vann', r.waterG - r.bigaWaterG, `${S.waterPct} % av mel`);
   } else if (hasExtra('surdeig')) {
     const surTot = r.surdeigFlourG + r.surdeigWaterG;
-    html += `<div class="ing-section-label pref-label">🌾 Surdeig starter — ${S.surdeigPct} % av mel · ${S.surdeigHydration} % hydrering</div>`;
+    html += `<div class="ing-section-label pref-label">Surdeig starter — ${S.surdeigPct} % av mel · ${S.surdeigHydration} % hydrering</div>`;
     html += ingRow('Surdeig', surTot, `${gfmt(r.surdeigFlourG)} g mel + ${gfmt(r.surdeigWaterG)} g vann`);
     html += '<div class="ing-section-label">Mel — hoved-deig</div>';
     r.flourBreakdown.forEach(f => {

@@ -2145,6 +2145,32 @@
           <span style="font-size:12px;color:var(--muted)">%</span>
         </div>
       </div>
+
+      <!-- Fermentering — vises under valgt type -->
+      <div id="prefTimeContent" style="display:none">
+        <div style="font-size:11px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:0.5px;padding:10px 0 6px;border-top:1px solid var(--border);margin-top:8px">Heving</div>
+        <div class="time-grid" style="grid-template-columns:1fr 1fr">
+          <div class="time-card">
+            <div class="time-lbl">⏱️ Fermentering <i class="help-icon" data-tooltip="Poolish fermenteres typisk 12–16 t ved romtemperatur (18–22 °C). Biga fermenteres 8–12 t ved romtemperatur eller 16–24 t i kjøleskap (4–8 °C).">?</i></div>
+            <div class="stepper time-stepper">
+              <button class="step-btn" onclick="adj('prefHours',-1)">−</button>
+              <input  class="step-input" id="prefHours" type="number" value="14" min="1" max="48" onchange="upd('prefHours',this.value)">
+              <button class="step-btn" onclick="adj('prefHours',1)">+</button>
+              <span class="time-unit">t</span>
+            </div>
+          </div>
+          <div class="time-card">
+            <div class="time-lbl">🌡️ Temperatur</div>
+            <div class="temp-row">
+              <button class="step-btn" onclick="adj('prefTemp',-1)">−</button>
+              <input  class="step-input" id="prefTemp" type="number" value="20" min="0" max="40" onchange="upd('prefTemp',this.value)">
+              <button class="step-btn" onclick="adj('prefTemp',1)">+</button>
+              <span class="temp-unit">°C</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -2197,40 +2223,6 @@
           </div>
         </div>
 
-      </div>
-    </div>
-  </div>
-
-  <!-- ── 4b. Fordeig heving — vises kun når poolish/biga er valgt ── -->
-  <div class="card" id="prefTimeCard" style="display:none">
-    <div class="card-header" style="cursor:pointer" onclick="togglePrefTimeCard()">
-      <span class="card-icon" id="prefCardIcon">🫙</span>
-      <span class="card-title" id="prefCardTitle">Poolish — heving</span>
-      <i class="help-icon" style="margin-left:4px" data-tooltip="Poolish fermenteres typisk 12–16 t ved romtemperatur (18–22 °C). Biga fermenteres 8–12 t ved romtemperatur eller 16–24 t i kjøleskap (4–8 °C)." onclick="event.stopPropagation()">?</i>
-      <span class="pref-acc-chevron" id="prefTimeChevron" style="margin-left:auto">›</span>
-    </div>
-    <div id="prefTimeBody" style="display:none">
-      <div class="card-body">
-        <div class="time-grid" style="grid-template-columns:1fr 1fr">
-          <div class="time-card">
-            <div class="time-lbl">⏱️ Fermentering</div>
-            <div class="stepper time-stepper">
-              <button class="step-btn" onclick="adj('prefHours',-1)">−</button>
-              <input  class="step-input" id="prefHours" type="number" value="14" min="1" max="48" onchange="upd('prefHours',this.value)">
-              <button class="step-btn" onclick="adj('prefHours',1)">+</button>
-              <span class="time-unit">t</span>
-            </div>
-          </div>
-          <div class="time-card">
-            <div class="time-lbl">🌡️ Temperatur</div>
-            <div class="temp-row">
-              <button class="step-btn" onclick="adj('prefTemp',-1)">−</button>
-              <input  class="step-input" id="prefTemp" type="number" value="20" min="0" max="40" onchange="upd('prefTemp',this.value)">
-              <button class="step-btn" onclick="adj('prefTemp',1)">+</button>
-              <span class="temp-unit">°C</span>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -2837,26 +2829,9 @@ function syncPrefTypeUI() {
   if (bs) bs.classList.toggle('visible', t === 'biga');
   const badge = document.getElementById('prefAccBadge');
   if (badge) badge.textContent = t === 'poolish' ? '🫙 Poolish' : t === 'biga' ? '🧊 Biga' : '';
-  // Show/hide preferment time card
-  const pc = document.getElementById('prefTimeCard');
-  if (pc) {
-    pc.style.display = t !== 'none' ? '' : 'none';
-    const body = document.getElementById('prefTimeBody');
-    const chev = document.getElementById('prefTimeChevron');
-    if (t !== 'none') {
-      // Auto-open when poolish/biga selected
-      if (body) body.style.display = '';
-      if (chev) chev.classList.add('open');
-    } else {
-      // Collapse when hidden
-      if (body) body.style.display = 'none';
-      if (chev) chev.classList.remove('open');
-    }
-  }
-  const icon  = document.getElementById('prefCardIcon');
-  const title = document.getElementById('prefCardTitle');
-  if (icon)  icon.textContent  = t === 'biga' ? '🧊' : '🫙';
-  if (title) title.textContent = t === 'biga' ? 'Biga — heving' : 'Poolish — heving';
+  // Show/hide inline fermentation time block
+  const ptc = document.getElementById('prefTimeContent');
+  if (ptc) ptc.style.display = t !== 'none' ? '' : 'none';
 }
 
 function toggleExtra(name) {

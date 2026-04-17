@@ -1384,11 +1384,10 @@
     body.minimalist .pieces-weight-group .step-btn              { width: 22px; height: 26px; font-size: 16px; }
     body.minimalist .pieces-weight-group > div > div[style]     { display: contents; }
 
-    /* Time + temp på samme linje i minimalist */
-    body.minimalist .time-card        { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 4px 6px; padding: 6px 9px; }
-    body.minimalist .time-card .time-lbl      { width: 100%; font-size: 10px; }
-    body.minimalist .time-card .time-stepper  { flex: 1; justify-content: flex-start; }
-    body.minimalist .time-card .temp-row      { flex: 1; justify-content: flex-start; }
+    /* Time + temp side om side i minimalist — 2-kolonne grid */
+    body.minimalist .time-grid                { grid-template-columns: 1fr; }
+    body.minimalist .time-card                { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 6px; padding: 6px 9px; }
+    body.minimalist .time-card .time-lbl      { grid-column: 1 / -1; font-size: 10px; }
     body.minimalist .time-card .temp-bar-wrap { display: none; }
 
     /* Surdeig settings — same compact style as pieces-weight-group in minimalist */
@@ -2099,55 +2098,53 @@
         </div>
       </div>
 
-      <!-- Fordeig accordion -->
-      <div class="pref-accordion">
-        <button class="pref-acc-hdr" onclick="togglePrefAcc()">
-          <span>Fordeig</span>
-          <span class="pref-acc-right">
-            <span class="pref-acc-badge" id="prefAccBadge"></span>
-            <span class="pref-acc-chevron" id="prefAccChevron">›</span>
-          </span>
-        </button>
-        <div class="pref-acc-body" id="prefAccBody" style="display:none">
-          <div class="pref-type-row">
-            <button class="pref-type-btn active" id="btnPrefNone"    onclick="setPrefType('none')">Ingen</button>
-            <button class="pref-type-btn"        id="btnPrefPoolish" onclick="setPrefType('poolish')">🫙 Poolish</button>
-            <button class="pref-type-btn"        id="btnPrefBiga"    onclick="setPrefType('biga')">🧊 Biga</button>
+    </div>
+  </div>
+
+  <!-- ── 3b. Fordeig ── -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-icon">🫙</span>
+      <span class="card-title">Fordeig/preferment <i class="help-icon" data-tooltip="En fordeig er en del av oppskriften som fermenteres separat. Gir mer kompleks smak, bedre glutenstruktur og lengre holdbarhet. Velg type nedenfor.">?</i></span>
+      <span class="pref-acc-badge" id="prefAccBadge" style="margin-left:auto;font-size:13px;font-weight:700;color:var(--orange)"></span>
+    </div>
+    <div class="card-body">
+      <div class="pref-type-row">
+        <button class="pref-type-btn active" id="btnPrefNone"    onclick="setPrefType('none')">Ingen</button>
+        <button class="pref-type-btn"        id="btnPrefPoolish" onclick="setPrefType('poolish')">🫙 Poolish</button>
+        <button class="pref-type-btn"        id="btnPrefBiga"    onclick="setPrefType('biga')">🧊 Biga</button>
+      </div>
+      <div class="pref-settings" id="extraPoolish">
+        <div class="pref-row">
+          <span class="pref-lbl" style="font-size:11px;color:var(--muted)">Andel poolish <i class="help-icon" data-tooltip="Flytende fordeig med 100 % hydrering (like deler mel og vann). Fermenteres 12–16 t ved romtemp. Typisk 20–40 % av melet. Gir luftig krumme og mild syrlig aroma.">?</i></span>
+          <div class="stepper">
+            <button class="step-btn" onclick="adjExtra('poolishPct',-5,5,80)">−</button>
+            <input class="step-input" id="poolishPctInput" type="number" value="30" min="5" max="80" style="width:46px" onchange="updExtra('poolishPct',this.value,5,80)">
+            <button class="step-btn" onclick="adjExtra('poolishPct',5,5,80)">+</button>
           </div>
-          <div class="pref-settings" id="extraPoolish">
-            <div class="pref-row">
-              <span class="pref-lbl" style="font-size:11px;color:var(--muted)">Andel mel <i class="help-icon" data-tooltip="Flytende fordeig med 100 % hydrering (like deler mel og vann). Fermenteres 12–16 t ved romtemp. Typisk 20–40 % av melet. Gir luftig krumme og mild syrlig aroma.">?</i></span>
-              <div class="stepper">
-                <button class="step-btn" onclick="adjExtra('poolishPct',-5,5,80)">−</button>
-                <input class="step-input" id="poolishPctInput" type="number" value="30" min="5" max="80" style="width:46px" onchange="updExtra('poolishPct',this.value,5,80)">
-                <button class="step-btn" onclick="adjExtra('poolishPct',5,5,80)">+</button>
-              </div>
-              <span style="font-size:16px;color:var(--muted)">%</span>
-            </div>
-          </div>
-          <div class="pref-settings" id="extraBiga">
-            <div class="pref-row">
-              <span class="pref-lbl" style="font-size:11px;color:var(--muted)">Andel mel <i class="help-icon" data-tooltip="Stiv italiensk fordeig (45–55 % hydrering) med svært lite gjær. Settes i kjøleskap 16–24 t. Typisk 30–60 % av melet. Gir seig, åpen krumme og nøtteaktig smak.">?</i></span>
-              <div class="stepper">
-                <button class="step-btn" onclick="adjExtra('bigaPct',-5,5,80)">−</button>
-                <input class="step-input" id="bigaPctInput" type="number" value="40" min="5" max="80" style="width:46px" onchange="updExtra('bigaPct',this.value,5,80)">
-                <button class="step-btn" onclick="adjExtra('bigaPct',5,5,80)">+</button>
-              </div>
-              <span style="font-size:16px;color:var(--muted)">%</span>
-            </div>
-            <div class="pref-row">
-              <span class="pref-lbl">Hydrering</span>
-              <div class="stepper">
-                <button class="step-btn" onclick="adjExtra('bigaHydration',-5,40,65)">−</button>
-                <input class="step-input" id="bigaHydrationInput" type="number" value="50" min="40" max="65" style="width:46px" onchange="updExtra('bigaHydration',this.value,40,65)">
-                <button class="step-btn" onclick="adjExtra('bigaHydration',5,40,65)">+</button>
-              </div>
-              <span style="font-size:12px;color:var(--muted)">%</span>
-            </div>
-          </div>
+          <span style="font-size:16px;color:var(--muted)">%</span>
         </div>
       </div>
-
+      <div class="pref-settings" id="extraBiga">
+        <div class="pref-row">
+          <span class="pref-lbl" style="font-size:11px;color:var(--muted)">Andel biga <i class="help-icon" data-tooltip="Stiv italiensk fordeig (45–55 % hydrering) med svært lite gjær. Settes i kjøleskap 16–24 t. Typisk 30–60 % av melet. Gir seig, åpen krumme og nøtteaktig smak.">?</i></span>
+          <div class="stepper">
+            <button class="step-btn" onclick="adjExtra('bigaPct',-5,5,80)">−</button>
+            <input class="step-input" id="bigaPctInput" type="number" value="40" min="5" max="80" style="width:46px" onchange="updExtra('bigaPct',this.value,5,80)">
+            <button class="step-btn" onclick="adjExtra('bigaPct',5,5,80)">+</button>
+          </div>
+          <span style="font-size:16px;color:var(--muted)">%</span>
+        </div>
+        <div class="pref-row">
+          <span class="pref-lbl">Hydrering</span>
+          <div class="stepper">
+            <button class="step-btn" onclick="adjExtra('bigaHydration',-5,40,65)">−</button>
+            <input class="step-input" id="bigaHydrationInput" type="number" value="50" min="40" max="65" style="width:46px" onchange="updExtra('bigaHydration',this.value,40,65)">
+            <button class="step-btn" onclick="adjExtra('bigaHydration',5,40,65)">+</button>
+          </div>
+          <span style="font-size:12px;color:var(--muted)">%</span>
+        </div>
+      </div>
     </div>
   </div>
 

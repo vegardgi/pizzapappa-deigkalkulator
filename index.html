@@ -2472,9 +2472,7 @@ function calc() {
       yeastPct = (yeastG / flourG) * 100;
     }
   } else if (S.yeastType === 'surdeig') {
-    // Surdeig: no commercial yeast — yeastPct = 0
-    yeastPct = 0;
-    yeastG   = 0;
+    yeastPct = 0; yeastG = 0;
     const div = 1 + S.waterPct/100 + S.saltPct/100 + xSukker + xOlje;
     flourG   = totalDoughWt / div;
   } else {
@@ -2490,7 +2488,7 @@ function calc() {
   const sukkerG = flourG * xSukker;
   const oljeG   = flourG * xOlje;
 
-  // Preferment partitioning (poolish, biga, surdeig are subsets of flour+water — no change to totals)
+  // Preferment partitioning
   let poolishFlourG = 0, poolishWaterG = 0;
   if (hasExtra('poolish')) {
     poolishFlourG = flourG * (S.poolishPct||30) / 100 / 2; // 100% hydration
@@ -2509,6 +2507,38 @@ function calc() {
     surdeigWaterG = surdeigFlourG * sh;
   }
 
+  // ── Preferment yeast split ──────────────────────────────────────────────────
+  // Calibrated to published poolish/biga yeast tables (IDY basis):
+  //   A=1.426, B=0.234  →  0.28% IDY @ effH=7h, 0.12% @ 10.4h, 0.055% @ 13.9h
+  //   (matches Weekend Bakery / ChainBaker time-temperature tables)
+  const Q10_pref = 2;
+  const prefFlourG = hasExtra('poolish') ? poolishFlourG : hasExtra('biga') ? bigaFlourG : 0;
+  const hasPrefYeast = prefFlourG > 0 && S.yeastType !== 'surdeig';
+
+  let prefYeastG = 0, prefYeastPct = 0;    // yeast that goes IN the preferment
+  let mainYeastG = yeastG, mainYeastPct = yeastPct; // yeast for the main dough
+
+  if (hasPrefYeast) {
+    // Preferment yeast (always small — based on prefHours/prefTemp)
+    const actPref   = Math.pow(Q10_pref, ((S.prefTemp||20) - 22) / 10);
+    const effHPref  = Math.max(0.5, (S.prefHours||14) * actPref);
+    const idyPct    = Math.max(0.01, Math.min(0.5, 1.426 * Math.exp(-0.234 * effHPref)));
+    prefYeastPct    = S.yeastType === 'fresh' ? idyPct * 3 : idyPct;
+    prefYeastG      = prefFlourG * prefYeastPct / 100;
+
+    // Main-dough yeast: same Q10 model but on non-prefermented flour only
+    const mainFlourG    = flourG - prefFlourG;
+    const overrideActive = S.override && S.overrideVal != null && S.overrideVal > 0;
+    if (!overrideActive) {
+      mainYeastPct  = Math.max(0.001, (S.yeastType === 'fresh' ? yc.freshPct : yc.dryPct) + S.yeastBumpPct);
+      mainYeastG    = mainFlourG * mainYeastPct / 100;
+      yeastG        = mainYeastG;   // total commercial yeast for dough weight calc
+      yeastPct      = mainYeastPct;
+    }
+    // If override: override applies to main-dough yeast; prefYeast is still algorithmic
+  }
+  // ───────────────────────────────────────────────────────────────────────────
+
   // Normalize flour percentages
   const rawSum = S.flourTypes.reduce((s,f) => s + (f.pct||0), 0) || 100;
   const flourBreakdown = S.flourTypes.map(f => ({
@@ -2517,15 +2547,23 @@ function calc() {
     grams: flourG * (f.pct / rawSum)
   }));
 
+  // Straight-dough suggestions (used for override placeholder and non-pref display)
   const sugFreshG = flourG * yc.freshPct / 100;
   const sugDryG   = flourG * yc.dryPct   / 100;
+  // Main-dough suggestions when preferment active
+  const sugMainFreshG = hasPrefYeast ? (flourG - prefFlourG) * yc.freshPct / 100 : sugFreshG;
+  const sugMainDryG   = hasPrefYeast ? (flourG - prefFlourG) * yc.dryPct   / 100 : sugDryG;
 
   return { totalPieces, totalDoughWt, flourG, waterG, saltG,
            yeastG, yeastPct, yc, flourBreakdown, sugFreshG, sugDryG,
+           sugMainFreshG, sugMainDryG,
            sukkerG, oljeG,
            poolishFlourG, poolishWaterG,
            bigaFlourG, bigaWaterG,
-           surdeigFlourG, surdeigWaterG };
+           surdeigFlourG, surdeigWaterG,
+           prefYeastG, prefYeastPct,
+           mainYeastG, mainYeastPct,
+           hasPrefYeast };
 }
 
 // ═══════════════════════════════════════════════════════
@@ -2563,46 +2601,109 @@ function renderCalc() {
 
   // Yeast suggestion box (fully dynamic)
   const overrideActive = S.override && S.overrideVal != null && S.overrideVal > 0;
-  const sugG   = S.yeastType === 'fresh' ? r.sugFreshG : r.sugDryG;
-  const sugPct = S.yeastType === 'fresh' ? r.yc.freshPct : r.yc.dryPct;
   const yName  = S.yeastType === 'fresh' ? 'fersk gjær' : 'tørrgjær';
-  const displayPct = overrideActive ? r.yeastPct : (sugPct + S.yeastBumpPct);
-  const subLine = displayPct.toFixed(3) + ' % av mel  ·  ' +
-    S.rtHours + ' t @ ' + S.rtTemp + ' °C  +  ' +
-    S.coldHours + ' t @ ' + S.coldTemp + ' °C' +
-    '  →  eff. ' + r.yc.effH.toFixed(1) + ' t';
+  const yNameS = S.yeastType === 'fresh' ? 'fersk'      : 'tørrgjær';
 
   let sugBoxHtml;
-  if (overrideActive) {
-    sugBoxHtml = `
-      <div class="yeast-sug-lbl" style="color:var(--orange)">Overstyrt</div>
-      <div class="yeast-sug-val">${fmt1(r.yeastG)} g ${yName}</div>
-      <div class="yeast-sug-strike">
-        Beregnet: <s>${fmt1(sugG)} g</s> &nbsp;<s style="font-size:12px;color:var(--muted)">${sugPct.toFixed(3)} %</s>
-      </div>
-      <div class="yeast-sug-sub">${subLine}</div>`;
+
+  if (r.hasPrefYeast) {
+    // ── Preferment mode: show two lines (fordeig + hoved-deig) ──
+    const prefIcon = hasExtra('poolish') ? '🫙' : '🧊';
+    const prefLabel = hasExtra('poolish') ? 'Poolish' : 'Biga';
+    const subLine = r.mainYeastPct.toFixed(3) + ' % av mel  ·  ' +
+      S.rtHours + ' t @ ' + S.rtTemp + ' °C  +  ' +
+      S.coldHours + ' t @ ' + S.coldTemp + ' °C' +
+      '  →  eff. ' + r.yc.effH.toFixed(1) + ' t';
+    const prefSubLine = r.prefYeastPct.toFixed(3) + ' % av fordeig-mel  ·  ' +
+      S.prefHours + ' t @ ' + S.prefTemp + ' °C';
+
+    if (overrideActive) {
+      sugBoxHtml = `
+        <div class="yeast-sug-lbl" style="color:var(--orange)">Overstyrt (hoved-deig)</div>
+        <div style="display:flex;flex-direction:column;gap:4px;margin:4px 0">
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px">
+            <span style="color:var(--muted)">${prefIcon} ${prefLabel}-gjær</span>
+            <span style="font-weight:700">${fmt1(r.prefYeastG)} g ${yNameS}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px">
+            <span style="color:var(--muted)">🍞 Hoved-deig</span>
+            <span style="font-weight:700">${fmt1(r.mainYeastG)} g ${yNameS}</span>
+          </div>
+        </div>
+        <div class="yeast-sug-sub">${prefSubLine}</div>
+        <div class="yeast-sug-sub">${subLine}</div>`;
+    } else {
+      const bumpSign  = S.yeastBumpPct > 0 ? '+' : '';
+      const bumpClass = S.yeastBumpPct > 0 ? 'bumped-up' : S.yeastBumpPct < 0 ? 'bumped-down' : '';
+      const bumpText  = S.yeastBumpPct === 0 ? 'Hoved-deig' : bumpSign + S.yeastBumpPct.toFixed(1) + ' %';
+      sugBoxHtml = `
+        <div class="yeast-sug-lbl">Beregnet forslag</div>
+        <div style="display:flex;flex-direction:column;gap:4px;margin:4px 0">
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px">
+            <span style="color:var(--muted)">${prefIcon} ${prefLabel}-gjær</span>
+            <span style="font-weight:700">${fmt1(r.prefYeastG)} g ${yNameS}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="color:var(--muted);font-size:13px">🍞 Hoved-deig</span>
+            <div class="yeast-sug-val" style="margin:0">
+              <button class="bump-btn bump-minus bump-inline" onclick="bumpYeast(-0.2)" title="−0.2 %">−</button>
+              <span class="bump-val-inline">${fmt1(r.mainYeastG)} g ${yNameS}</span>
+              <button class="bump-btn bump-plus bump-inline"  onclick="bumpYeast(0.2)"  title="+0.2 %">+</button>
+            </div>
+          </div>
+        </div>
+        <div class="yeast-sug-sub">${prefSubLine}</div>
+        <div class="yeast-sug-sub">${subLine}</div>
+        <div class="yeast-bump-row">
+          <button class="bump-btn bump-minus" onclick="bumpYeast(-0.2)" title="−0.2 % av mel">−0.2 %</button>
+          <span class="bump-label ${bumpClass}">${bumpText}</span>
+          <button class="bump-btn bump-plus"  onclick="bumpYeast(0.2)"  title="+0.2 % av mel">+0.2 %</button>
+        </div>`;
+    }
   } else {
-    const bumpSign  = S.yeastBumpPct > 0 ? '+' : '';
-    const bumpClass = S.yeastBumpPct > 0 ? 'bumped-up' : S.yeastBumpPct < 0 ? 'bumped-down' : '';
-    const bumpText  = S.yeastBumpPct === 0 ? 'Forslag' : bumpSign + S.yeastBumpPct.toFixed(1) + ' %';
-    const yeastValG = fmt1(Math.max(0, sugG + (S.yeastBumpPct/100)*(r.flourG)));
-    sugBoxHtml = `
-      <div class="yeast-sug-lbl">Beregnet forslag</div>
-      <div class="yeast-sug-val">
-        <button class="bump-btn bump-minus bump-inline" onclick="bumpYeast(-0.2)" title="−0.2 %">−</button>
-        <span class="bump-val-inline">${yeastValG} g ${yName}</span>
-        <button class="bump-btn bump-plus bump-inline"  onclick="bumpYeast(0.2)"  title="+0.2 %">+</button>
-      </div>
-      <div class="yeast-sug-sub">${subLine}</div>
-      <div class="yeast-bump-row">
-        <button class="bump-btn bump-minus" onclick="bumpYeast(-0.2)" title="−0.2 % av mel">−0.2 %</button>
-        <span class="bump-label ${bumpClass}">${bumpText}</span>
-        <button class="bump-btn bump-plus"  onclick="bumpYeast(0.2)"  title="+0.2 % av mel">+0.2 %</button>
-      </div>`;
+    // ── Straight dough mode (no preferment) ──
+    const sugG   = S.yeastType === 'fresh' ? r.sugFreshG : r.sugDryG;
+    const sugPct = S.yeastType === 'fresh' ? r.yc.freshPct : r.yc.dryPct;
+    const displayPct = overrideActive ? r.yeastPct : (sugPct + S.yeastBumpPct);
+    const subLine = displayPct.toFixed(3) + ' % av mel  ·  ' +
+      S.rtHours + ' t @ ' + S.rtTemp + ' °C  +  ' +
+      S.coldHours + ' t @ ' + S.coldTemp + ' °C' +
+      '  →  eff. ' + r.yc.effH.toFixed(1) + ' t';
+
+    if (overrideActive) {
+      sugBoxHtml = `
+        <div class="yeast-sug-lbl" style="color:var(--orange)">Overstyrt</div>
+        <div class="yeast-sug-val">${fmt1(r.yeastG)} g ${yName}</div>
+        <div class="yeast-sug-strike">
+          Beregnet: <s>${fmt1(sugG)} g</s> &nbsp;<s style="font-size:12px;color:var(--muted)">${sugPct.toFixed(3)} %</s>
+        </div>
+        <div class="yeast-sug-sub">${subLine}</div>`;
+    } else {
+      const bumpSign  = S.yeastBumpPct > 0 ? '+' : '';
+      const bumpClass = S.yeastBumpPct > 0 ? 'bumped-up' : S.yeastBumpPct < 0 ? 'bumped-down' : '';
+      const bumpText  = S.yeastBumpPct === 0 ? 'Forslag' : bumpSign + S.yeastBumpPct.toFixed(1) + ' %';
+      const yeastValG = fmt1(Math.max(0, sugG + (S.yeastBumpPct/100)*(r.flourG)));
+      sugBoxHtml = `
+        <div class="yeast-sug-lbl">Beregnet forslag</div>
+        <div class="yeast-sug-val">
+          <button class="bump-btn bump-minus bump-inline" onclick="bumpYeast(-0.2)" title="−0.2 %">−</button>
+          <span class="bump-val-inline">${yeastValG} g ${yName}</span>
+          <button class="bump-btn bump-plus bump-inline"  onclick="bumpYeast(0.2)"  title="+0.2 %">+</button>
+        </div>
+        <div class="yeast-sug-sub">${subLine}</div>
+        <div class="yeast-bump-row">
+          <button class="bump-btn bump-minus" onclick="bumpYeast(-0.2)" title="−0.2 % av mel">−0.2 %</button>
+          <span class="bump-label ${bumpClass}">${bumpText}</span>
+          <button class="bump-btn bump-plus"  onclick="bumpYeast(0.2)"  title="+0.2 % av mel">+0.2 %</button>
+        </div>`;
+    }
   }
+
   document.getElementById('yeastSuggestion').innerHTML = sugBoxHtml;
 
   if (!overrideActive) {
+    const sugG   = S.yeastType === 'fresh' ? r.sugMainFreshG : r.sugMainDryG;
+    const sugPct = S.yeastType === 'fresh' ? r.yc.freshPct   : r.yc.dryPct;
     document.getElementById('overrideInput').placeholder =
       S.overrideUnit === 'gram' ? fmt1(sugG) : sugPct.toFixed(3);
   }
@@ -2626,15 +2727,19 @@ function renderCalc() {
   const hasPref = hasExtra('poolish') || hasExtra('biga') || hasExtra('surdeig');
 
   if (hasExtra('poolish')) {
-    const prefTot = r.poolishFlourG + r.poolishWaterG;
+    const prefTot    = r.poolishFlourG + r.poolishWaterG + r.prefYeastG;
     const prefTotFmt = S.roundIngredients ? gfmt(prefTot) : precise(prefTot);
     html += `<div class="pref-block">`;
-    html += `<div class="pref-block-hdr">🫙 Poolish<span class="pref-block-hint"> — forbered 12–16 t i forveien</span></div>`;
+    html += `<div class="pref-block-hdr">🫙 Poolish<span class="pref-block-hint"> — ${S.prefHours} t @ ${S.prefTemp} °C</span></div>`;
     r.flourBreakdown.forEach(f => {
       const pg = r.poolishFlourG * (f.normalizedPct / 100);
       html += ingRow(f.name, pg, multi ? `${f.pct} % av mel` : null);
     });
     html += ingRow('Vann', r.poolishWaterG, '100 % hydrering');
+    if (r.prefYeastG > 0) {
+      const yLbl = S.yeastType === 'fresh' ? 'Fersk gjær' : 'Tørrgjær';
+      html += ingRow(yLbl, r.prefYeastG, r.prefYeastPct.toFixed(3) + ' % av fordeig-mel');
+    }
     html += `<div class="pref-block-total"><span>Totalt</span><span class="pref-total-g">${prefTotFmt} g</span></div>`;
     html += `</div>`;
     html += '<div class="ing-section-label">Hoved-deig</div>';
@@ -2645,15 +2750,19 @@ function renderCalc() {
     if (multi) html += ingSumLine(r.flourG - r.poolishFlourG);
     html += ingRow('Vann', r.waterG - r.poolishWaterG, null);
   } else if (hasExtra('biga')) {
-    const prefTot = r.bigaFlourG + r.bigaWaterG;
+    const prefTot    = r.bigaFlourG + r.bigaWaterG + r.prefYeastG;
     const prefTotFmt = S.roundIngredients ? gfmt(prefTot) : precise(prefTot);
     html += `<div class="pref-block">`;
-    html += `<div class="pref-block-hdr">🧊 Biga<span class="pref-block-hint"> — sett i kjøleskap 16–24 t · ${S.bigaHydration} % hydrering</span></div>`;
+    html += `<div class="pref-block-hdr">🧊 Biga<span class="pref-block-hint"> — ${S.prefHours} t @ ${S.prefTemp} °C · ${S.bigaHydration} % hydrering</span></div>`;
     r.flourBreakdown.forEach(f => {
       const bg = r.bigaFlourG * (f.normalizedPct / 100);
       html += ingRow(f.name, bg, multi ? `${f.pct} % av mel` : null);
     });
     html += ingRow('Vann', r.bigaWaterG, null);
+    if (r.prefYeastG > 0) {
+      const yLbl = S.yeastType === 'fresh' ? 'Fersk gjær' : 'Tørrgjær';
+      html += ingRow(yLbl, r.prefYeastG, r.prefYeastPct.toFixed(3) + ' % av fordeig-mel');
+    }
     html += `<div class="pref-block-total"><span>Totalt</span><span class="pref-total-g">${prefTotFmt} g</span></div>`;
     html += `</div>`;
     html += '<div class="ing-section-label">Hoved-deig</div>';
@@ -2689,12 +2798,16 @@ function renderCalc() {
   html += ingRow('Salt', r.saltG, `${S.saltPct} % av mel`);
   // Yeast or surdeig
   if (S.yeastType === 'surdeig') {
-    // surdeig is already shown in the preferment section; skip yeast line
+    // surdeig is shown in the preferment section; skip yeast line
   } else {
+    const yLbl  = S.yeastType === 'fresh' ? 'Fersk gjær' : 'Tørrgjær';
+    const yG    = r.hasPrefYeast ? r.mainYeastG   : r.yeastG;
+    const yPct  = r.hasPrefYeast ? r.mainYeastPct : r.yeastPct;
+    const ySub  = yPct.toFixed(3) + ' % av mel' + (r.hasPrefYeast ? ' (hoved-deig)' : '') + (S.override ? ' · overstyrt' : '');
     html += `<div class="ing-item">
-      <div><div class="ing-name">${S.yeastType === 'fresh' ? 'Fersk gjær' : 'Tørrgjær'}</div>
-      <div class="ing-sub">${r.yeastPct.toFixed(3)} % av mel${S.override ? ' · overstyrt' : ''}</div></div>
-      <div class="ing-grams">${S.roundIngredients ? (r.yeastG >= 5 ? roundYeast(r.yeastG).toFixed(1) : fmt1(r.yeastG)) : fmt1(r.yeastG)}<span class="g">g</span></div>
+      <div><div class="ing-name">${yLbl}</div>
+      <div class="ing-sub">${ySub}</div></div>
+      <div class="ing-grams">${S.roundIngredients ? (yG >= 5 ? roundYeast(yG).toFixed(1) : fmt1(yG)) : fmt1(yG)}<span class="g">g</span></div>
     </div>`;
   }
   if (hasExtra('sukker')) html += ingRow('Sukker', r.sukkerG, `${S.sukkerPct} % av mel`);
@@ -2705,10 +2818,11 @@ function renderCalc() {
   // Svinn display
   document.getElementById('svinnVal').textContent = S.svinnPct + ' %';
 
-  const tot = r.flourG + r.waterG + r.saltG + r.yeastG + r.sukkerG + r.oljeG;
+  const mainY  = r.hasPrefYeast ? r.mainYeastG : r.yeastG;
+  const tot = r.flourG + r.waterG + r.saltG + mainY + r.prefYeastG + r.sukkerG + r.oljeG;
   const totDisplay = S.roundIngredients
     ? gfmt(roundFlour(r.flourG) + roundWater(r.waterG) + roundSalt(r.saltG)
-        + (r.yeastG >= 5 ? roundYeast(r.yeastG) : r.yeastG)
+        + (mainY >= 5 ? roundYeast(mainY) : mainY) + r.prefYeastG
         + Math.round(r.sukkerG) + Math.round(r.oljeG))
     : precise(tot);
   document.getElementById('resultTotal').textContent = totDisplay + ' g';

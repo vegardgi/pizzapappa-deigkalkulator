@@ -394,18 +394,24 @@
       gap: 4px;
       white-space: nowrap;
     }
-    .time-stepper { justify-content: center; }
-    .time-sub { font-size: 11px; color: var(--muted); margin-top: 7px; margin-bottom: 8px; }
+    .time-stepper { justify-content: center; width: 100%; }
+    .time-sub { display: none; }
     .temp-row {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 2px;
+      gap: 0;
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 2px 4px;
+      padding: 2px 0;
+      margin-top: 5px;
+      width: 100%;
+      overflow: hidden;
     }
+    .temp-row .step-btn { width: 34px; height: 32px; font-size: 18px; }
+    .temp-row .step-input { width: 54px; height: 32px; font-size: 14px; }
+    .temp-row .temp-unit { font-size: 12px; color: var(--muted); padding-right: 6px; }
 
     /* ── Yeast ── */
     .yeast-toggle {
@@ -1309,6 +1315,7 @@
       <button class="modal-tab active" id="tabHand" onclick="switchTab('hand')">✋ For hånd</button>
       <button class="modal-tab" id="tabMachine" onclick="switchTab('machine')">🤖 I maskin</button>
       <button class="modal-tab" id="tabHeving" onclick="switchTab('heving')">🍞 Heving</button>
+      <button class="modal-tab" id="tabEltefritt" onclick="switchTab('eltefritt')">🙌 Eltefritt</button>
     </div>
     <div class="modal-body">
 
@@ -1508,6 +1515,70 @@
         </div>
       </div>
 
+      <!-- ELTEFRITT -->
+      <div class="tips-panel" id="panelEltefritt">
+        <div class="tip-item">
+          <div class="tip-num">1</div>
+          <div class="tip-content">
+            <div class="tip-title">Tid erstatter arbeid</div>
+            <div class="tip-desc">Eltefri metode bruker lang hevetid (12–24 t ved romtemp, eller 24–72 t i kjøleskap) i stedet for mekanisk arbeid. Enzymer i melet bryter ned proteiner og bygger glutenstruktur automatisk — uten at du trenger å ta i deigen.</div>
+            <span class="tip-badge badge-green">Grunnprinsippet</span>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">2</div>
+          <div class="tip-content">
+            <div class="tip-title">Høy hydrering gjør det enklere</div>
+            <div class="tip-desc">Eltefri deig fungerer best med minst 70–80 % vann. Mye vann gir proteinet i melet frihet til å orientere seg og danne glutenbånd på egen hånd. Tørrere deig trenger mer mekanisk hjelp.</div>
+            <span class="tip-badge badge-orange">70 %+ vann</span>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">3</div>
+          <div class="tip-content">
+            <div class="tip-title">Bruk lite gjær</div>
+            <div class="tip-desc">Eltefri metode krever svært lite gjær — typisk 0,1–0,3 % av melvekten. Lite gjær = sakte fermentering = mer tid til smakutvikling. For mye gjær overhever deigen raskt og gir flat smak. Kalkulatoren justerer gjærmengde automatisk basert på hevingstid og temperatur.</div>
+            <span class="tip-badge badge-red">0,1–0,3 % gjær</span>
+            <a class="tip-link" href="https://www.pizzapappa.no/post/hva-er-gjaer" target="_blank" rel="noopener">Les mer på pizzapappa.no →</a>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">4</div>
+          <div class="tip-content">
+            <div class="tip-title">Strekk og brett i stedet for elting</div>
+            <div class="tip-desc">Gjør 3–4 sett strekk-og-brett de første 2 timene: fukt hånden, ta tak i siden av deigen, strekk opp og brett inn mot midten. Roter bollen 90° og gjenta 4 ganger per sett. Hvert sett tar bare 30 sekunder og styrker glutennettverket betraktelig.</div>
+            <span class="tip-badge badge-orange">Strekk &amp; brett</span>
+            <a class="tip-link" href="https://www.pizzapappa.no/post/elting-av-deig" target="_blank" rel="noopener">Les mer på pizzapappa.no →</a>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">5</div>
+          <div class="tip-content">
+            <div class="tip-title">Autolyse gir head-start</div>
+            <div class="tip-desc">Bland mel og vann (uten gjær og salt) og la stå 20–60 min tildekket. I denne pausen suger melet til seg vannet, gluten begynner å dannes, og stivelse sveller. Deigen blir merkbart mykere og lettere å forme — og du trenger enda mindre elting etterpå.</div>
+            <span class="tip-badge badge-green">20–60 min hvil</span>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">6</div>
+          <div class="tip-content">
+            <div class="tip-title">Form forsiktig — ikke degass</div>
+            <div class="tip-desc">Eltefri deig har luftbobler du vil beholde. Hvelv deigen på et godt melet underlag, og strekk forsiktig til rett form uten å trykke ned. For pizza: bruk fingertuppene fra midten og utover. For brød: brett kantene inn under og la overflatespenningen forme loaven.</div>
+            <span class="tip-badge badge-orange">Skånsom forming</span>
+            <a class="tip-link" href="https://www.pizzapappa.no/post/fremgangsm%C3%A5te-for-elting-av-pizzadeig" target="_blank" rel="noopener">Les mer på pizzapappa.no →</a>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">7</div>
+          <div class="tip-content">
+            <div class="tip-title">Les deigen, ikke klokken</div>
+            <div class="tip-desc">Eltefri deig er klar når den er nesten doblet i størrelse, overflaten er hvelvd med synlige bobler, og fingeravtrykk spretter sakte tilbake (ikke umiddelbart). Er det kaldt tar det lenger tid — er det varmt kortere. Temperatur er alt.</div>
+            <span class="tip-badge badge-green">Fingertest</span>
+            <a class="tip-link" href="https://www.pizzapappa.no/post/faq-ofte-spurte-sp%C3%B8rsm%C3%A5l" target="_blank" rel="noopener">Les mer på pizzapappa.no →</a>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -1662,12 +1733,11 @@
             <button class="step-btn" onclick="adj('rtHours',1)">+</button>
             <span style="font-size:12px;font-weight:600;color:var(--muted)">timer</span>
           </div>
-          <div class="time-sub">timer</div>
           <div class="temp-row">
-            <button class="step-btn" onclick="adj('rtTemp',-1)" style="width:28px;height:28px;font-size:16px">−</button>
-            <input  class="step-input" id="rtTemp" type="number" value="20" min="10" max="40" style="width:44px;font-size:14px" onchange="upd('rtTemp',this.value)">
-            <button class="step-btn" onclick="adj('rtTemp',1)"  style="width:28px;height:28px;font-size:16px">+</button>
-            <span style="font-size:12px;color:var(--muted)">°C</span>
+            <button class="step-btn" onclick="adj('rtTemp',-1)">−</button>
+            <input  class="step-input" id="rtTemp" type="number" value="20" min="10" max="40" onchange="upd('rtTemp',this.value)">
+            <button class="step-btn" onclick="adj('rtTemp',1)">+</button>
+            <span class="temp-unit">°C</span>
           </div>
           <div class="temp-bar-wrap" id="rtTempWrap">
             <div class="temp-bar temp-bar-rt" id="rtTempBar"></div>
@@ -1683,12 +1753,11 @@
             <button class="step-btn" onclick="adj('coldHours',1)">+</button>
             <span style="font-size:12px;font-weight:600;color:var(--muted)">timer</span>
           </div>
-          <div class="time-sub">timer</div>
           <div class="temp-row">
-            <button class="step-btn" onclick="adj('coldTemp',-1)" style="width:28px;height:28px;font-size:16px">−</button>
-            <input  class="step-input" id="coldTemp" type="number" value="4" min="0" max="15" style="width:44px;font-size:14px" onchange="upd('coldTemp',this.value)">
-            <button class="step-btn" onclick="adj('coldTemp',1)"  style="width:28px;height:28px;font-size:16px">+</button>
-            <span style="font-size:12px;color:var(--muted)">°C</span>
+            <button class="step-btn" onclick="adj('coldTemp',-1)">−</button>
+            <input  class="step-input" id="coldTemp" type="number" value="4" min="0" max="15" onchange="upd('coldTemp',this.value)">
+            <button class="step-btn" onclick="adj('coldTemp',1)">+</button>
+            <span class="temp-unit">°C</span>
           </div>
           <div class="temp-bar-wrap" id="coldTempWrap">
             <div class="temp-bar temp-bar-cold" id="coldTempBar"></div>
@@ -2292,45 +2361,50 @@ let renamingId = null;
 
 const DEFAULT_RECIPES = [
   // ── Pizza ──
-  { id:1, name:'🍕 Napolitansk Pizzadeig 8t', mode:'pizza', snap:{
+  { id:1, name:'Napolitansk Pizzadeig 8t', mode:'pizza', snap:{
     mode:'pizza', numDoughs:1, piecesPerDough:6, weightPerPiece:265,
     flourTypes:[{id:1,name:'Hvetemel tipo 00',pct:100}],
     waterPct:65, saltPct:2.5, rtHours:8, rtTemp:20, coldHours:0, coldTemp:4,
     yeastType:'fresh', svinnPct:0 }},
-  { id:2, name:'🍕 Napolitansk Pizzadeig 24t', mode:'pizza', snap:{
+  { id:2, name:'Napolitansk Pizzadeig 24t', mode:'pizza', snap:{
     mode:'pizza', numDoughs:1, piecesPerDough:6, weightPerPiece:265,
     flourTypes:[{id:1,name:'Hvetemel tipo 00',pct:100}],
     waterPct:65, saltPct:2.5, rtHours:18, rtTemp:20, coldHours:6, coldTemp:4,
     yeastType:'fresh', svinnPct:0 }},
-  { id:3, name:'🍕 Napolitansk Pizzadeig 48t', mode:'pizza', snap:{
+  { id:3, name:'Napolitansk Pizzadeig 48t', mode:'pizza', snap:{
     mode:'pizza', numDoughs:1, piecesPerDough:6, weightPerPiece:265,
     flourTypes:[{id:1,name:'Hvetemel tipo 00',pct:100}],
     waterPct:65, saltPct:2.5, rtHours:14, rtTemp:20, coldHours:34, coldTemp:4,
     yeastType:'fresh', svinnPct:0 }},
-  { id:4, name:'🍕 Napolitansk Pizzadeig 24t kun RT', mode:'pizza', snap:{
+  { id:4, name:'Napolitansk Pizzadeig 24t RT', mode:'pizza', snap:{
     mode:'pizza', numDoughs:1, piecesPerDough:6, weightPerPiece:265,
     flourTypes:[{id:1,name:'Hvetemel tipo 00',pct:100}],
     waterPct:65, saltPct:2.5, rtHours:24, rtTemp:20, coldHours:0, coldTemp:4,
     yeastType:'fresh', svinnPct:0 }},
+  { id:9, name:'New York Pizza 48t', mode:'pizza', snap:{
+    mode:'pizza', numDoughs:1, piecesPerDough:4, weightPerPiece:280,
+    flourTypes:[{id:1,name:'Brødmel (tipo 0 / høy protein)',pct:100}],
+    waterPct:59, saltPct:2.0, rtHours:4, rtTemp:20, coldHours:44, coldTemp:4,
+    yeastType:'fresh', svinnPct:0 }},
   // ── Brød ──
-  { id:5, name:'🍞 Klassisk Loff', mode:'bread', snap:{
+  { id:5, name:'Klassisk Loff', mode:'bread', snap:{
     mode:'bread', numDoughs:1, piecesPerDough:1, weightPerPiece:850,
     flourTypes:[{id:1,name:'Hvetemel',pct:100}],
     waterPct:67, saltPct:1.5, rtHours:3, rtTemp:20, coldHours:0, coldTemp:4,
     yeastType:'fresh', svinnPct:12 }},
-  { id:6, name:'🍞 Grovt Hverdagsbrød', mode:'bread', snap:{
+  { id:6, name:'Grovt Hverdagsbrød', mode:'bread', snap:{
     mode:'bread', numDoughs:1, piecesPerDough:1, weightPerPiece:850,
-    flourTypes:[{id:1,name:'Fullkornshvetemel',pct:70},{id:2,name:'Sammalt hvete grov',pct:30}],
+    flourTypes:[{id:1,name:'Hvetemel',pct:60},{id:2,name:'Sammalt hvete grov',pct:40}],
     waterPct:68, saltPct:1.8, rtHours:2, rtTemp:20, coldHours:0, coldTemp:4,
     yeastType:'fresh', svinnPct:12 }},
-  { id:7, name:'🍞 Eltefritt Brød', mode:'bread', snap:{
+  { id:7, name:'Eltefritt Brød', mode:'bread', snap:{
     mode:'bread', numDoughs:1, piecesPerDough:1, weightPerPiece:900,
     flourTypes:[{id:1,name:'Hvetemel',pct:70},{id:2,name:'Sammalt hvete',pct:30}],
     waterPct:78, saltPct:2, rtHours:9, rtTemp:20, coldHours:0, coldTemp:4,
     yeastType:'fresh', svinnPct:13 }},
-  { id:8, name:'🍞 Mellomgrovt hverdagsbrød', mode:'bread', snap:{
+  { id:8, name:'Mellomgrovt hverdagsbrød', mode:'bread', snap:{
     mode:'bread', numDoughs:1, piecesPerDough:1, weightPerPiece:850,
-    flourTypes:[{id:1,name:'Hvetemel',pct:60},{id:2,name:'Sammalt hvete grov',pct:40}],
+    flourTypes:[{id:1,name:'Hvetemel',pct:70},{id:2,name:'Sammalt hvete grov',pct:30}],
     waterPct:70, saltPct:1.8, rtHours:2, rtTemp:20, coldHours:0, coldTemp:4,
     yeastType:'fresh', svinnPct:12 }},
 ];
@@ -2573,7 +2647,7 @@ function closeTips() {
   document.body.style.overflow = '';
 }
 function switchTab(tab) {
-  ['heving','hand','machine'].forEach(t => {
+  ['heving','hand','machine','eltefritt'].forEach(t => {
     document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('active', tab === t);
     document.getElementById('panel' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('active', tab === t);
   });

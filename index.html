@@ -1319,7 +1319,8 @@
     body.minimalist .pieces-weight-group .form-row .form-hint   { display: none; }
     body.minimalist .pieces-weight-group .form-row .help-icon   { display: none; }
     body.minimalist .pieces-weight-group .stepper               { background: none; border: none; padding: 0; overflow: visible; flex-shrink: 0; }
-    body.minimalist .pieces-weight-group .step-input            { width: 40px; font-size: 14px; font-weight: 700; padding: 0; text-align: center; height: 26px; }
+    .pieces-weight-group .step-input                            { width: 68px; }
+    body.minimalist .pieces-weight-group .step-input            { width: 36px; font-size: 14px; font-weight: 700; padding: 0; text-align: center; height: 26px; }
     body.minimalist .pieces-weight-group .step-btn              { width: 22px; height: 26px; font-size: 16px; }
     body.minimalist .pieces-weight-group > div > div[style]     { display: contents; }
 
@@ -1889,7 +1890,7 @@
           </div>
           <div class="stepper">
             <button class="step-btn" onclick="adj('piecesPerDough',-1)">−</button>
-            <input  class="step-input" id="piecesPerDough" type="number" value="4" min="1" max="100" style="width:68px" onchange="upd('piecesPerDough',this.value)">
+            <input  class="step-input" id="piecesPerDough" type="number" value="4" min="1" max="100" onchange="upd('piecesPerDough',this.value)">
             <button class="step-btn" onclick="adj('piecesPerDough',1)">+</button>
           </div>
         </div>
@@ -1901,7 +1902,7 @@
           </div>
           <div class="stepper">
             <button class="step-btn" onclick="adj('weightPerPiece',-5)">−</button>
-            <input  class="step-input" id="weightPerPiece" type="number" value="265" min="50" max="3000" style="width:68px" onchange="upd('weightPerPiece',this.value)">
+            <input  class="step-input" id="weightPerPiece" type="number" value="265" min="50" max="3000" onchange="upd('weightPerPiece',this.value)">
             <button class="step-btn" onclick="adj('weightPerPiece',5)">+</button>
           </div>
         </div>

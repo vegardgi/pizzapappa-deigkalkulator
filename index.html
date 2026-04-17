@@ -895,23 +895,26 @@
     .modal-close:hover { background: rgba(0,0,0,0.07); color: var(--text); }
     .modal-tabs {
       display: flex;
+      flex-wrap: wrap;
       padding: 10px 14px 0;
-      gap: 6px;
+      gap: 5px;
       flex-shrink: 0;
     }
     .modal-tab {
-      flex: 1;
-      padding: 9px 10px;
+      flex: 1 1 auto;
+      min-width: 0;
+      padding: 8px 8px;
       border: none;
       border-radius: 10px 10px 0 0;
       background: var(--surface);
       color: var(--muted2);
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
       cursor: pointer;
       transition: all 0.15s;
       border: 1px solid var(--border);
       border-bottom: none;
+      white-space: nowrap;
     }
     .modal-tab.active {
       background: var(--card-alt);
@@ -2410,8 +2413,17 @@ const DEFAULT_RECIPES = [
 function recipesLoad() {
   try { recipes = JSON.parse(localStorage.getItem(LS_KEY)) || []; }
   catch { recipes = []; }
-  if (recipes.length === 0)
+  if (recipes.length === 0) {
     recipes = DEFAULT_RECIPES.map(r => ({...r, snap:{...r.snap, flourTypes:r.snap.flourTypes.map(f=>({...f}))}}));
+  } else {
+    // Merge in any new default recipes that are missing (added after first load)
+    const existingIds = new Set(recipes.map(r => r.id));
+    DEFAULT_RECIPES.forEach(dr => {
+      if (!existingIds.has(dr.id)) {
+        recipes.push({...dr, snap:{...dr.snap, flourTypes:dr.snap.flourTypes.map(f=>({...f}))}});
+      }
+    });
+  }
 }
 
 function recipesSave() {

@@ -1315,8 +1315,8 @@
     body.minimalist .pieces-weight-group > div > div[style]     { display: contents; }
 
     /* Time + temp på samme linje i minimalist */
-    body.minimalist .time-card        { display: flex; align-items: center; gap: 6px; padding: 6px 9px; }
-    body.minimalist .time-card .time-lbl      { display: none; }
+    body.minimalist .time-card        { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; padding: 6px 9px; }
+    body.minimalist .time-card .time-lbl      { width: 100%; margin-bottom: 0; font-size: 10px; }
     body.minimalist .time-card .time-stepper  { flex: 1; justify-content: flex-start; }
     body.minimalist .time-card .temp-row      { margin-top: 0; width: auto; flex: 0 0 auto; }
     body.minimalist .time-card .temp-bar-wrap { display: none; }
@@ -1825,7 +1825,6 @@
       <button class="extra-chip" id="chipOlje" onclick="toggleExtra('olje')">🫒 Olje</button>
       <button class="extra-chip" id="chipPoolish" onclick="toggleExtra('poolish')">🫙 Poolish</button>
       <button class="extra-chip" id="chipBiga" onclick="toggleExtra('biga')">🧊 Biga</button>
-      <button class="extra-chip" id="chipSurdeig" onclick="toggleExtra('surdeig')">🌾 Surdeig</button>
     </div>
   </div>
 </div>
@@ -2039,31 +2038,6 @@
         </div>
       </div>
 
-      <!-- Extra: Surdeig -->
-      <div class="extra-field" id="extraSurdeig">
-        <div class="extra-field-header">
-          <span class="extra-field-lbl">🌾 Surdeig <i class="help-icon" data-tooltip="Surdeig erstatter gjær. Oppgi andelen av total melvekt i starteren. Typisk 15–30 % for pizza, 20–40 % for brød. Mel og vann i starteren trekkes fra hoved-deigen.">?</i></span>
-          <button class="extra-remove" onclick="toggleExtra('surdeig')" title="Fjern surdeig">×</button>
-        </div>
-        <div class="pref-row">
-          <span class="pref-lbl">Andel mel</span>
-          <div class="stepper">
-            <button class="step-btn" onclick="adjExtra('surdeigPct',-5,5,80)">−</button>
-            <input class="step-input" id="surdeigPctInput" type="number" value="20" min="5" max="80" style="width:46px" onchange="updExtra('surdeigPct',this.value,5,80)">
-            <button class="step-btn" onclick="adjExtra('surdeigPct',5,5,80)">+</button>
-          </div>
-          <span style="font-size:12px;color:var(--muted)">% av mel</span>
-        </div>
-        <div class="pref-row">
-          <span class="pref-lbl">Hydrering</span>
-          <div class="stepper">
-            <button class="step-btn" onclick="adjExtra('surdeigHydration',-10,50,200)">−</button>
-            <input class="step-input" id="surdeigHydrationInput" type="number" value="100" min="50" max="200" style="width:46px" onchange="updExtra('surdeigHydration',this.value,50,200)">
-            <button class="step-btn" onclick="adjExtra('surdeigHydration',10,50,200)">+</button>
-          </div>
-          <span style="font-size:12px;color:var(--muted)">%</span>
-        </div>
-      </div>
 
       <button class="extras-add-btn" onclick="openExtras()">⊕ Legg til ingrediens</button>
 
@@ -2130,8 +2104,31 @@
     <div class="card-body">
 
       <div class="yeast-toggle">
-        <button class="yeast-btn active" id="btnFresh" onclick="setYeastType('fresh')">Fersk gjær</button>
-        <button class="yeast-btn"        id="btnDry"   onclick="setYeastType('dry')">Tørrgjær</button>
+        <button class="yeast-btn active" id="btnFresh"   onclick="setYeastType('fresh')">Fersk gjær</button>
+        <button class="yeast-btn"        id="btnDry"     onclick="setYeastType('dry')">Tørrgjær</button>
+        <button class="yeast-btn"        id="btnSurdeig" onclick="setYeastType('surdeig')">🌾 Surdeig</button>
+      </div>
+
+      <!-- Surdeig settings — shown when surdeig is selected -->
+      <div id="surdeigSettings" style="display:none;margin-bottom:10px">
+        <div class="pref-row">
+          <span class="pref-lbl">Andel mel <i class="help-icon" data-tooltip="Andel av total melvekt som inngår i surdeigstarteren. Typisk 15–30 % for pizza, 20–40 % for brød. Mel og vann i starteren trekkes fra hoved-deigen.">?</i></span>
+          <div class="stepper">
+            <button class="step-btn" onclick="adjExtra('surdeigPct',-5,5,80)">−</button>
+            <input class="step-input" id="surdeigPctInput" type="number" value="20" min="5" max="80" style="width:46px" onchange="updExtra('surdeigPct',this.value,5,80)">
+            <button class="step-btn" onclick="adjExtra('surdeigPct',5,5,80)">+</button>
+          </div>
+          <span style="font-size:12px;color:var(--muted)">% av mel</span>
+        </div>
+        <div class="pref-row">
+          <span class="pref-lbl">Hydrering <i class="help-icon" data-tooltip="Hydreringsprosenten til surdeigstarteren din. 100 % = like deler mel og vann (mest vanlig). En stivere starter ligger på 50–80 %, en flytende på 100–125 %.">?</i></span>
+          <div class="stepper">
+            <button class="step-btn" onclick="adjExtra('surdeigHydration',-10,50,200)">−</button>
+            <input class="step-input" id="surdeigHydrationInput" type="number" value="100" min="50" max="200" style="width:46px" onchange="updExtra('surdeigHydration',this.value,50,200)">
+            <button class="step-btn" onclick="adjExtra('surdeigHydration',10,50,200)">+</button>
+          </div>
+          <span style="font-size:12px;color:var(--muted)">%</span>
+        </div>
       </div>
 
       <div class="yeast-suggestion" id="yeastSuggestion"><!-- rendered by JS --></div>
@@ -2340,6 +2337,12 @@ function calc() {
       yeastG   = S.overrideVal;
       yeastPct = (yeastG / flourG) * 100;
     }
+  } else if (S.yeastType === 'surdeig') {
+    // Surdeig: no commercial yeast — yeastPct = 0
+    yeastPct = 0;
+    yeastG   = 0;
+    const div = 1 + S.waterPct/100 + S.saltPct/100 + xSukker + xOlje;
+    flourG   = totalDoughWt / div;
   } else {
     yeastPct = (S.yeastType === 'fresh' ? yc.freshPct : yc.dryPct) + S.yeastBumpPct;
     yeastPct = Math.max(0.001, yeastPct);
@@ -2540,13 +2543,18 @@ function renderCalc() {
     html += ingRow('Vann', r.waterG, `${S.waterPct} % av mel`);
   }
 
-  // Salt, yeast always shown
+  // Salt always shown
   html += ingRow('Salt', r.saltG, `${S.saltPct} % av mel`);
-  html += `<div class="ing-item">
-    <div><div class="ing-name">${S.yeastType === 'fresh' ? 'Fersk gjær' : 'Tørrgjær'}</div>
-    <div class="ing-sub">${r.yeastPct.toFixed(3)} % av mel${S.override ? ' · overstyrt' : ''}</div></div>
-    <div class="ing-grams">${S.roundIngredients && r.yeastG >= 5 ? roundYeast(r.yeastG).toFixed(1) : fmt1(r.yeastG)}<span class="g">g</span></div>
-  </div>`;
+  // Yeast or surdeig
+  if (S.yeastType === 'surdeig') {
+    // surdeig is already shown in the preferment section; skip yeast line
+  } else {
+    html += `<div class="ing-item">
+      <div><div class="ing-name">${S.yeastType === 'fresh' ? 'Fersk gjær' : 'Tørrgjær'}</div>
+      <div class="ing-sub">${r.yeastPct.toFixed(3)} % av mel${S.override ? ' · overstyrt' : ''}</div></div>
+      <div class="ing-grams">${S.roundIngredients && r.yeastG >= 5 ? roundYeast(r.yeastG).toFixed(1) : fmt1(r.yeastG)}<span class="g">g</span></div>
+    </div>`;
+  }
   if (hasExtra('sukker')) html += ingRow('Sukker', r.sukkerG, `${S.sukkerPct} % av mel`);
   if (hasExtra('olje'))   html += ingRow('Olje',   r.oljeG,   `${S.oljePct} % av mel`);
 
@@ -2655,7 +2663,7 @@ function closeExtras() {
   document.body.style.overflow = '';
 }
 function renderExtras() {
-  ['sukker','olje','poolish','biga','surdeig'].forEach(n => {
+  ['sukker','olje','poolish','biga'].forEach(n => {
     const cap = n.charAt(0).toUpperCase() + n.slice(1);
     const field = document.getElementById('extra' + cap);
     if (field) field.classList.toggle('visible', hasExtra(n));
@@ -2782,8 +2790,20 @@ function setMode(mode) {
 function setYeastType(t) {
   S.yeastType = t;
   S.yeastBumpPct = 0;
-  document.getElementById('btnFresh').className = 'yeast-btn' + (t==='fresh' ? ' active' : '');
-  document.getElementById('btnDry').className   = 'yeast-btn' + (t==='dry'   ? ' active' : '');
+  // Sync surdeig extra state with yeast type selection
+  if (t === 'surdeig') {
+    if (!S.extras) S.extras = [];
+    if (!S.extras.includes('surdeig')) S.extras.push('surdeig');
+  } else {
+    if (S.extras) { const i = S.extras.indexOf('surdeig'); if (i >= 0) S.extras.splice(i, 1); }
+  }
+  document.getElementById('btnFresh').className   = 'yeast-btn' + (t==='fresh'   ? ' active' : '');
+  document.getElementById('btnDry').className     = 'yeast-btn' + (t==='dry'     ? ' active' : '');
+  document.getElementById('btnSurdeig').className = 'yeast-btn' + (t==='surdeig' ? ' active' : '');
+  document.getElementById('surdeigSettings').style.display = t === 'surdeig' ? '' : 'none';
+  // Hide yeast suggestion box when surdeig is selected
+  document.getElementById('yeastSuggestion').style.display = t === 'surdeig' ? 'none' : '';
+  document.querySelector('.override-row').style.display    = t === 'surdeig' ? 'none' : '';
   renderCalc();
 }
 
@@ -2998,8 +3018,12 @@ function loadRecipe(id) {
   document.getElementById('overrideInput').value  = '';
   document.getElementById('btnPizza').className = 'mode-btn' + (S.mode==='pizza' ? ' active' : '');
   document.getElementById('btnBread').className = 'mode-btn' + (S.mode==='bread' ? ' active' : '');
-  document.getElementById('btnFresh').className = 'yeast-btn' + (S.yeastType==='fresh' ? ' active' : '');
-  document.getElementById('btnDry').className   = 'yeast-btn' + (S.yeastType==='dry'   ? ' active' : '');
+  document.getElementById('btnFresh').className   = 'yeast-btn' + (S.yeastType==='fresh'   ? ' active' : '');
+  document.getElementById('btnDry').className     = 'yeast-btn' + (S.yeastType==='dry'     ? ' active' : '');
+  document.getElementById('btnSurdeig').className = 'yeast-btn' + (S.yeastType==='surdeig' ? ' active' : '');
+  document.getElementById('surdeigSettings').style.display = S.yeastType === 'surdeig' ? '' : 'none';
+  document.getElementById('yeastSuggestion').style.display = S.yeastType === 'surdeig' ? 'none' : '';
+  document.querySelector('.override-row').style.display    = S.yeastType === 'surdeig' ? 'none' : '';
 
   render();
   renderRecipes();
@@ -3121,8 +3145,12 @@ function restoreState() {
     document.getElementById('saltSlider').value  = S.saltPct;
     document.getElementById('btnPizza').className = 'mode-btn' + (S.mode==='pizza' ? ' active' : '');
     document.getElementById('btnBread').className = 'mode-btn' + (S.mode==='bread' ? ' active' : '');
-    document.getElementById('btnFresh').className = 'yeast-btn' + (S.yeastType==='fresh' ? ' active' : '');
-    document.getElementById('btnDry').className   = 'yeast-btn' + (S.yeastType==='dry'   ? ' active' : '');
+    document.getElementById('btnFresh').className   = 'yeast-btn' + (S.yeastType==='fresh'   ? ' active' : '');
+    document.getElementById('btnDry').className     = 'yeast-btn' + (S.yeastType==='dry'     ? ' active' : '');
+    document.getElementById('btnSurdeig').className = 'yeast-btn' + (S.yeastType==='surdeig' ? ' active' : '');
+    document.getElementById('surdeigSettings').style.display = S.yeastType === 'surdeig' ? '' : 'none';
+    document.getElementById('yeastSuggestion').style.display = S.yeastType === 'surdeig' ? 'none' : '';
+    document.querySelector('.override-row').style.display    = S.yeastType === 'surdeig' ? 'none' : '';
     // Override
     document.getElementById('overrideCheck').checked = S.override;
     document.getElementById('overrideInput').disabled = !S.override;

@@ -1296,22 +1296,22 @@
     body.minimalist .water-salt-group .slider-header { flex-wrap: wrap; }
 
     /* Antall emner + vekt side om side — kompakt som vann/salt */
-    body.minimalist .pieces-weight-group     { display: flex; gap: 8px; align-items: stretch; }
+    body.minimalist .pieces-weight-group     { display: flex; gap: 6px; align-items: center; }
     body.minimalist .pieces-weight-group .form-row {
       flex: 1; margin-bottom: 0;
       background: var(--input-bg); border: 1px solid var(--input-border);
-      border-radius: 10px; padding: 7px 10px;
-      display: flex; flex-direction: column; gap: 4px;
+      border-radius: 8px; padding: 4px 8px;
+      display: flex; flex-direction: row; align-items: center; gap: 6px;
     }
     body.minimalist .pieces-weight-group .form-row .form-label {
-      font-size: 11px; font-weight: 700; color: var(--muted2);
-      text-transform: uppercase; letter-spacing: 0.4px;
+      font-size: 10px; font-weight: 700; color: var(--muted2);
+      text-transform: uppercase; letter-spacing: 0.3px; flex: 1;
     }
     body.minimalist .pieces-weight-group .form-row .form-hint   { display: none; }
     body.minimalist .pieces-weight-group .form-row .help-icon   { display: none; }
-    body.minimalist .pieces-weight-group .stepper               { background: none; border: none; padding: 0; overflow: visible; justify-content: flex-start; }
-    body.minimalist .pieces-weight-group .step-input            { width: 52px; font-size: 16px; font-weight: 700; padding: 0; text-align: left; }
-    body.minimalist .pieces-weight-group .step-btn              { width: 26px; height: 28px; font-size: 17px; }
+    body.minimalist .pieces-weight-group .stepper               { background: none; border: none; padding: 0; overflow: visible; flex-shrink: 0; }
+    body.minimalist .pieces-weight-group .step-input            { width: 40px; font-size: 14px; font-weight: 700; padding: 0; text-align: center; height: 26px; }
+    body.minimalist .pieces-weight-group .step-btn              { width: 22px; height: 26px; font-size: 16px; }
     body.minimalist .pieces-weight-group > div > div[style]     { display: contents; }
 
     /* Time + temp på samme linje i minimalist */

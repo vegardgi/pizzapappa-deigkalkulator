@@ -1278,6 +1278,18 @@
     body.minimalist .stepper           { gap: 3px; }
     body.minimalist .slider-row + .slider-row { margin-top: 0; }
 
+    /* Vann + salt side om side */
+    body.minimalist .water-salt-group        { display: flex; gap: 8px; align-items: flex-start; }
+    body.minimalist .water-salt-group .slider-row { flex: 1; margin-bottom: 0; }
+    body.minimalist .water-salt-group .slider-row input[type="range"] { display: none; }
+    body.minimalist .water-salt-group .slider-header { flex-wrap: wrap; }
+
+    /* Antall emner + vekt side om side */
+    body.minimalist .pieces-weight-group     { display: flex; gap: 8px; align-items: flex-start; }
+    body.minimalist .pieces-weight-group .form-row { flex: 1; margin-bottom: 0; flex-direction: column; align-items: flex-start; gap: 5px; }
+    body.minimalist .pieces-weight-group .form-row .form-label { font-size: 11px; }
+    body.minimalist .pieces-weight-group .form-row .form-hint  { display: none; }
+
     /* ── Responsive ── */
     @media (max-width: 380px) {
       .step-input { width: 48px; }
@@ -1629,29 +1641,31 @@
         </div>
       </div>
 
-      <div class="form-row">
-        <div class="form-label">
-          Antall deigemner
-          <div class="form-hint">Biter / pizza per porsjon</div>
-        </div>
-        <div class="stepper">
-          <button class="step-btn" onclick="adj('piecesPerDough',-1)">−</button>
-          <input  class="step-input" id="piecesPerDough" type="number" value="4" min="1" max="100" onchange="upd('piecesPerDough',this.value)">
-          <button class="step-btn" onclick="adj('piecesPerDough',1)">+</button>
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-label">
-          Vekt i gram per emne
-          <i class="help-icon" data-tooltip="Ønsket vekt på ferdig produkt per stykke — f.eks. 250–280 g for en napolitansk pizzabunn. Rådeigvekten justeres automatisk opp om svinn er satt.">?</i>
-          <div class="form-hint">Gram ferdig deig per stykke</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:6px">
+      <div class="pieces-weight-group">
+        <div class="form-row">
+          <div class="form-label">
+            Antall deigemner
+            <div class="form-hint">Biter / pizza per porsjon</div>
+          </div>
           <div class="stepper">
-            <button class="step-btn" onclick="adj('weightPerPiece',-5)">−</button>
-            <input  class="step-input" id="weightPerPiece" type="number" value="265" min="50" max="3000" style="width:68px" onchange="upd('weightPerPiece',this.value)">
-            <button class="step-btn" onclick="adj('weightPerPiece',5)">+</button>
+            <button class="step-btn" onclick="adj('piecesPerDough',-1)">−</button>
+            <input  class="step-input" id="piecesPerDough" type="number" value="4" min="1" max="100" onchange="upd('piecesPerDough',this.value)">
+            <button class="step-btn" onclick="adj('piecesPerDough',1)">+</button>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-label">
+            Vekt i gram per emne
+            <i class="help-icon" data-tooltip="Ønsket vekt på ferdig produkt per stykke — f.eks. 250–280 g for en napolitansk pizzabunn. Rådeigvekten justeres automatisk opp om svinn er satt.">?</i>
+            <div class="form-hint">Gram ferdig deig per stykke</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <div class="stepper">
+              <button class="step-btn" onclick="adj('weightPerPiece',-5)">−</button>
+              <input  class="step-input" id="weightPerPiece" type="number" value="265" min="50" max="3000" style="width:68px" onchange="upd('weightPerPiece',this.value)">
+              <button class="step-btn" onclick="adj('weightPerPiece',5)">+</button>
+            </div>
           </div>
         </div>
       </div>
@@ -1698,22 +1712,24 @@
     </div>
     <div class="card-body">
 
-      <div class="slider-row">
-        <div class="slider-header">
-          <span class="slider-label">💧 Vann <i class="help-icon" data-tooltip="Baker's percent: vann måles som % av melvekt. 65 % = 650 g vann per 1 000 g mel. Høyere % gir luftigere skorpe og mer sprø pizza, men er vanskeligere å håndtere og må stekes på lavere temperatur.">?</i></span>
-          <input class="slider-val-input" id="waterInput" type="number" value="65" min="40" max="100" step="0.5" onchange="sliderInput('water',this.value)">
-          <span class="unit">%</span>
+      <div class="water-salt-group">
+        <div class="slider-row">
+          <div class="slider-header">
+            <span class="slider-label">💧 Vann <i class="help-icon" data-tooltip="Baker's percent: vann måles som % av melvekt. 65 % = 650 g vann per 1 000 g mel. Høyere % gir luftigere skorpe og mer sprø pizza, men er vanskeligere å håndtere og må stekes på lavere temperatur.">?</i></span>
+            <input class="slider-val-input" id="waterInput" type="number" value="65" min="40" max="100" step="0.5" onchange="sliderInput('water',this.value)">
+            <span class="unit">%</span>
+          </div>
+          <input type="range" id="waterSlider" min="40" max="100" value="65" step="0.5" oninput="sliderDrag('water',this.value)">
         </div>
-        <input type="range" id="waterSlider" min="40" max="100" value="65" step="0.5" oninput="sliderDrag('water',this.value)">
-      </div>
 
-      <div class="slider-row">
-        <div class="slider-header">
-          <span class="slider-label">🧂 Salt <i class="help-icon" data-tooltip="Baker's percent: salt som % av melvekt. Typisk 2–3 % for pizza, 1,8–2 % for brød. Salt styrker glutennettverket og gir smak.">?</i></span>
-          <input class="slider-val-input" id="saltInput" type="number" value="2.5" min="0" max="6" step="0.1" onchange="sliderInput('salt',this.value)">
-          <span class="unit">%</span>
+        <div class="slider-row">
+          <div class="slider-header">
+            <span class="slider-label">🧂 Salt <i class="help-icon" data-tooltip="Baker's percent: salt som % av melvekt. Typisk 2–3 % for pizza, 1,8–2 % for brød. Salt styrker glutennettverket og gir smak.">?</i></span>
+            <input class="slider-val-input" id="saltInput" type="number" value="2.5" min="0" max="6" step="0.1" onchange="sliderInput('salt',this.value)">
+            <span class="unit">%</span>
+          </div>
+          <input type="range" id="saltSlider" min="0" max="6" value="2.5" step="0.1" oninput="sliderDrag('salt',this.value)">
         </div>
-        <input type="range" id="saltSlider" min="0" max="6" value="2.5" step="0.1" oninput="sliderDrag('salt',this.value)">
       </div>
 
     </div>

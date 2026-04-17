@@ -2121,12 +2121,13 @@
       <!-- Surdeig settings — shown when surdeig is selected -->
       <div id="surdeigSettings" style="display:none;margin-bottom:10px">
         <div class="pref-row">
+          <span class="pref-lbl">Andel starter <i class="help-icon" data-tooltip="Andel av total melvekt som inngår i surdeigstarteren. Typisk 15–30 % for pizza, 20–40 % for brød. Mel og vann i starteren trekkes fra hoved-deigen.">?</i></span>
           <div class="stepper">
             <button class="step-btn" onclick="adjExtra('surdeigPct',-5,5,80)">−</button>
             <input class="step-input" id="surdeigPctInput" type="number" value="20" min="5" max="80" style="width:46px" onchange="updExtra('surdeigPct',this.value,5,80)">
             <button class="step-btn" onclick="adjExtra('surdeigPct',5,5,80)">+</button>
           </div>
-          <span style="font-size:12px;color:var(--muted)">baker's % <i class="help-icon" data-tooltip="Andel av total melvekt som inngår i surdeigstarteren. Typisk 15–30 % for pizza, 20–40 % for brød. Mel og vann i starteren trekkes fra hoved-deigen.">?</i></span>
+          <span style="font-size:12px;color:var(--muted)">baker's %</span>
         </div>
         <div class="pref-row">
           <span class="pref-lbl">Hydrering <i class="help-icon" data-tooltip="Hydreringsprosenten til surdeigstarteren din. 100 % = like deler mel og vann (mest vanlig). En stivere starter ligger på 50–80 %, en flytende på 100–125 %.">?</i></span>

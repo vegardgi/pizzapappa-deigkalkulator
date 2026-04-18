@@ -215,11 +215,22 @@
     body.minimalist #fordeigCard { display: none; }
     body.minimalist #svinnCard { display: none; }
     body.minimalist #recipesCard { display: none; }
+    body.minimalist #meltyperCard { display: none; }
     body.minimalist .override-row { display: none !important; }
     body.minimalist .extras-add-btn { display: none !important; }
     body.minimalist .flour-name-input { display: none; }
     body.minimalist .flour-name-static { display: inline-block; }
     body.minimalist .flour-add-mini { display: none !important; }
+
+    /* Mel-kolonne inne i water-salt-group (kun minimalist) */
+    .mel-mini-row { display: none; }
+    body.minimalist .mel-mini-row { display: block; }
+    .mel-mini-val {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.75;
+    }
 
     .mode-group {
       display: flex;
@@ -1485,7 +1496,10 @@
     body.minimalist .water-salt-group .slider-val-input { width: 62px; }
     body.minimalist .water-salt-group .slider-row input[type="range"] { display: none; }
     body.minimalist .extra-field input[type="range"] { display: none; }
-    body.minimalist .water-salt-group .slider-header { flex-wrap: wrap; }
+    body.minimalist .water-salt-group .slider-header { flex-wrap: wrap; gap: 4px; margin-bottom: 0; }
+    body.minimalist .water-salt-group .slider-val-input { width: 50px; padding: 3px 4px; font-size: 13px; }
+    body.minimalist .water-salt-group .slider-label { font-size: 13px; flex: 1 0 auto; white-space: nowrap; }
+    body.minimalist .water-salt-group .unit { font-size: 12px; color: var(--muted); }
 
     /* Legg til ingrediens-knapp under vann/salt i minimalist */
     .add-mini-icon { display: none; }  /* hidden in full view */
@@ -2084,7 +2098,7 @@
   <!-- ── Intro / kort forklaring ── -->
   <div class="intro-box" id="introBox">
     <button class="intro-close" onclick="dismissIntro()" aria-label="Lukk">✕</button>
-    <p>Still inn <strong>antall deiger</strong>, <strong>emner</strong> og <strong>vekt</strong>, og juster vann, salt, heve­tid og temperatur. Kalkulatoren bruker baker­prosent og en gjær­modell (Q10) til å regne ut riktig mengde gjær for ditt tids- og temperatur­oppsett.</p>
+    <p>Still inn <strong>antall deigemner</strong> og <strong>vekt</strong>, og juster vann, salt, heve­tid og temperatur. Kalkulatoren regner ut riktig mengde gjær for ditt tids- og temperatur­oppsett.</p>
     <p>Alle ingrediensene — med eventuell fordeig (poolish, biga, surdeig) — dukker opp <strong>nederst på siden</strong> så snart du endrer noe.</p>
   </div>
 
@@ -2173,7 +2187,7 @@
   </div>
 
   <!-- ── 2. Meltyper ── -->
-  <div class="card">
+  <div class="card" id="meltyperCard">
     <div class="card-header">
       <span class="card-icon">🌾</span>
       <span class="card-title">Meltyper</span>
@@ -2198,6 +2212,13 @@
 
       <div class="water-salt-row">
       <div class="water-salt-group">
+        <div class="slider-row mel-mini-row">
+          <div class="slider-header">
+            <span class="slider-label">🌾 Mel</span>
+            <span class="slider-val-input mel-mini-val">100</span>
+            <span class="unit">%</span>
+          </div>
+        </div>
         <div class="slider-row">
           <div class="slider-header">
             <span class="slider-label">💧 Vann <i class="help-icon" data-tooltip="Baker's percent: vann måles som % av melvekt. 65 % = 650 g vann per 1 000 g mel. Høyere % gir luftigere skorpe og mer sprø pizza, men er vanskeligere å håndtere og må stekes på lavere temperatur.">?</i></span>

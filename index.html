@@ -1992,13 +1992,13 @@
     body.minimalist #surdeigSettings .step-input { font-size: 20px; font-weight: 700; height: 36px; }
 
     /* ── Hevetid: label full bredde øverst, steppere side om side under ── */
-    body.minimalist .time-card { flex-wrap: wrap; padding: 8px 0; min-height: auto; gap: 4px 8px; }
+    body.minimalist .time-card { flex-wrap: wrap; padding: 8px 0; min-height: auto; gap: 4px 8px; justify-content: flex-end; }
     body.minimalist .time-card .time-lbl {
       width: 100%; flex: none; font-size: 12px; font-weight: 700; letter-spacing: 0.3px;
       white-space: normal; min-width: unset; overflow: visible; padding-bottom: 2px;
     }
     body.minimalist .time-card .step-btn  { width: 48px; height: 48px; font-size: 24px; font-weight: 800; }
-    body.minimalist .time-card .step-input { width: 32px; font-size: 16px; font-weight: 700; height: 36px; padding: 0; }
+    body.minimalist .time-card .step-input { width: 44px; font-size: 20px; font-weight: 700; height: 36px; padding: 0; }
     body.minimalist .time-card .time-unit { font-size: 12px; padding: 0 0 0 2px; }
     body.minimalist .time-card .temp-unit { font-size: 12px; padding: 0 0 0 2px; }
 
@@ -4364,7 +4364,7 @@ async function submitContact(e) {
 <footer class="site-footer">
   Laget av <a href="https://pizzapappa.no" target="_blank" rel="noopener">Vegard / pizzapappa.no</a>
   <br>
-  <button class="footer-contact-btn" onclick="openContact()">Tips og ønsker til kalkulatoren</button>
+  <button class="footer-contact-btn" onclick="openContact()">Tips og ønsker til kalkulatoren?</button>
 </footer>
 
 <!-- ── Contact modal ── -->

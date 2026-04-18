@@ -1723,6 +1723,7 @@
     body.minimalist .pieces-weight-group .label-mini { display: inline; }
 
     /* Kort: ren hvit flate, ingen skygge, ingen kantradius */
+    body.minimalist main { gap: 0; }
     body.minimalist .card {
       background: var(--card);
       border: none;
@@ -3203,9 +3204,9 @@ function renderCalc() {
           <div style="display:flex;justify-content:space-between;align-items:center">
             <span style="color:var(--muted);font-size:13px">Hoved-deig</span>
             <div class="yeast-sug-val" style="margin:0">
-              <button class="bump-btn bump-minus bump-inline" onclick="bumpYeast(-0.2)" title="−0.2 %">−</button>
+              <button class="bump-btn bump-minus bump-inline" onclick="bumpYeastG(-0.2)" title="−0.2 g">−</button>
               <span class="bump-val-inline">${fmt1(r.mainYeastG)}</span><span class="mvs-unit">g</span>
-              <button class="bump-btn bump-plus bump-inline"  onclick="bumpYeast(0.2)"  title="+0.2 %">+</button>
+              <button class="bump-btn bump-plus bump-inline"  onclick="bumpYeastG(0.2)"  title="+0.2 g">+</button>
             </div>
           </div>
         </div>
@@ -3243,9 +3244,9 @@ function renderCalc() {
       sugBoxHtml = `
         <div class="yeast-sug-lbl">${yLblCap}</div>
         <div class="yeast-sug-val">
-          <button class="bump-btn bump-minus bump-inline" onclick="bumpYeast(-0.2)" title="−0.2 %">−</button>
+          <button class="bump-btn bump-minus bump-inline" onclick="bumpYeastG(-0.2)" title="−0.2 g">−</button>
           <span class="bump-val-inline">${yeastValG}</span><span class="mvs-unit">g</span>
-          <button class="bump-btn bump-plus bump-inline"  onclick="bumpYeast(0.2)"  title="+0.2 %">+</button>
+          <button class="bump-btn bump-plus bump-inline"  onclick="bumpYeastG(0.2)"  title="+0.2 g">+</button>
         </div>
         <div class="yeast-sug-sub">${subLine}</div>
         <div class="yeast-bump-row">
@@ -3772,6 +3773,14 @@ function setYeastType(t) {
 function bumpYeast(delta) {
   S.yeastBumpPct = Math.max(-10, Math.round((S.yeastBumpPct + delta) * 10) / 10);
   renderCalc();
+}
+// Mini view: change yeast by a fixed gram amount (0.2 g) instead of 0.2 % of flour
+function bumpYeastG(dg) {
+  const r = calc();
+  if (r.flourG > 0) {
+    S.yeastBumpPct = Math.max(-10, S.yeastBumpPct + (dg / r.flourG) * 100);
+    renderCalc();
+  }
 }
 
 function toggleRecipes() {

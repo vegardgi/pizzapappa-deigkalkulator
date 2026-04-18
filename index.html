@@ -3177,6 +3177,7 @@ function renderCalc() {
   const yLblCap = yName.charAt(0).toUpperCase() + yName.slice(1);
 
   let sugBoxHtml;
+  const isMinYeast = document.body.classList.contains('minimalist');
 
   if (r.hasPrefYeast) {
     // ── Preferment mode: show two lines (fordeig + hoved-deig) ──
@@ -3218,19 +3219,19 @@ function renderCalc() {
           <div style="display:flex;justify-content:space-between;align-items:center">
             <span style="color:var(--muted);font-size:13px">Hoved-deig</span>
             <div class="yeast-sug-val" style="margin:0">
-              <button class="bump-btn bump-minus bump-inline" onclick="bumpYeastG(-0.2)" title="−0.2 g">−</button>
-              <span class="bump-val-inline">${fmt1(r.mainYeastG)}</span><span class="mvs-unit">g</span>
-              <button class="bump-btn bump-plus bump-inline"  onclick="bumpYeastG(0.2)"  title="+0.2 g">+</button>
+              <button class="bump-btn bump-minus bump-inline" onclick="${isMinYeast ? 'bumpYeast(-0.2)' : 'bumpYeastG(-0.2)'}" title="${isMinYeast ? '−0.2 % av mel' : '−0.2 g'}">−</button>
+              <span class="bump-val-inline">${isMinYeast ? r.mainYeastPct.toFixed(3) : fmt1(r.mainYeastG)}</span><span class="mvs-unit">${isMinYeast ? '%' : 'g'}</span>
+              <button class="bump-btn bump-plus bump-inline"  onclick="${isMinYeast ? 'bumpYeast(0.2)' : 'bumpYeastG(0.2)'}"  title="${isMinYeast ? '+0.2 % av mel' : '+0.2 g'}">+</button>
             </div>
           </div>
         </div>
         <div class="yeast-sug-sub">${prefSubLine}</div>
         <div class="yeast-sug-sub">${subLine}</div>
-        <div class="yeast-bump-row">
+        ${isMinYeast ? '' : `<div class="yeast-bump-row">
           <button class="bump-btn bump-minus" onclick="bumpYeast(-0.2)" title="−0.2 % av mel">−0.2 %</button>
           <span class="bump-label ${bumpClass}">${bumpText}</span>
           <button class="bump-btn bump-plus"  onclick="bumpYeast(0.2)"  title="+0.2 % av mel">+0.2 %</button>
-        </div>`;
+        </div>`}`;
     }
   } else {
     // ── Straight dough mode (no preferment) ──
@@ -3258,16 +3259,16 @@ function renderCalc() {
       sugBoxHtml = `
         <div class="yeast-sug-lbl">${yLblCap}</div>
         <div class="yeast-sug-val">
-          <button class="bump-btn bump-minus bump-inline" onclick="bumpYeastG(-0.2)" title="−0.2 g">−</button>
-          <span class="bump-val-inline">${yeastValG}</span><span class="mvs-unit">g</span>
-          <button class="bump-btn bump-plus bump-inline"  onclick="bumpYeastG(0.2)"  title="+0.2 g">+</button>
+          <button class="bump-btn bump-minus bump-inline" onclick="${isMinYeast ? 'bumpYeast(-0.2)' : 'bumpYeastG(-0.2)'}" title="${isMinYeast ? '−0.2 % av mel' : '−0.2 g'}">−</button>
+          <span class="bump-val-inline">${isMinYeast ? displayPct.toFixed(3) : yeastValG}</span><span class="mvs-unit">${isMinYeast ? '%' : 'g'}</span>
+          <button class="bump-btn bump-plus bump-inline"  onclick="${isMinYeast ? 'bumpYeast(0.2)' : 'bumpYeastG(0.2)'}"  title="${isMinYeast ? '+0.2 % av mel' : '+0.2 g'}">+</button>
         </div>
         <div class="yeast-sug-sub">${subLine}</div>
-        <div class="yeast-bump-row">
+        ${isMinYeast ? '' : `<div class="yeast-bump-row">
           <button class="bump-btn bump-minus" onclick="bumpYeast(-0.2)" title="−0.2 % av mel">−0.2 %</button>
           <span class="bump-label ${bumpClass}">${bumpText}</span>
           <button class="bump-btn bump-plus"  onclick="bumpYeast(0.2)"  title="+0.2 % av mel">+0.2 %</button>
-        </div>`;
+        </div>`}`;
     }
   }
 

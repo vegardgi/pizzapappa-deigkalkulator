@@ -956,14 +956,13 @@
     }
     .modal-close:hover { background: rgba(0,0,0,0.07); color: var(--text); }
     .modal-tabs {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
       padding: 10px 14px 0;
       gap: 5px;
       flex-shrink: 0;
     }
     .modal-tab {
-      flex: 1 1 auto;
       min-width: 0;
       padding: 8px 8px;
       border: none;
@@ -1354,15 +1353,20 @@
     body.minimalist .extra-field input[type="range"] { display: none; }
     body.minimalist .water-salt-group .slider-header { flex-wrap: wrap; }
 
-    /* ⊕ knapp ved siden av vann/salt i minimalist */
+    /* ⊕ knapp ved siden av vann/salt i minimalist — lik flour-add-mini */
     body.minimalist .water-salt-row         { display: flex; align-items: flex-start; gap: 8px; }
     body.minimalist .water-salt-row .water-salt-group { flex: 1; }
     body.minimalist .water-salt-row .extras-add-btn {
-      flex-shrink: 0; width: auto; margin-top: 0;
-      padding: 0 10px; align-self: stretch;
-      font-size: 17px; border-radius: 8px;
+      flex-shrink: 0; width: 26px; height: 26px; margin-top: 0; padding: 0;
+      border: 1.5px solid var(--border); border-style: solid;
+      border-radius: 6px; align-self: center;
+      font-size: 17px; font-weight: 700;
     }
-    body.minimalist .add-lbl { display: none; }
+    body.minimalist .add-lbl  { display: none; }
+    body.minimalist .add-icon { font-size: 17px; font-weight: 700; line-height: 1; }
+    body.minimalist .water-salt-row .extras-add-btn .add-icon::before { content: '+'; }
+    body.minimalist .water-salt-row .extras-add-btn .add-icon         { font-size: 0; }
+    body.minimalist .water-salt-row .extras-add-btn .add-icon::before { font-size: 17px; }
 
     /* Antall emner + vekt side om side — kompakt som vann/salt */
     body.minimalist .pieces-weight-group     { display: flex; gap: 6px; align-items: center; }
@@ -1384,11 +1388,17 @@
     body.minimalist .pieces-weight-group .step-btn              { width: 22px; height: 26px; font-size: 16px; }
     body.minimalist .pieces-weight-group > div > div[style]     { display: contents; }
 
-    /* Time + temp side om side i minimalist — 2-kolonne grid */
-    body.minimalist .time-grid                { grid-template-columns: 1fr; }
-    body.minimalist .time-card                { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 6px; padding: 6px 9px; }
-    body.minimalist .time-card .time-lbl      { grid-column: 1 / -1; font-size: 10px; }
+    /* Hevetid: 2-kolonne grid med kompakte tid+temp-kontroller i minimalist */
+    body.minimalist .time-grid                { grid-template-columns: 1fr 1fr; gap: 5px; }
+    body.minimalist .time-card                { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 4px; padding: 5px 7px; }
+    body.minimalist .time-card .time-lbl      { grid-column: 1 / -1; font-size: 9px; }
     body.minimalist .time-card .temp-bar-wrap { display: none; }
+    body.minimalist .time-card .time-stepper  { gap: 1px; padding: 1px 0; }
+    body.minimalist .time-card .temp-row      { gap: 1px; padding: 1px 0; }
+    body.minimalist .time-card .step-btn      { width: 18px; height: 22px; font-size: 13px; }
+    body.minimalist .time-card .step-input    { width: 22px; padding: 0; font-size: 12px; font-weight: 700; text-align: center; height: 22px; }
+    body.minimalist .time-card .time-unit,
+    body.minimalist .time-card .temp-unit     { font-size: 9px; padding-right: 2px; color: var(--muted); }
 
     /* Surdeig settings — same compact style as pieces-weight-group in minimalist */
     body.minimalist #surdeigSettings                     { display: flex; gap: 6px; align-items: stretch; margin-bottom: 8px; }
@@ -2063,7 +2073,7 @@
           <input type="range" id="saltSlider" min="0" max="6" value="3" step="0.1" oninput="sliderDrag('salt',this.value)">
         </div>
       </div>
-      <button class="extras-add-btn" onclick="openExtras()">⊕<span class="add-lbl"> Legg til ingrediens</span></button>
+      <button class="extras-add-btn" onclick="openExtras()"><span class="add-icon">⊕</span><span class="add-lbl"> Legg til ingrediens</span></button>
       </div>
 
       <!-- Extra: Sukker -->
@@ -2110,7 +2120,7 @@
     </div>
     <div class="card-body">
       <div class="pref-type-row">
-        <button class="pref-type-btn active" id="btnPrefNone"    onclick="setPrefType('none')">Ingen</button>
+        <button class="pref-type-btn active" id="btnPrefNone"    onclick="setPrefType('none')">ingen preferment</button>
         <button class="pref-type-btn"        id="btnPrefPoolish" onclick="setPrefType('poolish')">🫙 Poolish</button>
         <button class="pref-type-btn"        id="btnPrefBiga"    onclick="setPrefType('biga')">🧊 Biga</button>
       </div>

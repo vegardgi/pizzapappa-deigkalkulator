@@ -222,15 +222,58 @@
     body.minimalist .flour-name-static { display: inline-block; }
     body.minimalist .flour-add-mini { display: none !important; }
 
-    /* Mel-kolonne inne i water-salt-group (kun minimalist) */
-    .mel-mini-row { display: none; }
-    body.minimalist .mel-mini-row { display: block; }
-    .mel-mini-val {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0.75;
+    /* Mel/Vann/Salt — 3-kolonne rad (kun minimalist), speiler pieces-weight-group */
+    .mvs-mini-group { display: none; }
+    body.minimalist .mvs-mini-group {
+      display: flex;
+      gap: 6px;
+      align-items: stretch;
+      margin-bottom: 8px;
     }
+    body.minimalist .mvs-mini-group .form-row {
+      flex: 1 1 0;
+      min-width: 0;
+      margin-bottom: 0;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 8px;
+      padding: 4px 6px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 3px;
+    }
+    body.minimalist .mvs-mini-group .form-label {
+      font-size: 9px; font-weight: 700; color: var(--muted2);
+      text-transform: uppercase; letter-spacing: 0.3px; flex: 0 0 auto;
+    }
+    body.minimalist .mvs-mini-group .stepper {
+      background: none; border: none; padding: 0; overflow: visible;
+      flex: 1 1 auto; justify-content: flex-end; gap: 1px;
+    }
+    body.minimalist .mvs-mini-group .step-input {
+      width: 26px; font-size: 13px; font-weight: 700;
+      padding: 0; text-align: center; height: 24px;
+      background: none; border: none; color: var(--text);
+      -moz-appearance: textfield;
+    }
+    body.minimalist .mvs-mini-group .step-input::-webkit-outer-spin-button,
+    body.minimalist .mvs-mini-group .step-input::-webkit-inner-spin-button {
+      -webkit-appearance: none; margin: 0;
+    }
+    body.minimalist .mvs-mini-group .mvs-static {
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; height: 24px; opacity: 0.75;
+      padding: 0 2px;
+    }
+    body.minimalist .mvs-mini-group .step-btn {
+      width: 16px; height: 24px; font-size: 13px; padding: 0;
+    }
+    body.minimalist .mvs-mini-group .mvs-unit {
+      font-size: 10px; color: var(--muted); margin-left: 1px;
+    }
+    /* Skjul den gamle water-salt-group i minimalist (bruker mvs-mini-group i stedet) */
+    body.minimalist .water-salt-group { display: none !important; }
 
     .mode-group {
       display: flex;
@@ -1473,7 +1516,13 @@
     body.minimalist .ing-list          { padding: 1px 11px 4px; }
     body.minimalist .total-row         { padding: 8px 11px 9px; }
     body.minimalist .recipe-list       { gap: 4px; margin-bottom: 6px; }
-    body.minimalist .yeast-suggestion  { padding: 7px 10px; margin-bottom: 7px; }
+    body.minimalist .yeast-suggestion  {
+      padding: 7px 10px; margin-bottom: 7px;
+      display: flex; flex-wrap: wrap; align-items: center;
+      justify-content: space-between; gap: 8px;
+    }
+    body.minimalist .yeast-suggestion .yeast-sug-lbl { margin: 0; flex: 0 0 auto; }
+    body.minimalist .yeast-suggestion .yeast-sug-val { margin: 0; flex: 0 0 auto; }
     body.minimalist .time-grid         { gap: 6px; }
     body.minimalist .time-card         { padding: 7px 9px; }
     body.minimalist .yeast-sug-val     { font-size: 15px; }
@@ -2210,15 +2259,37 @@
     </div>
     <div class="card-body">
 
-      <div class="water-salt-row">
-      <div class="water-salt-group">
-        <div class="slider-row mel-mini-row">
-          <div class="slider-header">
-            <span class="slider-label">🌾 Mel</span>
-            <span class="slider-val-input mel-mini-val">100</span>
-            <span class="unit">%</span>
+      <!-- Mini: Mel/Vann/Salt som 3 bokser lik pieces-weight-group -->
+      <div class="mvs-mini-group">
+        <div class="form-row">
+          <div class="form-label">Mel</div>
+          <div class="stepper">
+            <span class="step-input mvs-static">100</span>
+            <span class="mvs-unit">%</span>
           </div>
         </div>
+        <div class="form-row">
+          <div class="form-label">Vann</div>
+          <div class="stepper">
+            <button class="step-btn" onclick="sliderInput('water',(S.waterPct||0)-1)">−</button>
+            <input class="step-input" id="waterInputMini" type="number" value="63" min="40" max="100" step="1" onchange="sliderInput('water',this.value)">
+            <button class="step-btn" onclick="sliderInput('water',(S.waterPct||0)+1)">+</button>
+            <span class="mvs-unit">%</span>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-label">Salt</div>
+          <div class="stepper">
+            <button class="step-btn" onclick="sliderInput('salt',(S.saltPct||0)-0.1)">−</button>
+            <input class="step-input" id="saltInputMini" type="number" value="3" min="0" max="6" step="0.1" onchange="sliderInput('salt',this.value)">
+            <button class="step-btn" onclick="sliderInput('salt',(S.saltPct||0)+0.1)">+</button>
+            <span class="mvs-unit">%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="water-salt-row">
+      <div class="water-salt-group">
         <div class="slider-row">
           <div class="slider-header">
             <span class="slider-label">💧 Vann <i class="help-icon" data-tooltip="Baker's percent: vann måles som % av melvekt. 65 % = 650 g vann per 1 000 g mel. Høyere % gir luftigere skorpe og mer sprø pizza, men er vanskeligere å håndtere og må stekes på lavere temperatur.">?</i></span>
@@ -3214,8 +3285,15 @@ function upd(field, val) {
 
 function sliderDrag(type, val) {
   const v = parseFloat(val);
-  if (type === 'water') { S.waterPct = v; document.getElementById('waterInput').value = v; }
-  else                  { S.saltPct  = v; document.getElementById('saltInput').value  = v; }
+  if (type === 'water') {
+    S.waterPct = v;
+    document.getElementById('waterInput').value = v;
+    const m = document.getElementById('waterInputMini'); if (m) m.value = v;
+  } else {
+    S.saltPct = v;
+    document.getElementById('saltInput').value = v;
+    const m = document.getElementById('saltInputMini'); if (m) m.value = v;
+  }
   render();
 }
 function sliderInput(type, val) {
@@ -3225,11 +3303,13 @@ function sliderInput(type, val) {
     S.waterPct = v;
     document.getElementById('waterSlider').value = v;
     document.getElementById('waterInput').value  = v;
+    const m = document.getElementById('waterInputMini'); if (m) m.value = v;
   } else {
-    v = Math.max(0, Math.min(6, v));
+    v = Math.max(0, Math.min(6, Math.round(v * 10) / 10));
     S.saltPct = v;
     document.getElementById('saltSlider').value = v;
     document.getElementById('saltInput').value  = v;
+    const m = document.getElementById('saltInputMini'); if (m) m.value = v;
   }
   render();
 }
@@ -3256,6 +3336,8 @@ function setMode(mode) {
   document.getElementById('waterSlider').value    = S.waterPct;
   document.getElementById('saltInput').value      = S.saltPct;
   document.getElementById('saltSlider').value     = S.saltPct;
+  { const m = document.getElementById('waterInputMini'); if (m) m.value = S.waterPct; }
+  { const m = document.getElementById('saltInputMini');  if (m) m.value = S.saltPct;  }
   document.getElementById('rtHours').value        = S.rtHours;
   document.getElementById('rtTemp').value         = S.rtTemp;
   document.getElementById('coldHours').value      = S.coldHours;
@@ -3519,6 +3601,8 @@ function loadRecipe(id) {
   document.getElementById('waterSlider').value    = S.waterPct;
   document.getElementById('saltInput').value      = S.saltPct;
   document.getElementById('saltSlider').value     = S.saltPct;
+  { const m = document.getElementById('waterInputMini'); if (m) m.value = S.waterPct; }
+  { const m = document.getElementById('saltInputMini');  if (m) m.value = S.saltPct;  }
   document.getElementById('rtHours').value        = S.rtHours;
   document.getElementById('rtTemp').value         = S.rtTemp;
   document.getElementById('coldHours').value      = S.coldHours;
@@ -3656,6 +3740,8 @@ function restoreState() {
     document.getElementById('waterSlider').value = S.waterPct;
     document.getElementById('saltInput').value   = S.saltPct;
     document.getElementById('saltSlider').value  = S.saltPct;
+    { const m = document.getElementById('waterInputMini'); if (m) m.value = S.waterPct; }
+    { const m = document.getElementById('saltInputMini');  if (m) m.value = S.saltPct;  }
     document.getElementById('btnPizza').className = 'mode-btn' + (S.mode==='pizza' ? ' active' : '');
     document.getElementById('btnBread').className = 'mode-btn' + (S.mode==='bread' ? ' active' : '');
     document.getElementById('btnFresh').className   = 'yeast-btn' + (S.yeastType==='fresh'   ? ' active' : '');
@@ -3708,20 +3794,11 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTips();
 // ═══════════════════════════════════════════════════════
 //  INTRO-BOKS (kort forklaring under menyen)
 // ═══════════════════════════════════════════════════════
-const INTRO_KEY = 'pp_introDismissed_v1';
 function dismissIntro() {
+  // Intro er kun en "hide-for-now" i denne økten — vises alltid på nytt ved refresh
   const box = document.getElementById('introBox');
   if (box) box.style.display = 'none';
-  try { localStorage.setItem(INTRO_KEY, '1'); } catch(e) {}
 }
-(function initIntro() {
-  try {
-    if (localStorage.getItem(INTRO_KEY) === '1') {
-      const box = document.getElementById('introBox');
-      if (box) box.style.display = 'none';
-    }
-  } catch(e) {}
-})();
 
 // ═══════════════════════════════════════════════════════
 //  TEMP BAR DRAG

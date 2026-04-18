@@ -75,7 +75,7 @@
       "Støtter poolish, biga og surdeig",
       "Baker's percent / bakerens prosent",
       "Lagre og hente oppskrifter lokalt",
-      "Minimalistisk visning for kjøkkenbruk"
+      "Til minimalistisk visning for kjøkkenbruk"
     ]
   }
   </script>
@@ -2043,7 +2043,7 @@
 <div class="min-btn-wrap" id="minBtnWrap">
   <button class="min-btn-x" onclick="collapseMinBtn()" title="Skjul">×</button>
   <button class="min-btn" id="minBtn" onclick="toggleMinimalist()">
-    <span class="min-icon">⊡</span> Minimalistisk visning
+    <span class="min-icon">⊡</span> Til minimalistisk visning
   </button>
 </div>
 <button class="min-btn-tab" id="minBtnTab" onclick="expandMinBtn()" title="Vis">◀</button>
@@ -4281,7 +4281,7 @@ function toggleMinimalist() {
   try { localStorage.setItem(MIN_KEY, on ? '1' : ''); } catch {}
   document.getElementById('minBtn').innerHTML = on
     ? '<span class="min-icon">⊞</span> Til fullversjon'
-    : '<span class="min-icon">⊡</span> Minimalistisk visning';
+    : '<span class="min-icon">⊡</span> Til minimalistisk visning';
   renderCalc();
 }
 function collapseMinBtn() {

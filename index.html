@@ -3220,7 +3220,8 @@ function renderCalc() {
             <span style="color:var(--muted);font-size:13px">Hoved-deig</span>
             <div class="yeast-sug-val" style="margin:0">
               <button class="bump-btn bump-minus bump-inline" onclick="${isMinYeast ? 'bumpYeast(-0.2)' : 'bumpYeastG(-0.2)'}" title="${isMinYeast ? '−0.2 % av mel' : '−0.2 g'}">−</button>
-              <span class="bump-val-inline">${isMinYeast ? r.mainYeastPct.toFixed(3) : fmt1(r.mainYeastG)}</span><span class="mvs-unit">${isMinYeast ? '%' : 'g'}</span>
+              ${isMinYeast ? '<span class="mvs-unit">%</span>' : ''}
+              <span class="bump-val-inline">${isMinYeast ? r.mainYeastPct.toFixed(3) : fmt1(r.mainYeastG)}</span>${isMinYeast ? '' : '<span class="mvs-unit">g</span>'}
               <button class="bump-btn bump-plus bump-inline"  onclick="${isMinYeast ? 'bumpYeast(0.2)' : 'bumpYeastG(0.2)'}"  title="${isMinYeast ? '+0.2 % av mel' : '+0.2 g'}">+</button>
             </div>
           </div>
@@ -3260,7 +3261,8 @@ function renderCalc() {
         <div class="yeast-sug-lbl">${yLblCap}</div>
         <div class="yeast-sug-val">
           <button class="bump-btn bump-minus bump-inline" onclick="${isMinYeast ? 'bumpYeast(-0.2)' : 'bumpYeastG(-0.2)'}" title="${isMinYeast ? '−0.2 % av mel' : '−0.2 g'}">−</button>
-          <span class="bump-val-inline">${isMinYeast ? displayPct.toFixed(3) : yeastValG}</span><span class="mvs-unit">${isMinYeast ? '%' : 'g'}</span>
+          ${isMinYeast ? '<span class="mvs-unit">%</span>' : ''}
+          <span class="bump-val-inline">${isMinYeast ? displayPct.toFixed(3) : yeastValG}</span>${isMinYeast ? '' : '<span class="mvs-unit">g</span>'}
           <button class="bump-btn bump-plus bump-inline"  onclick="${isMinYeast ? 'bumpYeast(0.2)' : 'bumpYeastG(0.2)'}"  title="${isMinYeast ? '+0.2 % av mel' : '+0.2 g'}">+</button>
         </div>
         <div class="yeast-sug-sub">${subLine}</div>

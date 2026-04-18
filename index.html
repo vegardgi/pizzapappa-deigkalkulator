@@ -226,12 +226,21 @@
     .mvs-mini-group { display: none; }
     body.minimalist .mvs-mini-group {
       display: flex;
+      flex-direction: column;
       gap: 6px;
-      align-items: stretch;
       margin-bottom: 8px;
     }
+    body.minimalist .mvs-mini-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: stretch;
+    }
+    body.minimalist .mvs-mini-row:empty {
+      display: none;
+    }
     body.minimalist .mvs-mini-group .form-row {
-      flex: 1 1 0;
+      flex: 0 0 calc(33.333% - 4px);
       min-width: 0;
       margin-bottom: 0;
       background: var(--input-bg);
@@ -242,6 +251,49 @@
       flex-direction: row;
       align-items: center;
       gap: 3px;
+    }
+    body.minimalist .mvs-mini-group .form-row.mvs-ghost {
+      background: transparent;
+      border: 1px dashed transparent;
+      pointer-events: none;
+    }
+    body.minimalist .mvs-mini-group .form-row.mvs-ghost-add {
+      pointer-events: auto;
+      justify-content: center;
+      padding: 0;
+    }
+    /* Ekstra mel-celler (Mel 2, Mel 3, ...) — kompakt layout for å passe i 1/3 bredde */
+    body.minimalist .mvs-mini-group .form-row.mvs-extra-cell {
+      padding: 4px 4px 4px 6px;
+      gap: 2px;
+      position: relative;
+      overflow: visible;
+    }
+    body.minimalist .mvs-mini-group .mvs-extra-cell .step-btn {
+      width: 22px; height: 28px; font-size: 15px; font-weight: 800;
+    }
+    body.minimalist .mvs-mini-group .mvs-extra-cell .step-input {
+      width: 20px; height: 22px; font-size: 12px;
+    }
+    body.minimalist .mvs-mini-group .mvs-extra-cell .form-label {
+      font-size: 9px;
+    }
+    body.minimalist .mvs-mini-group .mvs-extra-cell .mini-flour-del {
+      position: absolute;
+      top: -6px; right: -6px;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      font-size: 11px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      z-index: 2;
+    }
+    body.minimalist .mvs-mini-group .mini-flour-add-solo {
+      width: 100%; height: 100%;
+      min-height: 36px;
+      border-radius: 8px;
+      font-size: 20px; font-weight: 800;
+      margin: 0;
     }
     body.minimalist .mvs-mini-group .form-label {
       font-size: 9px; font-weight: 700; color: var(--muted2);
@@ -267,10 +319,39 @@
       padding: 0 2px;
     }
     body.minimalist .mvs-mini-group .step-btn {
-      width: 28px; height: 32px; font-size: 15px; padding: 0;
+      width: 32px; height: 36px; font-size: 18px; font-weight: 800; padding: 0;
     }
     body.minimalist .mvs-mini-group .mvs-unit {
       font-size: 10px; color: var(--muted); margin-left: 1px;
+    }
+    /* Legg til meltype-knapp (inne i Mel-cellen, mellom Mel og Vann) */
+    body.minimalist .mvs-mini-group .mini-flour-add {
+      flex: 0 0 auto;
+      width: 22px; height: 26px;
+      background: var(--orange, #E26726); color: #fff;
+      border: none; border-radius: 6px;
+      font-size: 15px; font-weight: 700; line-height: 1;
+      padding: 0; margin-left: 2px;
+      display: inline-flex; align-items: center; justify-content: center;
+      cursor: pointer;
+    }
+    body.minimalist .mvs-mini-group .mini-flour-add:hover {
+      filter: brightness(1.08);
+    }
+    /* Fjern-knapp for ekstra mel-rader (Mel 2, Mel 3, ...) */
+    body.minimalist .mvs-mini-group .mini-flour-del {
+      flex: 0 0 auto;
+      width: 20px; height: 24px;
+      background: transparent; color: var(--muted, #888);
+      border: 1px solid var(--input-border);
+      border-radius: 6px;
+      font-size: 14px; line-height: 1;
+      padding: 0; margin-left: 2px;
+      display: inline-flex; align-items: center; justify-content: center;
+      cursor: pointer;
+    }
+    body.minimalist .mvs-mini-group .mini-flour-del:hover {
+      color: var(--error, #c44); border-color: var(--error, #c44);
     }
     /* Skjul den gamle water-salt-group i minimalist (bruker mvs-mini-group i stedet) */
     body.minimalist .water-salt-group { display: none !important; }
@@ -1529,7 +1610,7 @@
     body.minimalist .bump-label        { display: none; }
     body.minimalist .yeast-bump-row    { gap: 5px; flex-direction: row; align-items: center; }
     body.minimalist .yeast-sug-val     { display: flex; align-items: center; gap: 6px; }
-    body.minimalist .yeast-sug-val .bump-btn { padding: 6px 14px; font-size: 14px; }
+    body.minimalist .yeast-sug-val .bump-btn { padding: 8px 16px; font-size: 16px; font-weight: 800; }
     body.minimalist .yeast-bump-row .bump-label { order: 2; }
     body.minimalist .yeast-bump-row .bump-minus { order: 1; }
     body.minimalist .yeast-bump-row .bump-plus  { order: 3; }
@@ -1582,7 +1663,7 @@
     body.minimalist .pieces-weight-group .stepper               { background: none; border: none; padding: 0; overflow: visible; flex-shrink: 0; }
     .pieces-weight-group .step-input                            { width: 68px; }
     body.minimalist .pieces-weight-group .step-input            { width: 36px; font-size: 14px; font-weight: 700; padding: 0; text-align: center; height: 26px; }
-    body.minimalist .pieces-weight-group .step-btn              { width: 32px; height: 32px; font-size: 16px; }
+    body.minimalist .pieces-weight-group .step-btn              { width: 36px; height: 36px; font-size: 19px; font-weight: 800; }
     body.minimalist .pieces-weight-group > div > div[style]     { display: contents; }
 
     /* Hevetid: 2-kolonne grid med kompakte tid+temp-kontroller i minimalist */
@@ -1592,7 +1673,7 @@
     body.minimalist .time-card .temp-bar-wrap { display: none; }
     body.minimalist .time-card .time-stepper  { gap: 1px; padding: 1px 0; }
     body.minimalist .time-card .temp-row      { gap: 1px; padding: 1px 0; }
-    body.minimalist .time-card .step-btn      { width: 28px; height: 38px; font-size: 14px; }
+    body.minimalist .time-card .step-btn      { width: 32px; height: 40px; font-size: 17px; font-weight: 800; }
     body.minimalist .time-card .step-input    { width: 22px; padding: 0; font-size: 12px; font-weight: 700; text-align: center; height: 34px; }
     body.minimalist .time-card .time-unit,
     body.minimalist .time-card .temp-unit     { font-size: 9px; padding-right: 2px; color: var(--muted); }
@@ -1603,7 +1684,7 @@
     body.minimalist #surdeigSettings .pref-lbl           { font-size: 10px; font-weight: 700; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.3px; flex: 1; min-width: auto; }
     body.minimalist #surdeigSettings .stepper            { background: none; border: none; padding: 0; overflow: visible; flex-shrink: 0; }
     body.minimalist #surdeigSettings .step-input         { width: 36px; font-size: 14px; font-weight: 700; padding: 0; text-align: center; height: 26px; }
-    body.minimalist #surdeigSettings .step-btn           { width: 32px; height: 32px; font-size: 16px; }
+    body.minimalist #surdeigSettings .step-btn           { width: 36px; height: 36px; font-size: 19px; font-weight: 800; }
     body.minimalist #surdeigSettings [style*="font-size:16px"] { display: none; }
     body.minimalist .override-row  { flex-wrap: nowrap; gap: 6px; }
     body.minimalist .override-input { width: 60px; padding: 4px 5px; }
@@ -2261,31 +2342,8 @@
 
       <!-- Mini: Mel/Vann/Salt som 3 bokser lik pieces-weight-group -->
       <div class="mvs-mini-group">
-        <div class="form-row">
-          <div class="form-label">Mel</div>
-          <div class="stepper">
-            <span class="step-input mvs-static">100</span>
-            <span class="mvs-unit">%</span>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-label">Vann</div>
-          <div class="stepper">
-            <button class="step-btn" onclick="sliderInput('water',(S.waterPct||0)-1)">−</button>
-            <input class="step-input" id="waterInputMini" type="number" value="63" min="40" max="100" step="1" onchange="sliderInput('water',this.value)">
-            <button class="step-btn" onclick="sliderInput('water',(S.waterPct||0)+1)">+</button>
-            <span class="mvs-unit">%</span>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-label">Salt</div>
-          <div class="stepper">
-            <button class="step-btn" onclick="sliderInput('salt',(S.saltPct||0)-0.1)">−</button>
-            <input class="step-input" id="saltInputMini" type="number" value="3" min="0" max="6" step="0.1" onchange="sliderInput('salt',this.value)">
-            <button class="step-btn" onclick="sliderInput('salt',(S.saltPct||0)+0.1)">+</button>
-            <span class="mvs-unit">%</span>
-          </div>
-        </div>
+        <div class="mvs-mini-row" id="miniFlourRow"><!-- Mel + Vann + Salt — populated by renderMiniFlours() --></div>
+        <div class="mvs-mini-row" id="miniFlourExtraRow"><!-- Mel 2, Mel 3... populated by renderMiniFlours() --></div>
       </div>
 
       <div class="water-salt-row">
@@ -2432,7 +2490,7 @@
           <div class="time-lbl">🌡️ Romtemp <i class="help-icon" data-tooltip="Heving ved romtemperatur før eventuell kjøling. Lengre tid og høyere temp = mer gjæraktivitet = kalkulatoren foreslår mindre gjær.">?</i></div>
           <div class="stepper time-stepper">
             <button class="step-btn" onclick="adj('rtHours',-1)">−</button>
-            <input  class="step-input" id="rtHours" type="number" value="2" min="0" max="72" onchange="upd('rtHours',this.value)">
+            <input  class="step-input" id="rtHours" type="number" value="8" min="0" max="72" onchange="upd('rtHours',this.value)">
             <button class="step-btn" onclick="adj('rtHours',1)">+</button>
             <span class="time-unit">t</span>
           </div>
@@ -2452,7 +2510,7 @@
           <div class="time-lbl">❄️ Kjøleskap <i class="help-icon" data-tooltip="Kaldheving i kjøleskap bremser gjæren og gir mer smak via enzymatisk aktivitet. Typisk 3–5 °C i 12–72 timer. Sett 0 timer om du ikke bruker kjøleskap.">?</i></div>
           <div class="stepper time-stepper">
             <button class="step-btn" onclick="adj('coldHours',-1)">−</button>
-            <input  class="step-input" id="coldHours" type="number" value="24" min="0" max="120" onchange="upd('coldHours',this.value)">
+            <input  class="step-input" id="coldHours" type="number" value="0" min="0" max="120" onchange="upd('coldHours',this.value)">
             <button class="step-btn" onclick="adj('coldHours',1)">+</button>
             <span class="time-unit">t</span>
           </div>
@@ -2576,9 +2634,9 @@ const S = {
   flourTypes:    [{ id:1, name:'Hvetemel tipo 00', pct:100 }],
   waterPct:      63,
   saltPct:       3,
-  rtHours:       2,
+  rtHours:       8,
   rtTemp:        20,
-  coldHours:     24,
+  coldHours:     0,
   coldTemp:      4,
   yeastType:     'fresh',   // 'fresh' | 'dry'
   yeastBumpPct:  0,         // additive baker's % bump on top of calculated value
@@ -2612,7 +2670,7 @@ const PRESETS = {
     piecesPerDough: 4, weightPerPiece: 265,
     flourTypes: [{ id:1, name:'Hvetemel tipo 00', pct:100 }],
     waterPct: 63, saltPct: 3,
-    rtHours: 2, rtTemp: 20, coldHours: 24, coldTemp: 4
+    rtHours: 8, rtTemp: 20, coldHours: 0, coldTemp: 4
   },
   bread: {
     piecesPerDough: 1, weightPerPiece: 900,
@@ -3112,6 +3170,7 @@ function renderFlourList() {
       <span class="flour-name-static">Mel</span>
       <div class="flour-pct-wrap">
         <input class="flour-pct-input" type="number" value="${f.pct}"
+               data-flour-id="${f.id}"
                min="0" max="100" step="1"
                oninput="setFlourPct(${f.id}, this.value)">
         <span style="color:var(--muted);font-size:13px;margin-left:2px">%</span>
@@ -3120,6 +3179,118 @@ function renderFlourList() {
         ? `<button class="flour-del-btn" onclick="removeFlour(${f.id})" title="Fjern">×</button>`
         : `<button class="flour-add-mini" onclick="addFlour()" title="Legg til meltype">+</button>`}
     </div>`).join('');
+  renderFlourSumBadge();
+  renderMiniFlours();
+}
+
+// Renders the minimalist view Mel/Vann/Salt rows (and extra Mel 2/3/... rows)
+function renderMiniFlours() {
+  const top = document.getElementById('miniFlourRow');
+  const extra = document.getElementById('miniFlourExtraRow');
+  if (!top || !extra) return;
+  const flours = S.flourTypes;
+  const multi = flours.length > 1;
+
+  // First flour cell (Mel or Mel 1). Add-button only in Mel cell when single flour;
+  // when multi, the add-button appears at the end of the extras row.
+  const first = flours[0];
+  const melLabel = multi ? 'Mel 1' : 'Mel';
+  const melInner = multi
+    ? `<button class="step-btn" onclick="adjFlourPct(${first.id},-1)">−</button>
+       <input class="step-input" id="miniFlourPct_${first.id}" type="number" value="${first.pct}" min="0" max="100" step="1" oninput="setFlourPct(${first.id},this.value)">
+       <button class="step-btn" onclick="adjFlourPct(${first.id},1)">+</button>
+       <span class="mvs-unit">%</span>`
+    : `<span class="step-input mvs-static">100</span>
+       <span class="mvs-unit">%</span>
+       <button class="mini-flour-add" onclick="addFlour()" title="Legg til meltype">+</button>`;
+  const melCell = `
+    <div class="form-row">
+      <div class="form-label">${melLabel}</div>
+      <div class="stepper">
+        ${melInner}
+      </div>
+    </div>`;
+
+  const vannCell = `
+    <div class="form-row">
+      <div class="form-label">Vann</div>
+      <div class="stepper">
+        <button class="step-btn" onclick="sliderInput('water',(S.waterPct||0)-1)">−</button>
+        <input class="step-input" id="waterInputMini" type="number" value="${S.waterPct}" min="40" max="100" step="1" onchange="sliderInput('water',this.value)">
+        <button class="step-btn" onclick="sliderInput('water',(S.waterPct||0)+1)">+</button>
+        <span class="mvs-unit">%</span>
+      </div>
+    </div>`;
+
+  const saltCell = `
+    <div class="form-row">
+      <div class="form-label">Salt</div>
+      <div class="stepper">
+        <button class="step-btn" onclick="sliderInput('salt',(S.saltPct||0)-0.1)">−</button>
+        <input class="step-input" id="saltInputMini" type="number" value="${S.saltPct}" min="0" max="6" step="0.1" onchange="sliderInput('salt',this.value)">
+        <button class="step-btn" onclick="sliderInput('salt',(S.saltPct||0)+0.1)">+</button>
+        <span class="mvs-unit">%</span>
+      </div>
+    </div>`;
+
+  top.innerHTML = melCell + vannCell + saltCell;
+
+  // Extra flours (Mel 2, Mel 3, ...) go into extra row, 3 per row, padded with ghosts.
+  // The add-flour button is appended as its own small cell after the last extra.
+  const extras = flours.slice(1);
+  if (extras.length === 0) {
+    extra.innerHTML = '';
+  } else {
+    const cells = extras.map((f, idx) => `
+      <div class="form-row mvs-extra-cell">
+        <button class="mini-flour-del" onclick="removeFlour(${f.id})" title="Fjern">×</button>
+        <div class="form-label">Mel ${idx + 2}</div>
+        <div class="stepper">
+          <button class="step-btn" onclick="adjFlourPct(${f.id},-1)">−</button>
+          <input class="step-input" id="miniFlourPct_${f.id}" type="number" value="${f.pct}" min="0" max="100" step="1" oninput="setFlourPct(${f.id},this.value)">
+          <button class="step-btn" onclick="adjFlourPct(${f.id},1)">+</button>
+        </div>
+      </div>`);
+    // Pad to multiple of 3 with ghost cells (so last row aligns with 3-col grid)
+    while (cells.length % 3 !== 0) {
+      cells.push('<div class="form-row mvs-ghost" aria-hidden="true"></div>');
+    }
+    // Put the "add meltype" button on top of the first ghost slot if possible,
+    // otherwise append a new ghost row containing it.
+    const addBtn = `<button class="mini-flour-add mini-flour-add-solo" onclick="addFlour()" title="Legg til meltype">+</button>`;
+    // Always append an add-button cell at the end (as a ghost-sized cell).
+    // Find the first ghost and replace its contents with the add button.
+    let replaced = false;
+    for (let i = 0; i < cells.length; i++) {
+      if (cells[i].includes('mvs-ghost')) {
+        cells[i] = `<div class="form-row mvs-ghost mvs-ghost-add">${addBtn}</div>`;
+        replaced = true;
+        break;
+      }
+    }
+    if (!replaced) {
+      // No ghost slot available (extras fill exact multiple of 3) — add a new row
+      cells.push(`<div class="form-row mvs-ghost mvs-ghost-add">${addBtn}</div>`);
+      while (cells.length % 3 !== 0) {
+        cells.push('<div class="form-row mvs-ghost" aria-hidden="true"></div>');
+      }
+    }
+    extra.innerHTML = cells.join('');
+  }
+}
+
+// Nudge flour percent by delta (for mini-view +/- buttons)
+function adjFlourPct(id, delta) {
+  const f = S.flourTypes.find(f => f.id === id);
+  if (!f) return;
+  const next = Math.max(0, Math.min(100, (parseFloat(f.pct) || 0) + delta));
+  f.pct = next;
+  // Sync both views' inputs
+  const mini = document.getElementById('miniFlourPct_' + id);
+  if (mini) mini.value = next;
+  const full = document.querySelector(`.flour-pct-input[data-flour-id="${id}"]`);
+  if (full) full.value = next;
+  renderCalc();
   renderFlourSumBadge();
 }
 
@@ -3432,7 +3603,16 @@ function setFlourName(id, val) {
 }
 function setFlourPct(id, val) {
   const f = S.flourTypes.find(f => f.id === id);
-  if (f) { f.pct = parseFloat(val) || 0; renderCalc(); }  // same
+  if (!f) return;
+  f.pct = parseFloat(val) || 0;
+  // Sync the opposite view's input (preserve focus on the active one)
+  const active = document.activeElement;
+  const mini = document.getElementById('miniFlourPct_' + id);
+  if (mini && mini !== active) mini.value = f.pct;
+  const full = document.querySelector(`.flour-pct-input[data-flour-id="${id}"]`);
+  if (full && full !== active) full.value = f.pct;
+  renderCalc();
+  renderFlourSumBadge();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -3491,6 +3671,16 @@ const DEFAULT_RECIPES = [
     flourTypes:[{id:1,name:'Hvetemel',pct:70},{id:2,name:'Sammalt hvete grov',pct:30}],
     waterPct:70, saltPct:1.8, rtHours:2, rtTemp:20, coldHours:0, coldTemp:4,
     yeastType:'fresh', svinnPct:12 }},
+  { id:10, name:'Focaccia', mode:'bread', snap:{
+    mode:'bread', numDoughs:1, piecesPerDough:1, weightPerPiece:900,
+    flourTypes:[{id:1,name:'Hvetemel tipo 00',pct:100}],
+    waterPct:80, saltPct:2.2, rtHours:2, rtTemp:21, coldHours:18, coldTemp:4,
+    yeastType:'dry', svinnPct:10 }},
+  { id:11, name:'Ciabatta', mode:'bread', snap:{
+    mode:'bread', numDoughs:1, piecesPerDough:2, weightPerPiece:400,
+    flourTypes:[{id:1,name:'Sterkt hvetemel',pct:100}],
+    waterPct:80, saltPct:2.0, rtHours:4, rtTemp:21, coldHours:0, coldTemp:4,
+    yeastType:'dry', svinnPct:10 }},
 ];
 
 function recipesLoad() {
@@ -3839,8 +4029,8 @@ loadStoredPresets();
 recipesLoad();
 const _hadSavedState = !!localStorage.getItem(STATE_KEY);
 restoreState();
-// On first ever load (no saved state): auto-load first recipe
-if (!_hadSavedState && recipes.length > 0) loadRecipe(recipes[0].id);
+// Fresh load uses the S defaults defined above (see the S constant) —
+// no auto-loaded recipe, so users see the canonical starting values.
 renderRecipes();
 render();
 initTempDrag('rtTempBar',   'rtTempMarker',   'rtTemp',   10, 40);

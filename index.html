@@ -1711,6 +1711,120 @@
     body.minimalist .override-row  { flex-wrap: nowrap; gap: 6px; }
     body.minimalist .override-input { width: 60px; padding: 4px 5px; }
 
+    /* ═══════════════════════════════════════════════════════
+       NORDIC FLAT — Minimalistisk v2
+       Flate rader · ingen bokser · store tappflater (≥48 px)
+       Inspirert av nordisk/skandinavisk app-design
+       ═══════════════════════════════════════════════════════ */
+
+    /* label-mini / label-full-toggle */
+    .label-mini { display: none; }
+    body.minimalist .pieces-weight-group .label-full { display: none; }
+    body.minimalist .pieces-weight-group .label-mini { display: inline; }
+
+    /* Kort: ren hvit flate, ingen skygge, ingen kantradius */
+    body.minimalist .card {
+      background: var(--card);
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+      overflow: visible;
+      margin-bottom: 0;
+    }
+    body.minimalist .card-body { padding: 0 16px; }
+    body.minimalist .card + .card { margin-top: 20px; }
+
+    /* Oppskrifter beholder sin boks-stil */
+    body.minimalist .recipes-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    body.minimalist .recipes-card + .card { margin-top: 0; }
+    body.minimalist .recipes-card .card-body { padding: 8px 11px; }
+
+    /* ── Emner og vekt: stakkede flate rader ── */
+    body.minimalist .pieces-weight-group { flex-direction: column; gap: 0; align-items: stretch; }
+    body.minimalist .pieces-weight-group .form-row {
+      flex: none;
+      background: none; border: none; border-radius: 0;
+      border-bottom: 1px solid var(--border);
+      padding: 4px 0; gap: 10px; min-height: 58px;
+    }
+    body.minimalist .pieces-weight-group .form-row:last-child { border-bottom: none; }
+    body.minimalist .pieces-weight-group .form-row .form-label { font-size: 12px; font-weight: 700; letter-spacing: 0.3px; }
+    body.minimalist .pieces-weight-group .step-btn  { width: 48px; height: 48px; font-size: 24px; font-weight: 800; }
+    body.minimalist .pieces-weight-group .step-input { width: 44px; font-size: 20px; font-weight: 700; height: 36px; }
+
+    /* ── Mel/Vann/Salt: stakkede flate rader ── */
+    body.minimalist .mvs-mini-row  { flex-direction: column; gap: 0; }
+    body.minimalist .mvs-mini-group { gap: 0; margin-bottom: 0; }
+
+    body.minimalist .mvs-mini-group .form-row {
+      flex: none; width: 100%;
+      background: none; border: none; border-radius: 0;
+      border-bottom: 1px solid var(--border);
+      padding: 4px 0; gap: 10px; min-height: 58px;
+    }
+    /* mel-celle: behov for position:relative er borte — override :has-regel */
+    body.minimalist .mvs-mini-group .form-row:has(.mvs-static) { position: static; }
+
+    body.minimalist .mvs-mini-group .form-label {
+      font-size: 12px; font-weight: 700; letter-spacing: 0.3px;
+      flex: 0 0 auto; min-width: 40px;
+    }
+    body.minimalist .mvs-mini-group .stepper      { flex: 1 1 auto; justify-content: flex-end; gap: 4px; }
+    body.minimalist .mvs-mini-group .stepper:has(.mvs-static) { justify-content: flex-end; }
+    body.minimalist .mvs-mini-group .step-btn     { width: 48px; height: 48px; font-size: 24px; font-weight: 800; }
+    body.minimalist .mvs-mini-group .step-input   { width: 44px; font-size: 20px; font-weight: 700; height: 36px; }
+    body.minimalist .mvs-mini-group .mvs-static   { font-size: 20px; font-weight: 700; height: 36px; opacity: 1; }
+    body.minimalist .mvs-mini-group .mvs-unit     { font-size: 14px; margin-left: 3px; align-self: center; }
+
+    /* mini-flour-add: inneflyt (ikke absolut) */
+    body.minimalist .mvs-mini-group .mini-flour-add {
+      position: static; transform: none;
+      width: 38px; height: 38px; font-size: 20px; margin-left: 8px;
+    }
+
+    /* Ekstra mel-celler */
+    body.minimalist .mvs-mini-group .form-row.mvs-extra-cell { position: static; }
+    body.minimalist .mvs-mini-group .mvs-extra-cell .mini-flour-del {
+      position: static; order: 99;
+      width: 32px; height: 32px; font-size: 16px; margin-left: 4px;
+    }
+
+    /* Add-knapp: full rad-bredde */
+    body.minimalist .mvs-mini-group .mini-flour-add-sq {
+      flex: none; align-self: stretch; width: 100%;
+      height: 48px; border-radius: 10px; font-size: 20px; font-weight: 800;
+      margin: 8px 0 4px; margin-left: 0;
+    }
+
+    /* ── Hevetid: flate rader ── */
+    body.minimalist .time-card {
+      background: none; border: none; border-radius: 0;
+      border-bottom: 1px solid var(--border);
+      padding: 4px 0; min-height: 58px;
+      gap: 8px;
+    }
+    body.minimalist .time-grid .time-card:last-child { border-bottom: none; }
+    body.minimalist .time-card .time-lbl   { font-size: 11px; font-weight: 700; letter-spacing: 0.3px; flex: 1; white-space: nowrap; min-width: 0; overflow: hidden; }
+    body.minimalist .time-card .step-btn   { width: 36px; height: 44px; font-size: 19px; font-weight: 800; }
+    body.minimalist .time-card .step-input { width: 28px; font-size: 16px; font-weight: 700; height: 32px; padding: 0; }
+    body.minimalist .time-card .time-unit  { font-size: 13px; padding: 0 0 0 2px; }
+    body.minimalist .time-card .temp-unit  { font-size: 13px; padding: 0 0 0 2px; }
+    /* Fjern bokser fra time-stepper og temp-row (har !important i base-CSS) */
+    body.minimalist .time-card .time-stepper {
+      background: none !important; border: none !important;
+      border-radius: 0 !important; padding: 0 !important; overflow: visible !important;
+    }
+    body.minimalist .time-card .temp-row {
+      background: none !important; border: none !important;
+      border-radius: 0 !important; padding: 0 !important; overflow: visible !important;
+    }
+
     /* ── Extras ── */
     .extras-add-btn {
       display: flex; align-items: center; justify-content: center; gap: 7px;
@@ -2298,7 +2412,7 @@
       <div class="pieces-weight-group">
         <div class="form-row">
           <div class="form-label">
-            Antall deigemner
+            <span class="label-full">Antall deigemner</span><span class="label-mini">Emner</span>
           </div>
           <div class="stepper">
             <button class="step-btn" onclick="adj('piecesPerDough',-1)">−</button>
@@ -2309,7 +2423,7 @@
 
         <div class="form-row">
           <div class="form-label">
-            Vekt i gram per emne
+            <span class="label-full">Vekt i gram per emne</span><span class="label-mini">Gram</span>
             <i class="help-icon" data-tooltip="Ønsket vekt på ferdig produkt per stykke — f.eks. 250–280 g for en napolitansk pizzabunn. Rådeigvekten justeres automatisk opp om svinn er satt.">?</i>
           </div>
           <div class="stepper">

@@ -1842,7 +1842,7 @@
           <div class="tip-num">4</div>
           <div class="tip-content">
             <div class="tip-title">Regnestykket: mel og vann i fordeigen trekkes fra hoved-deigen</div>
-            <div class="tip-desc">Melet og vannet i fordeigen er en del av den totale oppskriften — ikke noe ekstra. Bruker du f.eks. 30 % poolish av 500 g mel, tar du 150 g mel + 150 g vann til poolishen. Hoved-deigen får da 350 g mel og resten av vannet. Kalkulatoren beregner dette automatisk.</div>
+            <div class="tip-desc">Melet og vannet i fordeigen er en del av den totale oppskriften — ikke noe ekstra. Bruker du f.eks. 30 % poolish av 1 000 g mel, blir det 300 g poolish (150 g mel + 150 g vann ved 100 % hydrering). Hoved-deigen får da 850 g mel og resten av vannet. Kalkulatoren beregner dette automatisk.</div>
             <span class="tip-badge badge-green">Innbakt i kalkulatoren</span>
           </div>
         </div>
@@ -2206,7 +2206,7 @@
       </div>
       <div class="pref-settings" id="extraPoolish">
         <div class="pref-row">
-          <span class="pref-lbl" style="font-size:11px;color:var(--muted)">Andel poolish <i class="help-icon" data-tooltip="Flytende fordeig med 100 % hydrering (like deler mel og vann). Fermenteres 12–16 t ved romtemp. Typisk 20–40 % av melet. Gir luftig krumme og mild syrlig aroma.">?</i></span>
+          <span class="pref-lbl" style="font-size:11px;color:var(--muted)">Andel poolish <i class="help-icon" data-tooltip="Poolishens totalvekt som andel av melvekt (100 % hydrering — like deler mel og vann). 30 % av 1 000 g mel = 300 g poolish (150 g mel + 150 g vann). Fermenteres 12–16 t ved romtemp. Typisk 20–40 %. Gir luftig krumme og mild syrlig aroma.">?</i></span>
           <div class="stepper">
             <button class="step-btn" onclick="adjExtra('poolishPct',-5,5,80)">−</button>
             <input class="step-input" id="poolishPctInput" type="number" value="30" min="5" max="80" style="width:46px" onchange="updExtra('poolishPct',this.value,5,80)">
@@ -2217,7 +2217,7 @@
       </div>
       <div class="pref-settings" id="extraBiga">
         <div class="pref-row">
-          <span class="pref-lbl" style="font-size:11px;color:var(--muted)">Andel biga <i class="help-icon" data-tooltip="Stiv italiensk fordeig (45–55 % hydrering) med svært lite gjær. Settes i kjøleskap 16–24 t. Typisk 30–60 % av melet. Gir seig, åpen krumme og nøtteaktig smak.">?</i></span>
+          <span class="pref-lbl" style="font-size:11px;color:var(--muted)">Andel biga <i class="help-icon" data-tooltip="Bigaens totalvekt som andel av melvekt. 40 % av 1 000 g mel = 400 g biga, fordelt på mel og vann etter valgt hydrering (50 % → ~267 g mel + ~133 g vann). Settes i kjøleskap 16–24 t. Typisk 30–60 %. Gir seig, åpen krumme og nøtteaktig smak.">?</i></span>
           <div class="stepper">
             <button class="step-btn" onclick="adjExtra('bigaPct',-5,5,80)">−</button>
             <input class="step-input" id="bigaPctInput" type="number" value="40" min="5" max="80" style="width:46px" onchange="updExtra('bigaPct',this.value,5,80)">
@@ -2334,7 +2334,7 @@
       <!-- Surdeig settings — shown when surdeig is selected -->
       <div id="surdeigSettings" style="display:none;margin-bottom:10px">
         <div class="pref-row">
-          <span class="pref-lbl">Andel starter <i class="help-icon" data-tooltip="Andel av total melvekt som inngår i surdeigstarteren. Typisk 15–30 % for pizza, 20–40 % for brød. Mel og vann i starteren trekkes fra hoved-deigen.">?</i></span>
+          <span class="pref-lbl">Andel starter <i class="help-icon" data-tooltip="Starterens totalvekt som andel av melvekt. 20 % av 1 000 g mel = 200 g starter, fordelt på mel og vann etter valgt hydrering (100 % → 100 g mel + 100 g vann). Typisk 15–30 % for pizza, 20–40 % for brød.">?</i></span>
           <div class="stepper">
             <button class="step-btn" onclick="adjExtra('surdeigPct',-5,5,80)">−</button>
             <input class="step-input" id="surdeigPctInput" type="number" value="20" min="5" max="80" style="width:46px" onchange="updExtra('surdeigPct',this.value,5,80)">
@@ -2581,14 +2581,19 @@ function calc() {
   const oljeG   = flourG * xOlje;
 
   // Preferment partitioning
+  // Convention: poolishPct / bigaPct / surdeigPct = fordeigens TOTALVEKT
+  // som andel av melvekt. 30 % poolish av 1000 g mel = 300 g poolish total
+  // (150 g mel + 150 g vann ved 100 % hydrering).
   let poolishFlourG = 0, poolishWaterG = 0;
   if (hasExtra('poolish')) {
-    poolishFlourG = flourG * (S.poolishPct||30) / 100 / 2; // 100% hydration
+    // 100 % hydrering → total/2 = mel = vann
+    poolishFlourG = flourG * (S.poolishPct||30) / 100 / 2;
     poolishWaterG = poolishFlourG;
   }
   let bigaFlourG = 0, bigaWaterG = 0;
   if (hasExtra('biga')) {
     const bh = (S.bigaHydration||50) / 100;
+    // total = mel × (1 + bh)  →  mel = total / (1 + bh)
     bigaFlourG = flourG * (S.bigaPct||40) / 100 / (1 + bh);
     bigaWaterG = bigaFlourG * bh;
   }
@@ -2840,7 +2845,7 @@ function renderCalc() {
       html += ingRow(f.name, mg, multi ? `${f.pct} % av mel` : null);
     });
     if (multi) html += ingSumLine(r.flourG - r.poolishFlourG);
-    html += ingRow('Vann', r.waterG - r.poolishWaterG, null);
+    html += ingRow('Vann', Math.max(0, r.waterG - r.poolishWaterG), null);
   } else if (hasExtra('biga')) {
     const prefTot    = r.bigaFlourG + r.bigaWaterG + r.prefYeastG;
     const prefTotFmt = S.roundIngredients ? gfmt(prefTot) : precise(prefTot);
@@ -2863,7 +2868,7 @@ function renderCalc() {
       html += ingRow(f.name, mg, multi ? `${f.pct} % av mel` : null);
     });
     if (multi) html += ingSumLine(r.flourG - r.bigaFlourG);
-    html += ingRow('Vann', r.waterG - r.bigaWaterG, null);
+    html += ingRow('Vann', Math.max(0, r.waterG - r.bigaWaterG), null);
   } else if (hasExtra('surdeig')) {
     const surTot = r.surdeigFlourG + r.surdeigWaterG;
     html += `<div class="ing-section-label pref-label">Surdeig starter — ${S.surdeigPct} % av mel · ${S.surdeigHydration} % hydrering</div>`;
@@ -2875,7 +2880,7 @@ function renderCalc() {
     });
     if (multi) html += ingSumLine(r.flourG - r.surdeigFlourG);
     html += '<div class="ing-section-label">Øvrig — hoved-deig</div>';
-    html += ingRow('Vann', r.waterG - r.surdeigWaterG, `${S.waterPct} % av mel`);
+    html += ingRow('Vann', Math.max(0, r.waterG - r.surdeigWaterG), `${S.waterPct} % av mel`);
   } else {
     html += '<div class="ing-section-label">Mel</div>';
     r.flourBreakdown.forEach(f => {
@@ -2996,22 +3001,6 @@ function fillSlider(id, val, min, max) {
 // ═══════════════════════════════════════════════════════
 //  EXTRAS
 // ═══════════════════════════════════════════════════════
-function togglePrefTimeCard() {
-  const body    = document.getElementById('prefTimeBody');
-  const chevron = document.getElementById('prefTimeChevron');
-  const open    = body.style.display !== 'none';
-  body.style.display = open ? 'none' : '';
-  chevron.classList.toggle('open', !open);
-}
-
-function togglePrefAcc() {
-  const body    = document.getElementById('prefAccBody');
-  const chevron = document.getElementById('prefAccChevron');
-  const open    = body.style.display !== 'none';
-  body.style.display = open ? 'none' : '';
-  chevron.classList.toggle('open', !open);
-}
-
 function setPrefType(t) {
   if (!S.extras) S.extras = [];
   S.extras = S.extras.filter(e => e !== 'poolish' && e !== 'biga');
@@ -3369,7 +3358,18 @@ function snapshotState() {
     rtHours: S.rtHours, rtTemp: S.rtTemp,
     coldHours: S.coldHours, coldTemp: S.coldTemp,
     yeastType: S.yeastType,
-    svinnPct: S.svinnPct
+    svinnPct: S.svinnPct,
+    // Extras (fordeig, sukker, olje)
+    extras: (S.extras||[]).slice(),
+    sukkerPct: S.sukkerPct,
+    oljePct: S.oljePct,
+    poolishPct: S.poolishPct,
+    bigaPct: S.bigaPct,
+    bigaHydration: S.bigaHydration,
+    surdeigPct: S.surdeigPct,
+    surdeigHydration: S.surdeigHydration,
+    prefHours: S.prefHours,
+    prefTemp: S.prefTemp
   };
 }
 
@@ -3405,8 +3405,25 @@ function loadRecipe(id) {
     coldHours: p.coldHours, coldTemp: p.coldTemp ?? 4,
     yeastType: p.yeastType ?? 'fresh',
     override: false, overrideVal: null,
-    svinnPct: p.svinnPct ?? 0
+    svinnPct: p.svinnPct ?? 0,
+    // Extras — reset when loading a recipe, then apply what's saved
+    extras: Array.isArray(p.extras) ? p.extras.slice() : [],
+    sukkerPct: p.sukkerPct ?? S.sukkerPct,
+    oljePct: p.oljePct ?? S.oljePct,
+    poolishPct: p.poolishPct ?? S.poolishPct,
+    bigaPct: p.bigaPct ?? S.bigaPct,
+    bigaHydration: p.bigaHydration ?? S.bigaHydration,
+    surdeigPct: p.surdeigPct ?? S.surdeigPct,
+    surdeigHydration: p.surdeigHydration ?? S.surdeigHydration,
+    prefHours: p.prefHours ?? S.prefHours,
+    prefTemp: p.prefTemp ?? S.prefTemp
   });
+  // Sync surdeig extra with yeast type so legacy recipes stay consistent
+  if (S.yeastType === 'surdeig') {
+    if (!S.extras.includes('surdeig')) S.extras.push('surdeig');
+  } else {
+    S.extras = S.extras.filter(e => e !== 'surdeig');
+  }
   _fid = Math.max(...S.flourTypes.map(f => f.id)) + 1;
 
   // Sync all DOM inputs

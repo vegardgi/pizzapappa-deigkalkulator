@@ -1987,6 +1987,43 @@
     body.minimalist .total-lbl { font-size: 14px; font-weight: 700; }
     body.minimalist .total-val { font-size: 24px; font-weight: 900; color: var(--red); }
 
+    /* ── Surdeig-innstillinger: steg-knapper lik Salt ── */
+    body.minimalist #surdeigSettings .step-btn  { width: 48px; height: 48px; font-size: 24px; font-weight: 800; }
+    body.minimalist #surdeigSettings .step-input { font-size: 20px; font-weight: 700; height: 36px; }
+
+    /* ── Hevetid: label full bredde øverst, steppere side om side under ── */
+    body.minimalist .time-card { flex-wrap: wrap; padding: 8px 0; min-height: auto; gap: 4px 8px; }
+    body.minimalist .time-card .time-lbl {
+      width: 100%; flex: none; font-size: 12px; font-weight: 700; letter-spacing: 0.3px;
+      white-space: normal; min-width: unset; overflow: visible; padding-bottom: 2px;
+    }
+    body.minimalist .time-card .step-btn  { width: 48px; height: 48px; font-size: 24px; font-weight: 800; }
+    body.minimalist .time-card .step-input { width: 32px; font-size: 16px; font-weight: 700; height: 36px; padding: 0; }
+    body.minimalist .time-card .time-unit { font-size: 12px; padding: 0 0 0 2px; }
+    body.minimalist .time-card .temp-unit { font-size: 12px; padding: 0 0 0 2px; }
+
+    /* ── Gjær-forslag: bump-knapper lik Salt step-btn ── */
+    body.minimalist .yeast-suggestion { min-height: 58px; }
+    body.minimalist .yeast-suggestion .yeast-sug-lbl {
+      font-size: 12px; font-weight: 700; color: var(--text);
+      text-transform: none; letter-spacing: 0.3px; flex: 0 0 auto;
+    }
+    body.minimalist .yeast-sug-val { gap: 4px; align-items: center; }
+    body.minimalist .bump-btn.bump-inline {
+      width: 48px; height: 48px; font-size: 24px; font-weight: 800;
+      background: none; border: none; border-radius: 10px; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center;
+      color: var(--red); transition: background 0.12s; flex-shrink: 0; padding: 0;
+    }
+    body.minimalist .bump-btn.bump-inline:hover { background: rgba(196,43,28,0.16); }
+    body.minimalist .bump-val-inline {
+      width: 44px; font-size: 20px; font-weight: 700; height: 36px;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    body.minimalist .yeast-sug-val .mvs-unit {
+      font-size: 14px; margin-left: 2px; align-self: center; color: var(--muted);
+    }
+
     /* ── Responsive ── */
     @media (max-width: 380px) {
       .step-input { width: 48px; }
@@ -2010,9 +2047,9 @@
   <h1>Pizzapappas deigkalkulator</h1>
   <p>Baker's percent — brød &amp; pizza</p>
   <div class="mode-toggle">
-    <button class="mode-btn" onclick="openTips()">💡 Tips</button>
-    <button class="mode-btn active" id="btnPizza" onclick="setMode('pizza')">🍕 Pizza</button>
-    <button class="mode-btn" id="btnBread" onclick="setMode('bread')">🍞 Brød</button>
+    <button class="mode-btn" onclick="openTips()">Tips</button>
+    <button class="mode-btn active" id="btnPizza" onclick="setMode('pizza')">Pizza</button>
+    <button class="mode-btn" id="btnBread" onclick="setMode('bread')">Brød</button>
   </div>
 </header>
 
@@ -2020,16 +2057,16 @@
 <div class="modal-overlay" id="tipsModal" onclick="if(event.target===this)closeTips()">
   <div class="modal-sheet">
     <div class="modal-header">
-      <span class="modal-title">💡 Tips</span>
+      <span class="modal-title">Tips</span>
       <button class="modal-close" onclick="closeTips()">✕</button>
     </div>
     <div class="modal-tabs">
-      <button class="modal-tab active" id="tabHand" onclick="switchTab('hand')">✋ For hånd</button>
-      <button class="modal-tab" id="tabMachine" onclick="switchTab('machine')">🤖 I maskin</button>
-      <button class="modal-tab" id="tabHeving" onclick="switchTab('heving')">🍞 Heving</button>
-      <button class="modal-tab" id="tabEltefritt" onclick="switchTab('eltefritt')">🙌 Eltefritt</button>
+      <button class="modal-tab active" id="tabHand" onclick="switchTab('hand')">For hånd</button>
+      <button class="modal-tab" id="tabMachine" onclick="switchTab('machine')">I maskin</button>
+      <button class="modal-tab" id="tabHeving" onclick="switchTab('heving')">Heving</button>
+      <button class="modal-tab" id="tabEltefritt" onclick="switchTab('eltefritt')">Eltefritt</button>
       <button class="modal-tab" id="tabFordeig" onclick="switchTab('fordeig')">Fordeig</button>
-      <button class="modal-tab" id="tabSteking" onclick="switchTab('steking')">🔥 Steking</button>
+      <button class="modal-tab" id="tabSteking" onclick="switchTab('steking')">Steking</button>
     </div>
     <div class="modal-body">
 
@@ -2435,7 +2472,7 @@
     </div>
     <div style="font-size:13px;color:var(--muted);margin:5px 0 0">Klikk for å aktivere — feltet vises i kalkulatoren</div>
     <div class="extras-chips">
-      <button class="extra-chip" id="chipSukker" onclick="toggleExtra('sukker')">🍯 Sukker</button>
+      <button class="extra-chip" id="chipSukker" onclick="toggleExtra('sukker')">Sukker</button>
       <button class="extra-chip" id="chipOlje" onclick="toggleExtra('olje')">🫒 Olje</button>
       <button class="extra-chip" id="chipAnnet" onclick="closeExtras()" style="border-style:dashed;color:var(--muted)">+ Annet</button>
     </div>
@@ -2454,7 +2491,6 @@
   <!-- ── 0. Oppskrifter ── -->
   <div class="card recipes-card" id="recipesCard">
     <div class="card-header" onclick="toggleRecipes()">
-      <span class="card-icon">📋</span>
       <span class="card-title">Oppskrifter</span>
       <span class="recipes-chevron">▼</span>
     </div>
@@ -2473,7 +2509,6 @@
   <!-- ── 1. Emner og vekt ── -->
   <div class="card">
     <div class="card-header">
-      <span class="card-icon">⚖️</span>
       <span class="card-title">Emner og vekt</span>
     </div>
     <div class="card-body">
@@ -2534,7 +2569,6 @@
   <!-- ── 2. Meltyper ── -->
   <div class="card" id="meltyperCard">
     <div class="card-header">
-      <span class="card-icon">🌾</span>
       <span class="card-title">Meltyper</span>
     </div>
     <div class="card-body">
@@ -2550,7 +2584,6 @@
   <!-- ── 3. Hydrering og salt ── -->
   <div class="card">
     <div class="card-header">
-      <span class="card-icon">💧</span>
       <span class="card-title">Hydrering og salt</span>
     </div>
     <div class="card-body">
@@ -2565,7 +2598,7 @@
       <div class="water-salt-group">
         <div class="slider-row">
           <div class="slider-header">
-            <span class="slider-label">💧 Vann <i class="help-icon" data-tooltip="Baker's percent: vann måles som % av melvekt. 65 % = 650 g vann per 1 000 g mel. Høyere % gir luftigere skorpe og mer sprø pizza, men er vanskeligere å håndtere og må stekes på lavere temperatur.">?</i></span>
+            <span class="slider-label">Vann <i class="help-icon" data-tooltip="Baker's percent: vann måles som % av melvekt. 65 % = 650 g vann per 1 000 g mel. Høyere % gir luftigere skorpe og mer sprø pizza, men er vanskeligere å håndtere og må stekes på lavere temperatur.">?</i></span>
             <input class="slider-val-input" id="waterInput" type="number" value="63" min="40" max="100" step="0.5" onchange="sliderInput('water',this.value)">
             <span class="unit">%</span>
           </div>
@@ -2574,7 +2607,7 @@
 
         <div class="slider-row">
           <div class="slider-header">
-            <span class="slider-label">🧂 Salt <i class="help-icon" data-tooltip="Baker's percent: salt som % av melvekt. Typisk 2–3 % for pizza, 1,8–2 % for brød. Salt styrker glutennettverket og gir smak.">?</i></span>
+            <span class="slider-label">Salt <i class="help-icon" data-tooltip="Baker's percent: salt som % av melvekt. Typisk 2–3 % for pizza, 1,8–2 % for brød. Salt styrker glutennettverket og gir smak.">?</i></span>
             <input class="slider-val-input" id="saltInput" type="number" value="3" min="0" max="6" step="0.1" onchange="sliderInput('salt',this.value)">
             <span class="unit">%</span>
           </div>
@@ -2587,7 +2620,7 @@
       <!-- Extra: Sukker -->
       <div class="extra-field" id="extraSukker">
         <div class="extra-field-header">
-          <span class="extra-field-lbl">🍯 Sukker <i class="help-icon" data-tooltip="Baker's prosent. Sukker hjelper bruning ved lavere steketemperatur og gir litt søtere smak. Typisk 1–3 % for NY-pizza og loff, 3–5 % for brioche.">?</i></span>
+          <span class="extra-field-lbl">Sukker <i class="help-icon" data-tooltip="Baker's prosent. Sukker hjelper bruning ved lavere steketemperatur og gir litt søtere smak. Typisk 1–3 % for NY-pizza og loff, 3–5 % for brioche.">?</i></span>
           <button class="extra-remove" onclick="toggleExtra('sukker')" title="Fjern sukker">×</button>
         </div>
         <div class="slider-row" style="margin-bottom:0">
@@ -2622,7 +2655,6 @@
   <!-- ── 3b. Fordeig ── -->
   <div class="card" id="fordeigCard">
     <div class="card-header">
-      <span class="card-icon">🫙</span>
       <span class="card-title">Fordeig/preferment <i class="help-icon" data-tooltip="En fordeig er en del av oppskriften som fermenteres separat. Gir mer kompleks smak, bedre glutenstruktur og lengre holdbarhet. Velg type nedenfor.">?</i></span>
       <span class="pref-acc-badge" id="prefAccBadge" style="margin-left:auto;font-size:13px;font-weight:700;color:var(--red)"></span>
     </div>
@@ -2669,7 +2701,7 @@
         <div style="font-size:11px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:0.5px;padding:10px 0 6px;border-top:1px solid var(--border);margin-top:8px">Heving</div>
         <div class="time-grid" style="grid-template-columns:1fr 1fr;min-width:0">
           <div class="time-card">
-            <div class="time-lbl">⏱️ Fermentering <i class="help-icon" data-tooltip="Poolish fermenteres typisk 12–16 t ved romtemperatur (18–22 °C). Biga fermenteres 8–12 t ved romtemperatur eller 16–24 t i kjøleskap (4–8 °C).">?</i></div>
+            <div class="time-lbl">Fermentering <i class="help-icon" data-tooltip="Poolish fermenteres typisk 12–16 t ved romtemperatur (18–22 °C). Biga fermenteres 8–12 t ved romtemperatur eller 16–24 t i kjøleskap (4–8 °C).">?</i></div>
             <div class="stepper time-stepper">
               <button class="step-btn" onclick="adj('prefHours',-1)">−</button>
               <input  class="step-input" id="prefHours" type="number" value="14" min="1" max="48" onchange="upd('prefHours',this.value)">
@@ -2678,7 +2710,7 @@
             </div>
           </div>
           <div class="time-card">
-            <div class="time-lbl">🌡️ Temperatur</div>
+            <div class="time-lbl">Temperatur</div>
             <div class="temp-row">
               <button class="step-btn" onclick="adj('prefTemp',-1)">−</button>
               <input  class="step-input" id="prefTemp" type="number" value="20" min="0" max="40" onchange="upd('prefTemp',this.value)">
@@ -2695,14 +2727,13 @@
   <!-- ── 4. Hevetid ── -->
   <div class="card">
     <div class="card-header">
-      <span class="card-icon">⏱️</span>
       <span class="card-title" id="hevetidTitle">Hevetid</span>
     </div>
     <div class="card-body">
       <div class="time-grid">
 
         <div class="time-card">
-          <div class="time-lbl">🌡️ Romtemp <i class="help-icon" data-tooltip="Heving ved romtemperatur før eventuell kjøling. Lengre tid og høyere temp = mer gjæraktivitet = kalkulatoren foreslår mindre gjær.">?</i></div>
+          <div class="time-lbl">Romtemp <i class="help-icon" data-tooltip="Heving ved romtemperatur før eventuell kjøling. Lengre tid og høyere temp = mer gjæraktivitet = kalkulatoren foreslår mindre gjær.">?</i></div>
           <div class="stepper time-stepper">
             <button class="step-btn" onclick="adj('rtHours',-1)">−</button>
             <input  class="step-input" id="rtHours" type="number" value="8" min="0" max="72" onchange="upd('rtHours',this.value)">
@@ -2722,7 +2753,7 @@
         </div>
 
         <div class="time-card">
-          <div class="time-lbl">❄️ Kjøleskap <i class="help-icon" data-tooltip="Kaldheving i kjøleskap bremser gjæren og gir mer smak via enzymatisk aktivitet. Typisk 3–5 °C i 12–72 timer. Sett 0 timer om du ikke bruker kjøleskap.">?</i></div>
+          <div class="time-lbl">Kjøleskap <i class="help-icon" data-tooltip="Kaldheving i kjøleskap bremser gjæren og gir mer smak via enzymatisk aktivitet. Typisk 3–5 °C i 12–72 timer. Sett 0 timer om du ikke bruker kjøleskap.">?</i></div>
           <div class="stepper time-stepper">
             <button class="step-btn" onclick="adj('coldHours',-1)">−</button>
             <input  class="step-input" id="coldHours" type="number" value="0" min="0" max="120" onchange="upd('coldHours',this.value)">
@@ -2748,7 +2779,6 @@
   <!-- ── 5. Gjær ── -->
   <div class="card">
     <div class="card-header">
-      <span class="card-icon">🍞</span>
       <span class="card-title">Gjær <i class="help-icon" data-tooltip="Gjærmengden beregnes automatisk fra hevetid og temperatur. Modellen bruker Q10-faktoren (gjærens aktivitet dobles per 10 °C) og er kalibrert mot AVPN-standarder for pizza og tradisjonelle brødoppskrifter.">?</i></span>
     </div>
     <div class="card-body">
@@ -2819,7 +2849,7 @@
   <!-- ── 7. Ingredienser ── -->
   <div class="card result-card">
     <div class="result-header">
-      <div class="result-title" id="resultTitle">🍕 Ingredienser</div>
+      <div class="result-title" id="resultTitle">Ingredienser</div>
       <label class="round-toggle">
         <input type="checkbox" id="roundCheck" onchange="S.roundIngredients=this.checked;renderCalc()">
         <span class="round-toggle-track"></span>
@@ -3125,6 +3155,7 @@ function renderCalc() {
   const overrideActive = S.override && S.overrideVal != null && S.overrideVal > 0;
   const yName  = S.yeastType === 'fresh' ? 'fersk gjær' : 'tørrgjær';
   const yNameS = S.yeastType === 'fresh' ? 'fersk'      : 'tørrgjær';
+  const yLblCap = yName.charAt(0).toUpperCase() + yName.slice(1);
 
   let sugBoxHtml;
 
@@ -3148,7 +3179,7 @@ function renderCalc() {
             <span style="font-weight:700">${fmt1(r.prefYeastG)} g ${yNameS}</span>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px">
-            <span style="color:var(--muted)">🍞 Hoved-deig</span>
+            <span style="color:var(--muted)">Hoved-deig</span>
             <span style="font-weight:700">${fmt1(r.mainYeastG)} g ${yNameS}</span>
           </div>
         </div>
@@ -3159,17 +3190,17 @@ function renderCalc() {
       const bumpClass = S.yeastBumpPct > 0 ? 'bumped-up' : S.yeastBumpPct < 0 ? 'bumped-down' : '';
       const bumpText  = S.yeastBumpPct === 0 ? 'Hoved-deig' : bumpSign + S.yeastBumpPct.toFixed(1) + ' %';
       sugBoxHtml = `
-        <div class="yeast-sug-lbl">Beregnet forslag</div>
+        <div class="yeast-sug-lbl">${yLblCap}</div>
         <div style="display:flex;flex-direction:column;gap:4px;margin:4px 0">
           <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px">
             <span style="color:var(--muted)">${prefLabel}-gjær</span>
             <span style="font-weight:700">${fmt1(r.prefYeastG)} g ${yNameS}</span>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center">
-            <span style="color:var(--muted);font-size:13px">🍞 Hoved-deig</span>
+            <span style="color:var(--muted);font-size:13px">Hoved-deig</span>
             <div class="yeast-sug-val" style="margin:0">
               <button class="bump-btn bump-minus bump-inline" onclick="bumpYeast(-0.2)" title="−0.2 %">−</button>
-              <span class="bump-val-inline">${fmt1(r.mainYeastG)} g ${yNameS}</span>
+              <span class="bump-val-inline">${fmt1(r.mainYeastG)}</span><span class="mvs-unit">g</span>
               <button class="bump-btn bump-plus bump-inline"  onclick="bumpYeast(0.2)"  title="+0.2 %">+</button>
             </div>
           </div>
@@ -3206,10 +3237,10 @@ function renderCalc() {
       const bumpText  = S.yeastBumpPct === 0 ? 'Forslag' : bumpSign + S.yeastBumpPct.toFixed(1) + ' %';
       const yeastValG = fmt1(Math.max(0, sugG + (S.yeastBumpPct/100)*(r.flourG)));
       sugBoxHtml = `
-        <div class="yeast-sug-lbl">Beregnet forslag</div>
+        <div class="yeast-sug-lbl">${yLblCap}</div>
         <div class="yeast-sug-val">
           <button class="bump-btn bump-minus bump-inline" onclick="bumpYeast(-0.2)" title="−0.2 %">−</button>
-          <span class="bump-val-inline">${yeastValG} g ${yName}</span>
+          <span class="bump-val-inline">${yeastValG}</span><span class="mvs-unit">g</span>
           <button class="bump-btn bump-plus bump-inline"  onclick="bumpYeast(0.2)"  title="+0.2 %">+</button>
         </div>
         <div class="yeast-sug-sub">${subLine}</div>
@@ -3350,9 +3381,8 @@ function renderCalc() {
   document.getElementById('resultTotal').textContent = totDisplay + ' g';
 
   const modeLabel = S.mode === 'pizza' ? 'pizzaer' : 'brød';
-  const modeIcon  = S.mode === 'pizza' ? '🍕' : '🍞';
   document.getElementById('resultTitle').textContent =
-    `${modeIcon} Ingredienser — ${r.totalPieces} ${modeLabel}`;
+    `Ingredienser — ${r.totalPieces} ${modeLabel}`;
 }
 
 function renderFlourSumBadge() {
@@ -4061,7 +4091,7 @@ function renderRecipes() {
     return;
   }
   container.innerHTML = visible.map(r => {
-    const icon    = r.mode === 'pizza' ? '🍕' : '🍞';
+    const icon    = r.mode === 'pizza' ? 'P' : 'B';
     const isActive = r.id === activeId;
     const isRenaming = r.id === renamingId;
     const nameHtml = isRenaming
@@ -4320,7 +4350,7 @@ async function submitContact(e) {
     });
     if (!res.ok) throw new Error();
     document.getElementById('contactBody').innerHTML =
-      '<div class="contact-success"><span>🙏</span>Takk for tilbakemeldingen!</div>';
+      '<div class="contact-success">Takk for tilbakemeldingen!</div>';
   } catch {
     btn.disabled = false;
     btn.textContent = 'Send inn';
@@ -4333,7 +4363,7 @@ async function submitContact(e) {
 <footer class="site-footer">
   Laget av <a href="https://pizzapappa.no" target="_blank" rel="noopener">Vegard / pizzapappa.no</a>
   <br>
-  <button class="footer-contact-btn" onclick="openContact()">💬 Tips og ønsker til kalkulatoren</button>
+  <button class="footer-contact-btn" onclick="openContact()">Tips og ønsker til kalkulatoren</button>
 </footer>
 
 <!-- ── Contact modal ── -->

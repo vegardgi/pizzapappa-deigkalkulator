@@ -213,6 +213,10 @@
     .intro-close:hover { background: var(--border); color: var(--text); }
     body.minimalist .intro-box { display: none; }
     body.minimalist #fordeigCard { display: none; }
+    body.minimalist #svinnCard { display: none; }
+    body.minimalist .override-row { display: none !important; }
+    body.minimalist .flour-name-input { display: none; }
+    body.minimalist .flour-name-static { display: inline-block; }
 
     .mode-group {
       display: flex;
@@ -380,6 +384,13 @@
       min-width: 0;
     }
     .flour-name-input::placeholder { color: var(--muted); }
+    .flour-name-static {
+      flex: 1;
+      color: var(--text);
+      font-size: 14px;
+      min-width: 0;
+      display: none;
+    }
     .flour-pct-wrap { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
     .flour-pct-input {
       width: 56px;
@@ -2424,7 +2435,7 @@
   </div>
 
   <!-- ── 6. Svinn ── -->
-  <div class="card">
+  <div class="card" id="svinnCard">
     <div class="card-body" style="padding: 12px 17px;">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
         <span class="form-label">Svinn <i class="help-icon" data-tooltip="En liten del av deigen går alltid tapt — noe setter seg fast i bollen, noe henger igjen i hevekassen, og litt fordamper under steking. For pizza er svinn typisk 0 %, men for brød kan du regne 10–15 % siden mye vann damper av i ovnen.">?</i></span>
@@ -3003,6 +3014,7 @@ function renderFlourList() {
       <input class="flour-name-input" type="text" value="${esc(f.name)}"
              placeholder="Navn på mel"
              oninput="setFlourName(${f.id}, this.value)">
+      <span class="flour-name-static">Mel</span>
       <div class="flour-pct-wrap">
         <input class="flour-pct-input" type="number" value="${f.pct}"
                min="0" max="100" step="1"

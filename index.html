@@ -1732,7 +1732,8 @@
       margin-bottom: 0;
     }
     body.minimalist .card-body { padding: 0 16px; }
-    body.minimalist .card + .card { margin-top: 20px; }
+    body.minimalist .card + .card { margin-top: 0; }
+    body.minimalist .card + .result-card { margin-top: 20px; }
 
     /* Oppskrifter beholder sin boks-stil */
     body.minimalist .recipes-card {
@@ -1746,7 +1747,7 @@
     body.minimalist .recipes-card .card-body { padding: 8px 11px; }
 
     /* ── Emner og vekt: stakkede flate rader ── */
-    body.minimalist .pieces-weight-group { flex-direction: column; gap: 0; align-items: stretch; }
+    body.minimalist .pieces-weight-group { flex-direction: column; gap: 0; align-items: stretch; padding-top: 8px; }
     body.minimalist .pieces-weight-group .form-row {
       flex: none;
       background: none; border: none; border-radius: 0;
@@ -1926,11 +1927,11 @@
     }
     .mini-flour-add-inline:hover { background: #a32318; }
 
-    /* ── Item 6: Separator mellom ±t og ±°C i Romtemp/Kjøleskap ── */
+    /* ── Item 6: Separator fjernet — kolliderer med single-row layout ── */
     body.minimalist .time-card .time-stepper {
-      border-right: 1px solid var(--border) !important;
-      padding-right: 10px !important;
-      margin-right: 2px !important;
+      border-right: none !important;
+      padding-right: 0 !important;
+      margin-right: 0 !important;
     }
 
     /* ── Item 7: Gjær/Surdeig knapper — flat tab-stil ── */
@@ -1991,14 +1992,16 @@
     body.minimalist #surdeigSettings .step-btn  { width: 48px; height: 48px; font-size: 24px; font-weight: 800; }
     body.minimalist #surdeigSettings .step-input { font-size: 20px; font-weight: 700; height: 36px; }
 
-    /* ── Hevetid: label full bredde øverst, steppere side om side under ── */
-    body.minimalist .time-card { flex-wrap: wrap; padding: 8px 0; min-height: auto; gap: 4px 8px; justify-content: flex-end; }
+    /* ── Hevetid: én linje — label venstre, steppere høyre (lik Salt) ── */
+    body.minimalist .time-card { flex-wrap: nowrap; padding: 8px 0; min-height: 58px; gap: 8px; justify-content: flex-start; align-items: center; }
     body.minimalist .time-card .time-lbl {
-      width: 100%; flex: none; font-size: 12px; font-weight: 700; letter-spacing: 0.3px;
-      white-space: normal; min-width: unset; overflow: visible; padding-bottom: 2px;
+      flex: 1; min-width: 0; width: auto; font-size: 11px; font-weight: 700; letter-spacing: 0.3px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-bottom: 0;
     }
-    body.minimalist .time-card .step-btn  { width: 48px; height: 48px; font-size: 24px; font-weight: 800; }
-    body.minimalist .time-card .step-input { width: 44px; font-size: 20px; font-weight: 700; height: 36px; padding: 0; }
+    body.minimalist .time-card .step-btn  { width: 44px; height: 44px; font-size: 22px; font-weight: 800; }
+    body.minimalist .time-card .step-input { width: 28px; font-size: 20px; font-weight: 700; height: 36px; padding: 0; }
+    body.minimalist .time-card .time-stepper { gap: 0 !important; }
+    body.minimalist .time-card .temp-row     { gap: 0 !important; }
     body.minimalist .time-card .time-unit { font-size: 12px; padding: 0 0 0 2px; }
     body.minimalist .time-card .temp-unit { font-size: 12px; padding: 0 0 0 2px; }
 
@@ -3279,15 +3282,18 @@ function renderCalc() {
   let html = '';
   const multi = r.flourBreakdown.length > 1;
   const hasPref = hasExtra('poolish') || hasExtra('biga') || hasExtra('surdeig');
+  // Mini view: replace actual flour names with generic "Mel" / "Mel 1", "Mel 2"…
+  const isMin = document.body.classList.contains('minimalist');
+  const fName = (i) => isMin ? (multi ? `Mel ${i + 1}` : 'Mel') : r.flourBreakdown[i].name;
 
   if (hasExtra('poolish')) {
     const prefTot    = r.poolishFlourG + r.poolishWaterG + r.prefYeastG;
     const prefTotFmt = S.roundIngredients ? gfmt(prefTot) : precise(prefTot);
     html += `<div class="pref-block">`;
     html += `<div class="pref-block-hdr">Poolish<span class="pref-block-hint"> — ${S.prefHours} t @ ${S.prefTemp} °C</span></div>`;
-    r.flourBreakdown.forEach(f => {
+    r.flourBreakdown.forEach((f, i) => {
       const pg = r.poolishFlourG * (f.normalizedPct / 100);
-      html += ingRow(f.name, pg, multi ? `${f.pct} % av mel` : null);
+      html += ingRow(fName(i), pg, multi ? `${f.pct} % av mel` : null);
     });
     html += ingRow('Vann', r.poolishWaterG, '100 % hydrering');
     if (r.prefYeastG > 0) {
@@ -3297,9 +3303,9 @@ function renderCalc() {
     html += `<div class="pref-block-total"><span>Totalt</span><span class="pref-total-g">${prefTotFmt} g</span></div>`;
     html += `</div>`;
     html += '<div class="ing-section-label">Hoved-deig</div>';
-    r.flourBreakdown.forEach(f => {
+    r.flourBreakdown.forEach((f, i) => {
       const mg = f.grams - r.poolishFlourG * (f.normalizedPct / 100);
-      html += ingRow(f.name, mg, multi ? `${f.pct} % av mel` : null);
+      html += ingRow(fName(i), mg, multi ? `${f.pct} % av mel` : null);
     });
     if (multi) html += ingSumLine(r.flourG - r.poolishFlourG);
     html += ingRow('Vann', Math.max(0, r.waterG - r.poolishWaterG), null);
@@ -3308,9 +3314,9 @@ function renderCalc() {
     const prefTotFmt = S.roundIngredients ? gfmt(prefTot) : precise(prefTot);
     html += `<div class="pref-block">`;
     html += `<div class="pref-block-hdr">Biga<span class="pref-block-hint"> — ${S.prefHours} t @ ${S.prefTemp} °C · ${S.bigaHydration} % hydrering</span></div>`;
-    r.flourBreakdown.forEach(f => {
+    r.flourBreakdown.forEach((f, i) => {
       const bg = r.bigaFlourG * (f.normalizedPct / 100);
-      html += ingRow(f.name, bg, multi ? `${f.pct} % av mel` : null);
+      html += ingRow(fName(i), bg, multi ? `${f.pct} % av mel` : null);
     });
     html += ingRow('Vann', r.bigaWaterG, null);
     if (r.prefYeastG > 0) {
@@ -3320,9 +3326,9 @@ function renderCalc() {
     html += `<div class="pref-block-total"><span>Totalt</span><span class="pref-total-g">${prefTotFmt} g</span></div>`;
     html += `</div>`;
     html += '<div class="ing-section-label">Hoved-deig</div>';
-    r.flourBreakdown.forEach(f => {
+    r.flourBreakdown.forEach((f, i) => {
       const mg = f.grams - r.bigaFlourG * (f.normalizedPct / 100);
-      html += ingRow(f.name, mg, multi ? `${f.pct} % av mel` : null);
+      html += ingRow(fName(i), mg, multi ? `${f.pct} % av mel` : null);
     });
     if (multi) html += ingSumLine(r.flourG - r.bigaFlourG);
     html += ingRow('Vann', Math.max(0, r.waterG - r.bigaWaterG), null);
@@ -3331,17 +3337,17 @@ function renderCalc() {
     html += `<div class="ing-section-label pref-label">Surdeig starter — ${S.surdeigPct} % av mel · ${S.surdeigHydration} % hydrering</div>`;
     html += ingRow('Surdeig starter', surTot, null);
     html += '<div class="ing-section-label">Mel — hoved-deig</div>';
-    r.flourBreakdown.forEach(f => {
+    r.flourBreakdown.forEach((f, i) => {
       const mg = f.grams - r.surdeigFlourG * (f.normalizedPct / 100);
-      html += ingRow(f.name, mg, multi ? `${f.pct} % av mel` : null);
+      html += ingRow(fName(i), mg, multi ? `${f.pct} % av mel` : null);
     });
     if (multi) html += ingSumLine(r.flourG - r.surdeigFlourG);
     html += '<div class="ing-section-label">Øvrig — hoved-deig</div>';
     html += ingRow('Vann', Math.max(0, r.waterG - r.surdeigWaterG), `${S.waterPct} % av mel`);
   } else {
     html += '<div class="ing-section-label">Mel</div>';
-    r.flourBreakdown.forEach(f => {
-      html += ingRow(f.name, f.grams, multi ? `${f.pct} % av mel` : null);
+    r.flourBreakdown.forEach((f, i) => {
+      html += ingRow(fName(i), f.grams, multi ? `${f.pct} % av mel` : null);
     });
     if (multi) html += ingSumLine(r.flourG);
     html += '<div class="ing-section-label">Øvrig</div>';

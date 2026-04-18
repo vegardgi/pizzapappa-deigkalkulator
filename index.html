@@ -2288,10 +2288,6 @@
 
       <div class="stats-box">
         <div class="stat-row">
-          <span class="stat-lbl">Totalt antall emner</span>
-          <span class="stat-val" id="sTotalPieces">4</span>
-        </div>
-        <div class="stat-row">
           <span class="stat-lbl">Total deigvekt</span>
           <span class="stat-val" id="sTotalDough">1 120 g</span>
         </div>
@@ -2662,10 +2658,7 @@ const PRESETS = {
   },
   bread: {
     piecesPerDough: 1, weightPerPiece: 900,
-    flourTypes: [
-      { id:1, name:'Hvetemel',      pct: 80 },
-      { id:2, name:'Sammalt hvete', pct: 20 }
-    ],
+    flourTypes: [{ id:1, name:'Hvetemel', pct: 100 }],
     waterPct: 72, saltPct: 2.0,
     rtHours: 8, rtTemp: 20, coldHours: 0, coldTemp: 4
   }
@@ -2839,8 +2832,8 @@ function calc() {
 
   // Normalize flour percentages
   const rawSum = S.flourTypes.reduce((s,f) => s + (f.pct||0), 0) || 100;
-  const flourBreakdown = S.flourTypes.map(f => ({
-    name: f.name, pct: f.pct,
+  const flourBreakdown = S.flourTypes.map((f, i) => ({
+    name: f.name.trim() || `Mel ${i + 1}`, pct: f.pct,
     normalizedPct: (f.pct / rawSum) * 100,
     grams: flourG * (f.pct / rawSum)
   }));
@@ -2880,7 +2873,7 @@ function renderCalc() {
   const r = calc();
 
   // Stats
-  document.getElementById('sTotalPieces').textContent = r.totalPieces;
+  { const el = document.getElementById('sTotalPieces'); if (el) el.textContent = r.totalPieces; }
   document.getElementById('sTotalDough').textContent  = gfmt(r.totalDoughWt) + ' g';
   document.getElementById('sTotalFlour').textContent  = gfmt(r.flourG)       + ' g';
 
@@ -3544,7 +3537,8 @@ function setOverrideUnit(unit) {
 function addFlour() {
   const id = _fid++;
   // Add new type with 0% — existing percentages unchanged
-  S.flourTypes.push({ id, name: 'Ny meltype', pct: 0 });
+  const n = S.flourTypes.length + 1;
+  S.flourTypes.push({ id, name: `Mel ${n}`, pct: 0 });
   renderFlourList();
   setTimeout(() => {
     const inputs = document.querySelectorAll('.flour-name-input');

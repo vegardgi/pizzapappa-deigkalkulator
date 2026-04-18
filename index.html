@@ -3285,7 +3285,7 @@ function renderCalc() {
   const hasPref = hasExtra('poolish') || hasExtra('biga') || hasExtra('surdeig');
   // Mini view: replace actual flour names with generic "Mel" / "Mel 1", "Mel 2"…
   const isMin = document.body.classList.contains('minimalist');
-  const fName = (i) => isMin ? `Mel ${i + 1}` : r.flourBreakdown[i].name;
+  const fName = (i) => isMin ? (multi ? `Mel ${i + 1}` : 'Mel') : r.flourBreakdown[i].name;
 
   if (hasExtra('poolish')) {
     const prefTot    = r.poolishFlourG + r.poolishWaterG + r.prefYeastG;

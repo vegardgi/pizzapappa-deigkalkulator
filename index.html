@@ -4282,6 +4282,7 @@ function toggleMinimalist() {
   document.getElementById('minBtn').innerHTML = on
     ? '<span class="min-icon">⊞</span> Til fullversjon'
     : '<span class="min-icon">⊡</span> Minimalistisk visning';
+  renderCalc();
 }
 function collapseMinBtn() {
   document.getElementById('minBtnWrap').classList.add('hidden');

@@ -377,7 +377,8 @@
     input[type=range]::-webkit-slider-thumb:hover { background: var(--orange-light); transform: scale(1.1); }
 
     /* ── Time grid ── */
-    .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+    .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; min-width: 0; }
+    .time-card { min-width: 0; overflow: hidden; }
     .time-card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -834,6 +835,7 @@
       display: flex;
       gap: 8px;
       align-items: center;
+      flex-wrap: wrap;
     }
     .save-name-input {
       flex: 1;
@@ -1077,12 +1079,12 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 15px;
-      height: 15px;
+      width: 20px;
+      height: 20px;
       border-radius: 50%;
       background: var(--border-light);
       color: var(--muted2);
-      font-size: 9px;
+      font-size: 11px;
       font-weight: 800;
       font-style: normal;
       cursor: default;
@@ -2159,7 +2161,7 @@
       <!-- Fermentering — vises under valgt type -->
       <div id="prefTimeContent" style="display:none">
         <div style="font-size:11px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:0.5px;padding:10px 0 6px;border-top:1px solid var(--border);margin-top:8px">Heving</div>
-        <div class="time-grid" style="grid-template-columns:1fr 1fr">
+        <div class="time-grid" style="grid-template-columns:1fr 1fr;min-width:0">
           <div class="time-card">
             <div class="time-lbl">⏱️ Fermentering <i class="help-icon" data-tooltip="Poolish fermenteres typisk 12–16 t ved romtemperatur (18–22 °C). Biga fermenteres 8–12 t ved romtemperatur eller 16–24 t i kjøleskap (4–8 °C).">?</i></div>
             <div class="stepper time-stepper">
@@ -2284,9 +2286,11 @@
           <button class="override-unit-btn active" id="btnOvGram" onclick="setOverrideUnit('gram')">g</button>
           <button class="override-unit-btn"        id="btnOvPct"  onclick="setOverrideUnit('pct')">%</button>
         </div>
-        <input class="override-input" id="overrideInput" type="number" min="0" step="0.1"
-               placeholder="—" disabled oninput="overrideChanged(this.value)">
-        <span class="unit" id="overrideUnitLbl">g</span>
+        <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
+          <input class="override-input" id="overrideInput" type="number" min="0" step="0.1"
+                 placeholder="—" disabled oninput="overrideChanged(this.value)">
+          <span class="unit" id="overrideUnitLbl">g</span>
+        </div>
       </div>
 
     </div>
@@ -2623,7 +2627,7 @@ function renderCalc() {
     const subLine = r.mainYeastPct.toFixed(3) + ' % av mel  ·  ' +
       S.rtHours + ' t @ ' + S.rtTemp + ' °C  +  ' +
       S.coldHours + ' t @ ' + S.coldTemp + ' °C' +
-      '  →  eff. ' + r.yc.effH.toFixed(1) + ' t';
+      '';
     const prefSubLine = r.prefYeastPct.toFixed(3) + ' % av fordeig-mel  ·  ' +
       S.prefHours + ' t @ ' + S.prefTemp + ' °C';
 
@@ -2678,7 +2682,7 @@ function renderCalc() {
     const subLine = displayPct.toFixed(3) + ' % av mel  ·  ' +
       S.rtHours + ' t @ ' + S.rtTemp + ' °C  +  ' +
       S.coldHours + ' t @ ' + S.coldTemp + ' °C' +
-      '  →  eff. ' + r.yc.effH.toFixed(1) + ' t';
+      '';
 
     if (overrideActive) {
       sugBoxHtml = `
@@ -2748,7 +2752,7 @@ function renderCalc() {
     html += ingRow('Vann', r.poolishWaterG, '100 % hydrering');
     if (r.prefYeastG > 0) {
       const yLbl = S.yeastType === 'fresh' ? 'Fersk gjær' : 'Tørrgjær';
-      html += ingRow(yLbl, r.prefYeastG, r.prefYeastPct.toFixed(3) + ' % av fordeig-mel');
+      html += ingRow(yLbl, r.prefYeastG, r.prefYeastPct.toFixed(1) + ' % av fordeig');
     }
     html += `<div class="pref-block-total"><span>Totalt</span><span class="pref-total-g">${prefTotFmt} g</span></div>`;
     html += `</div>`;
@@ -2771,7 +2775,7 @@ function renderCalc() {
     html += ingRow('Vann', r.bigaWaterG, null);
     if (r.prefYeastG > 0) {
       const yLbl = S.yeastType === 'fresh' ? 'Fersk gjær' : 'Tørrgjær';
-      html += ingRow(yLbl, r.prefYeastG, r.prefYeastPct.toFixed(3) + ' % av fordeig-mel');
+      html += ingRow(yLbl, r.prefYeastG, r.prefYeastPct.toFixed(1) + ' % av fordeig');
     }
     html += `<div class="pref-block-total"><span>Totalt</span><span class="pref-total-g">${prefTotFmt} g</span></div>`;
     html += `</div>`;
@@ -2813,7 +2817,7 @@ function renderCalc() {
     const yLbl  = S.yeastType === 'fresh' ? 'Fersk gjær' : 'Tørrgjær';
     const yG    = r.hasPrefYeast ? r.mainYeastG   : r.yeastG;
     const yPct  = r.hasPrefYeast ? r.mainYeastPct : r.yeastPct;
-    const ySub  = yPct.toFixed(3) + ' % av mel' + (r.hasPrefYeast ? ' (hoved-deig)' : '') + (S.override ? ' · overstyrt' : '');
+    const ySub  = yPct.toFixed(1) + ' %' + (r.hasPrefYeast ? ' · Hoveddeig' : '') + (S.override ? ' · overstyrt' : '');
     html += `<div class="ing-item">
       <div><div class="ing-name">${yLbl}</div>
       <div class="ing-sub">${ySub}</div></div>
@@ -2837,7 +2841,7 @@ function renderCalc() {
     : precise(tot);
   document.getElementById('resultTotal').textContent = totDisplay + ' g';
 
-  const modeLabel = S.mode === 'pizza' ? 'pizza' : 'brød';
+  const modeLabel = S.mode === 'pizza' ? 'pizzaer' : 'brød';
   const modeIcon  = S.mode === 'pizza' ? '🍕' : '🍞';
   document.getElementById('resultTitle').textContent =
     `${modeIcon} Ingredienser — ${r.totalPieces} ${modeLabel}`;

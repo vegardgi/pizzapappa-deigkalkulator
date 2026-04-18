@@ -1677,7 +1677,7 @@
 
     /* Hevetid: én rad per tidskort — same design as pieces-weight-group */
     body.minimalist .time-grid {
-      grid-template-columns: 1fr; gap: 6px;
+      grid-template-columns: 1fr; gap: 0;
     }
     body.minimalist .time-card {
       display: flex; flex-direction: row;
@@ -1755,7 +1755,7 @@
       border-bottom: 1px solid var(--border);
       padding: 4px 0; gap: 10px; min-height: 58px;
     }
-    body.minimalist .pieces-weight-group .form-row:last-child { border-bottom: none; }
+    body.minimalist .pieces-weight-group .form-row:last-child { border-bottom: 1px solid var(--border); }
     body.minimalist .pieces-weight-group .form-row .form-label { font-size: 12px; font-weight: 700; letter-spacing: 0.3px; }
     body.minimalist .pieces-weight-group .step-btn  { width: 48px; height: 48px; font-size: 24px; font-weight: 800; }
     body.minimalist .pieces-weight-group .step-input { width: 44px; font-size: 20px; font-weight: 700; height: 36px; }
@@ -1811,7 +1811,7 @@
       padding: 4px 0; min-height: 58px;
       gap: 8px;
     }
-    body.minimalist .time-grid .time-card:last-child { border-bottom: none; }
+    body.minimalist .time-grid .time-card:last-child { border-bottom: 1px solid var(--border); }
     body.minimalist .time-card .time-lbl   { font-size: 11px; font-weight: 700; letter-spacing: 0.3px; flex: 1; white-space: nowrap; min-width: 0; overflow: hidden; }
     body.minimalist .time-card .step-btn   { width: 36px; height: 44px; font-size: 19px; font-weight: 800; }
     body.minimalist .time-card .step-input { width: 28px; font-size: 16px; font-weight: 700; height: 32px; padding: 0; }
@@ -1994,7 +1994,7 @@
     body.minimalist #surdeigSettings .step-input { font-size: 20px; font-weight: 700; height: 36px; }
 
     /* ── Hevetid: én linje — label venstre, steppere høyre (lik Salt) ── */
-    body.minimalist .time-card { flex-wrap: nowrap; padding: 8px 0; min-height: 58px; gap: 8px; justify-content: flex-start; align-items: center; }
+    body.minimalist .time-card { flex-wrap: nowrap; padding: 4px 0; min-height: 58px; gap: 8px; justify-content: flex-start; align-items: center; }
     body.minimalist .time-card .time-lbl {
       flex: 1; min-width: 0; width: auto; font-size: 11px; font-weight: 700; letter-spacing: 0.3px;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-bottom: 0;

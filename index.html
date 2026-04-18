@@ -3230,6 +3230,7 @@ function renderMiniFlours() {
           <button class="step-btn" onclick="adjFlourPct(${f.id},-1)">−</button>
           <input class="step-input" id="miniFlourPct_${f.id}" type="number" value="${f.pct}" min="0" max="100" step="1" oninput="setFlourPct(${f.id},this.value)">
           <button class="step-btn" onclick="adjFlourPct(${f.id},1)">+</button>
+          <span class="mvs-unit">%</span>
         </div>
       </div>`);
     // Add button always at the end

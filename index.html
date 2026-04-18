@@ -3175,7 +3175,7 @@ function renderCalc() {
   const overrideActive = S.override && S.overrideVal != null && S.overrideVal > 0;
   const yName  = S.yeastType === 'fresh' ? 'fersk gjær' : 'tørrgjær';
   const yNameS = S.yeastType === 'fresh' ? 'fersk'      : 'tørrgjær';
-  const yLblCap = 'Beregnet mengde ' + (S.yeastType === 'fresh' ? 'fersk gjær' : 'tørr gjær');
+  const yLblCap = yName.charAt(0).toUpperCase() + yName.slice(1);
 
   let sugBoxHtml;
   const isMinYeast = document.body.classList.contains('minimalist');

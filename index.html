@@ -98,8 +98,8 @@
       --border-light:#C4AE96;
       --red:         #C42B1C;
       --red-bright:  #D93020;
-      --orange:      #E8641A;
-      --orange-light:#F07A35;
+      --orange:      #C42B1C;
+      --orange-light:#D93020;
       --gold:        #A06800;
       --cream:       #F5EDD8;
       --text:        #221608;
@@ -291,7 +291,7 @@
       border-radius: 8px;
       font-size: 22px; font-weight: 800;
       margin: 0; margin-left: 4px;
-      background: var(--orange, #E26726); color: #fff;
+      background: var(--red); color: #fff;
       border: none; cursor: pointer;
       display: inline-flex; align-items: center; justify-content: center;
     }
@@ -337,7 +337,7 @@
       position: absolute;
       right: 6px; top: 50%; transform: translateY(-50%);
       width: 22px; height: 26px;
-      background: var(--orange, #E26726); color: #fff;
+      background: var(--red); color: #fff;
       border: none; border-radius: 6px;
       font-size: 15px; font-weight: 700; line-height: 1;
       padding: 0;
@@ -463,7 +463,7 @@
       height: 36px;
       background: none;
       border: none;
-      color: var(--orange);
+      color: var(--red);
       font-size: 19px;
       cursor: pointer;
       display: flex;
@@ -472,7 +472,7 @@
       transition: background 0.12s;
       line-height: 1;
     }
-    .step-btn:hover { background: rgba(232,100,26,0.16); }
+    .step-btn:hover { background: rgba(196,43,28,0.16); }
     .step-input {
       width: 58px;
       height: 36px;
@@ -506,7 +506,7 @@
     }
     .stat-row:last-child { border-bottom: none; }
     .stat-lbl { color: var(--muted2); }
-    .stat-val { color: var(--orange); font-weight: 700; }
+    .stat-val { color: var(--red); font-weight: 700; }
 
     /* ── Flour types ── */
     .flour-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
@@ -552,7 +552,7 @@
       outline: none;
       transition: border-color 0.15s;
     }
-    .flour-pct-input:focus { border-color: var(--orange); }
+    .flour-pct-input:focus { border-color: var(--red); }
     .flour-del-btn {
       width: 26px;
       height: 26px;
@@ -573,12 +573,12 @@
     .flour-add-mini {
       width: 26px; height: 26px;
       background: none; border: 1.5px solid var(--border);
-      color: var(--orange); cursor: pointer;
+      color: var(--red); cursor: pointer;
       border-radius: 6px; font-size: 17px; font-weight: 700;
       display: none; align-items: center; justify-content: center;
       flex-shrink: 0; transition: background 0.12s, border-color 0.12s;
     }
-    .flour-add-mini:hover { background: rgba(232,100,26,0.12); border-color: var(--orange); }
+    .flour-add-mini:hover { background: rgba(196,43,28,0.12); border-color: var(--red); }
     body.minimalist .flour-add-mini { display: flex; }
     body.minimalist .add-flour-btn  { display: none; }
     .flour-sum-badge { display: none; }
@@ -592,7 +592,7 @@
       border-radius: 10px;
       border: 2px dashed var(--border-light);
       background: none;
-      color: var(--orange);
+      color: var(--red);
       font-size: 13px;
       font-weight: 700;
       cursor: pointer;
@@ -600,8 +600,8 @@
       letter-spacing: 0.2px;
     }
     .add-flour-btn:hover {
-      border-color: var(--orange);
-      background: rgba(232,100,26,0.07);
+      border-color: var(--red);
+      background: rgba(196,43,28,0.07);
     }
 
     /* ── Sliders ── */
@@ -629,7 +629,7 @@
       flex-shrink: 0;
       transition: border-color 0.15s;
     }
-    .slider-val-input:focus { border-color: var(--orange); }
+    .slider-val-input:focus { border-color: var(--red); }
     input[type=range] {
       -webkit-appearance: none;
       appearance: none;
@@ -644,7 +644,7 @@
       -webkit-appearance: none;
       width: 20px;
       height: 20px;
-      background: var(--orange);
+      background: var(--red);
       border-radius: 50%;
       box-shadow: 0 2px 8px rgba(0,0,0,0.45);
       transition: background 0.15s, transform 0.1s;
@@ -741,7 +741,7 @@
     .yeast-sug-val {
       font-size: 24px;
       font-weight: 900;
-      color: var(--orange);
+      color: var(--red);
       letter-spacing: -0.5px;
     }
     .yeast-sug-sub {
@@ -769,7 +769,7 @@
     .check-label input[type=checkbox] {
       width: 17px;
       height: 17px;
-      accent-color: var(--orange);
+      accent-color: var(--red);
       cursor: pointer;
     }
     .override-input {
@@ -785,7 +785,7 @@
       outline: none;
       transition: all 0.2s;
     }
-    .override-input:not(:disabled) { border-color: var(--orange); }
+    .override-input:not(:disabled) { border-color: var(--red); }
     .override-input:disabled { opacity: 0.35; }
     .override-unit-toggle {
       display: flex;
@@ -810,15 +810,15 @@
       border-radius: 6px;
       transition: all 0.15s;
     }
-    .override-unit-btn.active { background: var(--orange); color: #fff; }
+    .override-unit-btn.active { background: var(--red); color: #fff; }
 
     /* ── Results card ── */
     .result-card {
-      border-color: rgba(232,100,26,0.35);
+      border-color: rgba(196,43,28,0.35);
       background: linear-gradient(160deg, #FFF4EA, #FFF9F4);
     }
     .result-header {
-      background: linear-gradient(135deg, var(--red) 0%, var(--orange) 100%);
+      background: linear-gradient(135deg, var(--red) 0%, var(--red) 100%);
       padding: 14px 17px;
       display: flex;
       align-items: center;
@@ -899,19 +899,19 @@
 
     /* ── Preferment block ── */
     .pref-block {
-      background: rgba(232,100,26,0.05);
-      border: 1px solid rgba(232,100,26,0.2);
+      background: rgba(196,43,28,0.05);
+      border: 1px solid rgba(196,43,28,0.2);
       border-radius: 10px;
       margin: 4px 0 10px;
       padding: 0 12px;
     }
     .pref-block .ing-item {
-      border-bottom: 1px solid rgba(232,100,26,0.12);
+      border-bottom: 1px solid rgba(196,43,28,0.12);
     }
     .pref-block-hdr {
       font-size: 11px;
       font-weight: 800;
-      color: var(--orange);
+      color: var(--red);
       text-transform: uppercase;
       letter-spacing: 0.6px;
       padding: 9px 0 3px;
@@ -928,9 +928,9 @@
       justify-content: space-between;
       align-items: center;
       padding: 7px 0 8px;
-      border-top: 1px dashed rgba(232,100,26,0.25);
+      border-top: 1px dashed rgba(196,43,28,0.25);
       font-size: 12px;
-      color: var(--orange);
+      color: var(--red);
       font-weight: 700;
     }
     .pref-block-total .pref-total-g {
@@ -943,11 +943,11 @@
       justify-content: space-between;
       align-items: center;
       padding: 13px 17px 14px;
-      background: rgba(232,100,26,0.09);
-      border-top: 1.5px solid rgba(232,100,26,0.35);
+      background: rgba(196,43,28,0.09);
+      border-top: 1.5px solid rgba(196,43,28,0.35);
     }
-    .total-lbl { font-size: 14px; font-weight: 700; color: var(--orange); }
-    .total-val { font-size: 22px; font-weight: 900; color: var(--orange); }
+    .total-lbl { font-size: 14px; font-weight: 700; color: var(--red); }
+    .total-val { font-size: 22px; font-weight: 900; color: var(--red); }
 
     /* ── Svinn ── */
     .svinn-ctrl {
@@ -999,7 +999,7 @@
       transition: all 0.15s;
       letter-spacing: 0.2px;
     }
-    .bump-btn:hover { border-color: var(--orange); color: var(--orange); }
+    .bump-btn:hover { border-color: var(--red); color: var(--red); }
     .bump-plus  { color: var(--success); border-color: rgba(91,174,110,0.4); }
     .bump-plus:hover  { background: rgba(91,174,110,0.1); border-color: var(--success); color: var(--success); }
     .bump-minus { color: var(--error); border-color: rgba(224,82,82,0.4); }
@@ -1022,7 +1022,7 @@
     .bump-label.bumped-down { color: var(--error); }
 
     /* ── Recipes accordion ── */
-    .recipes-card { border-color: rgba(232,100,26,0.3); }
+    .recipes-card { border-color: rgba(196,43,28,0.3); }
     .recipes-card .card-header {
       cursor: pointer;
       user-select: none;
@@ -1062,8 +1062,8 @@
       cursor: pointer;
     }
     .recipe-item:hover { border-color: var(--border-light); }
-    .recipe-item:active { transform: scale(0.97); background: rgba(232,100,26,0.1); border-color: var(--orange); }
-    .recipe-item.active-recipe { border-color: var(--orange); background: rgba(232,100,26,0.06); }
+    .recipe-item:active { transform: scale(0.97); background: rgba(196,43,28,0.1); border-color: var(--red); }
+    .recipe-item.active-recipe { border-color: var(--red); background: rgba(196,43,28,0.06); }
     .recipe-icon { font-size: 16px; flex-shrink: 0; }
     .recipe-name-text {
       flex: 1;
@@ -1078,7 +1078,7 @@
     .recipe-name-input {
       flex: 1;
       background: var(--input-bg);
-      border: 1px solid var(--orange);
+      border: 1px solid var(--red);
       border-radius: 7px;
       color: var(--text);
       font-size: 14px;
@@ -1124,7 +1124,7 @@
       outline: none;
       transition: border-color 0.15s;
     }
-    .save-name-input:focus { border-color: var(--orange); }
+    .save-name-input:focus { border-color: var(--red); }
     .save-name-input::placeholder { color: var(--muted); }
     .save-btn {
       padding: 8px 16px;
@@ -1277,7 +1277,7 @@
     .tip-num {
       width: 26px;
       height: 26px;
-      background: linear-gradient(135deg, var(--red), var(--orange));
+      background: linear-gradient(135deg, var(--red), var(--red));
       border-radius: 50%;
       font-size: 12px;
       font-weight: 800;
@@ -1314,12 +1314,12 @@
       margin-top: 6px;
       margin-left: 7px;
       font-size: 11px;
-      color: var(--orange);
+      color: var(--red);
       text-decoration: none;
       font-weight: 600;
     }
     .tip-link:hover { text-decoration: underline; }
-    .badge-orange { background: rgba(232,100,26,0.18); color: var(--orange); }
+    .badge-orange { background: rgba(196,43,28,0.18); color: var(--red); }
     .badge-green  { background: rgba(91,174,110,0.15); color: var(--success); }
     .badge-red    { background: rgba(180,32,32,0.12);  color: var(--error); }
     .tips-source {
@@ -1371,7 +1371,7 @@
       transition: background 0.15s, color 0.15s;
     }
     .help-icon:hover, .help-icon.tt-open {
-      background: var(--orange);
+      background: var(--red);
       color: #fff;
     }
     /* Global tooltip bubble — appended to body, uses fixed positioning */
@@ -1413,7 +1413,7 @@
       margin-top: 8px;
     }
     .site-footer a {
-      color: var(--orange);
+      color: var(--red);
       text-decoration: none;
       font-weight: 600;
     }
@@ -1489,11 +1489,11 @@
       transition: border-color 0.15s;
     }
     .contact-field input:focus,
-    .contact-field textarea:focus { border-color: var(--orange); }
+    .contact-field textarea:focus { border-color: var(--red); }
     .contact-field textarea { height: 100px; resize: vertical; }
     .contact-send-btn {
       width: 100%;
-      background: var(--orange);
+      background: var(--red);
       color: #fff;
       border: none;
       border-radius: 12px;
@@ -1833,7 +1833,7 @@
       border-radius: 10px; color: var(--muted2); font-size: 13px; font-weight: 700;
       cursor: pointer; transition: border-color 0.15s, color 0.15s;
     }
-    .extras-add-btn:hover { border-color: var(--orange); color: var(--orange); }
+    .extras-add-btn:hover { border-color: var(--red); color: var(--red); }
 
     /* ── Fordeig accordion ── */
     .pref-accordion { border-top: 1px solid var(--border); margin-top: 12px; }
@@ -1845,8 +1845,8 @@
     }
     .pref-acc-hdr:hover { color: var(--text); }
     .pref-acc-right { display: flex; align-items: center; gap: 8px; }
-    .pref-acc-badge { font-size: 12px; font-weight: 700; color: var(--orange); text-transform: none; letter-spacing: 0; }
-    .pref-acc-chevron { font-size: 16px; color: var(--orange); transition: transform 0.2s; line-height: 1; }
+    .pref-acc-badge { font-size: 12px; font-weight: 700; color: var(--red); text-transform: none; letter-spacing: 0; }
+    .pref-acc-chevron { font-size: 16px; color: var(--red); transition: transform 0.2s; line-height: 1; }
     .pref-acc-chevron.open { transform: rotate(90deg); }
     .pref-acc-body { padding-bottom: 10px; }
     .pref-type-row {
@@ -1857,7 +1857,7 @@
       flex: 1; padding: 7px 4px; border: none; border-radius: 7px; background: none;
       cursor: pointer; font-size: 13px; font-weight: 600; color: var(--muted2); transition: all 0.15s;
     }
-    .pref-type-btn.active { background: var(--orange); color: #fff; }
+    .pref-type-btn.active { background: var(--red); color: #fff; }
     .pref-settings { display: none; }
     .pref-settings.visible { display: block; }
     .extras-overlay {
@@ -1880,7 +1880,7 @@
       color: var(--muted2); font-size: 14px; font-weight: 700;
       cursor: pointer; transition: all 0.15s;
     }
-    .extra-chip.active { border-color: var(--orange); background: rgba(232,100,26,0.09); color: var(--text); }
+    .extra-chip.active { border-color: var(--red); background: rgba(196,43,28,0.09); color: var(--text); }
     .extra-field { display: none; margin-top: 10px; }
     .extra-field.visible { display: block; }
     .extra-field-header {
@@ -1901,7 +1901,7 @@
     }
     .pref-lbl { font-size: 12px; color: var(--muted2); font-weight: 600; min-width: 68px; }
     #surdeigSettings .pref-lbl { min-width: 100px; }
-    .ing-section-label.pref-label { color: var(--orange); }
+    .ing-section-label.pref-label { color: var(--red); }
     .ing-pref-note { font-size: 11px; color: var(--muted); padding: 0 0 6px; line-height: 1.4; }
 
     /* ── Item 4: Mel % feil — rød tekst + rød bakgrunn ── */
@@ -2624,7 +2624,7 @@
     <div class="card-header">
       <span class="card-icon">🫙</span>
       <span class="card-title">Fordeig/preferment <i class="help-icon" data-tooltip="En fordeig er en del av oppskriften som fermenteres separat. Gir mer kompleks smak, bedre glutenstruktur og lengre holdbarhet. Velg type nedenfor.">?</i></span>
-      <span class="pref-acc-badge" id="prefAccBadge" style="margin-left:auto;font-size:13px;font-weight:700;color:var(--orange)"></span>
+      <span class="pref-acc-badge" id="prefAccBadge" style="margin-left:auto;font-size:13px;font-weight:700;color:var(--red)"></span>
     </div>
     <div class="card-body">
       <div class="pref-type-row">
@@ -3141,7 +3141,7 @@ function renderCalc() {
 
     if (overrideActive) {
       sugBoxHtml = `
-        <div class="yeast-sug-lbl" style="color:var(--orange)">Overstyrt (hoved-deig)</div>
+        <div class="yeast-sug-lbl" style="color:var(--red)">Overstyrt (hoved-deig)</div>
         <div style="display:flex;flex-direction:column;gap:4px;margin:4px 0">
           <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px">
             <span style="color:var(--muted)">${prefLabel}-gjær</span>
@@ -3194,7 +3194,7 @@ function renderCalc() {
 
     if (overrideActive) {
       sugBoxHtml = `
-        <div class="yeast-sug-lbl" style="color:var(--orange)">Overstyrt</div>
+        <div class="yeast-sug-lbl" style="color:var(--red)">Overstyrt</div>
         <div class="yeast-sug-val">${fmt1(r.yeastG)} g ${yName}</div>
         <div class="yeast-sug-strike">
           Beregnet: <s>${fmt1(sugG)} g</s> &nbsp;<s style="font-size:12px;color:var(--muted)">${sugPct.toFixed(3)} %</s>
@@ -3512,7 +3512,7 @@ function fillSlider(id, val, min, max) {
   const el = document.getElementById(id);
   const pct = ((val - min) / (max - min)) * 100;
   el.style.background =
-    `linear-gradient(to right, var(--orange) 0%, var(--orange) ${pct}%, var(--border-light) ${pct}%, var(--border-light) 100%)`;
+    `linear-gradient(to right, var(--red) 0%, var(--red) ${pct}%, var(--border-light) ${pct}%, var(--border-light) 100%)`;
 }
 
 // ═══════════════════════════════════════════════════════

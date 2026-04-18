@@ -395,12 +395,9 @@
       text-transform: uppercase;
       letter-spacing: 0.6px;
       display: flex;
-      flex-wrap: wrap;
       align-items: center;
-      gap: 2px 4px;
-      white-space: normal;
-    }
-    .time-lbl-sub { display: block; width: 100%; white-space: nowrap;
+      gap: 4px;
+      white-space: nowrap;
     }
     .time-stepper {
       justify-content: center;
@@ -2199,7 +2196,7 @@
       <div class="time-grid">
 
         <div class="time-card">
-          <div class="time-lbl">🌡️ Romtemp <span class="time-lbl-sub">(RT) <i class="help-icon" data-tooltip="Heving ved romtemperatur før eventuell kjøling. Lengre tid og høyere temp = mer gjæraktivitet = kalkulatoren foreslår mindre gjær.">?</i></span></div>
+          <div class="time-lbl">🌡️ Romtemp <i class="help-icon" data-tooltip="Heving ved romtemperatur før eventuell kjøling. Lengre tid og høyere temp = mer gjæraktivitet = kalkulatoren foreslår mindre gjær.">?</i></div>
           <div class="stepper time-stepper">
             <button class="step-btn" onclick="adj('rtHours',-1)">−</button>
             <input  class="step-input" id="rtHours" type="number" value="2" min="0" max="72" onchange="upd('rtHours',this.value)">
@@ -2219,7 +2216,7 @@
         </div>
 
         <div class="time-card">
-          <div class="time-lbl">❄️ Kjøleskap <span class="time-lbl-sub">(KT) <i class="help-icon" data-tooltip="Kaldheving i kjøleskap bremser gjæren og gir mer smak via enzymatisk aktivitet. Typisk 3–5 °C i 12–72 timer. Sett 0 timer om du ikke bruker kjøleskap.">?</i></span></div>
+          <div class="time-lbl">❄️ Kjøleskap <i class="help-icon" data-tooltip="Kaldheving i kjøleskap bremser gjæren og gir mer smak via enzymatisk aktivitet. Typisk 3–5 °C i 12–72 timer. Sett 0 timer om du ikke bruker kjøleskap.">?</i></div>
           <div class="stepper time-stepper">
             <button class="step-btn" onclick="adj('coldHours',-1)">−</button>
             <input  class="step-input" id="coldHours" type="number" value="24" min="0" max="120" onchange="upd('coldHours',this.value)">

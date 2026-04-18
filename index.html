@@ -1355,20 +1355,20 @@
     body.minimalist .extra-field input[type="range"] { display: none; }
     body.minimalist .water-salt-group .slider-header { flex-wrap: wrap; }
 
-    /* ⊕ knapp ved siden av vann/salt i minimalist */
+    /* Legg til ingrediens-knapp under vann/salt i minimalist */
     .add-mini-icon { display: none; }  /* hidden in full view */
-    body.minimalist .water-salt-row         { display: flex; align-items: flex-start; gap: 6px; }
-    body.minimalist .water-salt-row .water-salt-group { flex: 0 0 auto; }
+    body.minimalist .water-salt-row         { display: flex; flex-direction: column; gap: 8px; }
+    body.minimalist .water-salt-row .water-salt-group { width: 100%; }
     body.minimalist .water-salt-row .extras-add-btn {
-      flex-shrink: 0; width: auto; height: auto; margin-top: 0;
-      padding: 5px 9px; align-self: stretch;
+      width: 100%; margin-top: 0;
+      padding: 7px 12px;
       border: 1.5px solid var(--border); border-style: solid;
-      border-radius: 8px; font-size: 12px; font-weight: 600;
-      display: flex; align-items: center; gap: 4px; white-space: nowrap;
+      border-radius: 8px; font-size: 13px; font-weight: 600;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
     }
-    body.minimalist .add-symbol   { display: none; }
-    body.minimalist .add-lbl      { display: inline; font-size: 12px; }
-    body.minimalist .add-mini-icon { display: inline; font-size: 15px; font-weight: 700; }
+    body.minimalist .add-symbol    { display: none; }
+    body.minimalist .add-lbl       { display: inline; font-size: 13px; }
+    body.minimalist .add-mini-icon { display: inline; font-size: 16px; font-weight: 700; }
 
     /* Antall emner + vekt side om side — kompakt som vann/salt */
     body.minimalist .pieces-weight-group     { display: flex; gap: 6px; align-items: stretch; }

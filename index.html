@@ -262,21 +262,9 @@
       justify-content: center;
       padding: 0;
     }
-    /* Ekstra mel-celler (Mel 2, Mel 3, ...) — kompakt layout for å passe i 1/3 bredde */
+    /* Ekstra mel-celler (Mel 2, Mel 3, ...) — ligner på hovedradcellene */
     body.minimalist .mvs-mini-group .form-row.mvs-extra-cell {
-      padding: 4px 4px 4px 6px;
-      gap: 2px;
       position: relative;
-      overflow: visible;
-    }
-    body.minimalist .mvs-mini-group .mvs-extra-cell .step-btn {
-      width: 22px; height: 28px; font-size: 15px; font-weight: 800;
-    }
-    body.minimalist .mvs-mini-group .mvs-extra-cell .step-input {
-      width: 20px; height: 22px; font-size: 12px;
-    }
-    body.minimalist .mvs-mini-group .mvs-extra-cell .form-label {
-      font-size: 9px;
     }
     body.minimalist .mvs-mini-group .mvs-extra-cell .mini-flour-del {
       position: absolute;
@@ -1609,7 +1597,7 @@
     body.minimalist .yeast-sug-val     { font-size: 15px; }
     body.minimalist .bump-label        { display: none; }
     body.minimalist .yeast-bump-row    { gap: 5px; flex-direction: row; align-items: center; }
-    body.minimalist .yeast-sug-val     { display: flex; align-items: center; gap: 6px; }
+    body.minimalist .yeast-sug-val     { display: flex; align-items: center; gap: 14px; }
     body.minimalist .yeast-sug-val .bump-btn { padding: 8px 16px; font-size: 16px; font-weight: 800; }
     body.minimalist .yeast-bump-row .bump-label { order: 2; }
     body.minimalist .yeast-bump-row .bump-minus { order: 1; }
@@ -3235,8 +3223,8 @@ function renderMiniFlours() {
 
   top.innerHTML = melCell + vannCell + saltCell;
 
-  // Extra flours (Mel 2, Mel 3, ...) go into extra row, 3 per row, padded with ghosts.
-  // The add-flour button is appended as its own small cell after the last extra.
+  // Extra flours (Mel 2, Mel 3, ...) go into extra row.
+  // Add button is always placed at the very end of the extras.
   const extras = flours.slice(1);
   if (extras.length === 0) {
     extra.innerHTML = '';
@@ -3251,30 +3239,8 @@ function renderMiniFlours() {
           <button class="step-btn" onclick="adjFlourPct(${f.id},1)">+</button>
         </div>
       </div>`);
-    // Pad to multiple of 3 with ghost cells (so last row aligns with 3-col grid)
-    while (cells.length % 3 !== 0) {
-      cells.push('<div class="form-row mvs-ghost" aria-hidden="true"></div>');
-    }
-    // Put the "add meltype" button on top of the first ghost slot if possible,
-    // otherwise append a new ghost row containing it.
-    const addBtn = `<button class="mini-flour-add mini-flour-add-solo" onclick="addFlour()" title="Legg til meltype">+</button>`;
-    // Always append an add-button cell at the end (as a ghost-sized cell).
-    // Find the first ghost and replace its contents with the add button.
-    let replaced = false;
-    for (let i = 0; i < cells.length; i++) {
-      if (cells[i].includes('mvs-ghost')) {
-        cells[i] = `<div class="form-row mvs-ghost mvs-ghost-add">${addBtn}</div>`;
-        replaced = true;
-        break;
-      }
-    }
-    if (!replaced) {
-      // No ghost slot available (extras fill exact multiple of 3) — add a new row
-      cells.push(`<div class="form-row mvs-ghost mvs-ghost-add">${addBtn}</div>`);
-      while (cells.length % 3 !== 0) {
-        cells.push('<div class="form-row mvs-ghost" aria-hidden="true"></div>');
-      }
-    }
+    // Add button always at the end
+    cells.push(`<div class="form-row mvs-ghost mvs-ghost-add"><button class="mini-flour-add mini-flour-add-solo" onclick="addFlour()" title="Legg til meltype">+</button></div>`);
     extra.innerHTML = cells.join('');
   }
 }

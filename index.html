@@ -1904,6 +1904,89 @@
     .ing-section-label.pref-label { color: var(--orange); }
     .ing-pref-note { font-size: 11px; color: var(--muted); padding: 0 0 6px; line-height: 1.4; }
 
+    /* ── Item 4: Mel % feil — rød tekst + rød bakgrunn ── */
+    body.minimalist .form-row.mel-pct-err {
+      background: rgba(196,43,28,0.07);
+      border-radius: 6px;
+    }
+    body.minimalist .form-row.mel-pct-err .step-input,
+    body.minimalist .form-row.mel-pct-err .mvs-unit,
+    body.minimalist .form-row.mel-pct-err .mvs-static { color: var(--error); }
+
+    /* ── Item 5: + knapp på ekstra mel-rader — kompakt, orange ── */
+    .mini-flour-add-inline {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      background: var(--orange); color: #fff;
+      border: none; cursor: pointer;
+      font-size: 18px; font-weight: 800; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    .mini-flour-add-inline:hover { background: var(--red); }
+
+    /* ── Item 6: Separator mellom ±t og ±°C i Romtemp/Kjøleskap ── */
+    body.minimalist .time-card .time-stepper {
+      border-right: 1px solid var(--border) !important;
+      padding-right: 10px !important;
+      margin-right: 2px !important;
+    }
+
+    /* ── Item 7: Gjær/Surdeig knapper — flat tab-stil ── */
+    body.minimalist .yeast-toggle {
+      background: none; border: none; border-radius: 0;
+      padding: 0; margin-bottom: 0;
+      border-bottom: 2px solid var(--border);
+      gap: 0;
+    }
+    body.minimalist .yeast-btn {
+      padding: 10px 6px;
+      border-radius: 0; background: none;
+      font-size: 13px; font-weight: 700; color: var(--muted2);
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    body.minimalist .yeast-btn.active {
+      background: none; color: var(--red);
+      border-bottom: 2px solid var(--red);
+    }
+    body.minimalist .yeast-btn:not(.active):hover { color: var(--text); }
+
+    /* ── Item 8: Beregnet forslag + surdeig — flat ── */
+    body.minimalist .yeast-suggestion {
+      background: none; border: none; border-radius: 0;
+      border-bottom: 1px solid var(--border);
+      padding: 10px 0; margin-bottom: 0;
+    }
+    body.minimalist #surdeigSettings {
+      flex-direction: column; gap: 0; margin-bottom: 0;
+    }
+    body.minimalist #surdeigSettings .pref-row {
+      flex: none; background: none; border: none; border-radius: 0;
+      border-bottom: 1px solid var(--border);
+      padding: 6px 0; gap: 8px; min-height: 52px;
+    }
+    body.minimalist #surdeigSettings .pref-lbl {
+      font-size: 12px; font-weight: 700; color: var(--text);
+      text-transform: none; letter-spacing: 0; min-width: auto; flex: 1;
+    }
+    body.minimalist #surdeigSettings .stepper { flex-shrink: 0; }
+
+    /* ── Item 9: Ingrediensliste — flat ── */
+    body.minimalist .result-card {
+      background: var(--card);
+      border: none; border-radius: 0; border-top: 2px solid var(--orange);
+    }
+    body.minimalist .ing-list { padding: 0 16px 4px; }
+    body.minimalist .ing-item { padding: 12px 0; }
+    body.minimalist .ing-name { font-size: 15px; font-weight: 600; }
+    body.minimalist .ing-grams { font-size: 22px; }
+    body.minimalist .total-row { padding: 12px 16px; }
+    body.minimalist .total-lbl { font-size: 14px; font-weight: 700; }
+    body.minimalist .total-val { font-size: 24px; font-weight: 900; color: var(--orange); }
+
     /* ── Responsive ── */
     @media (max-width: 380px) {
       .step-input { width: 48px; }
@@ -2412,7 +2495,7 @@
       <div class="pieces-weight-group">
         <div class="form-row">
           <div class="form-label">
-            <span class="label-full">Antall deigemner</span><span class="label-mini">Emner</span>
+            <span class="label-full">Antall deigemner</span><span class="label-mini">Antall deiger</span>
           </div>
           <div class="stepper">
             <button class="step-btn" onclick="adj('piecesPerDough',-1)">−</button>
@@ -2423,7 +2506,7 @@
 
         <div class="form-row">
           <div class="form-label">
-            <span class="label-full">Vekt i gram per emne</span><span class="label-mini">Gram</span>
+            <span class="label-full">Vekt i gram per emne</span><span class="label-mini">Gram pr deig</span>
             <i class="help-icon" data-tooltip="Ønsket vekt på ferdig produkt per stykke — f.eks. 250–280 g for en napolitansk pizzabunn. Rådeigvekten justeres automatisk opp om svinn er satt.">?</i>
           </div>
           <div class="stepper">
@@ -3286,6 +3369,9 @@ function renderFlourSumBadge() {
   document.querySelectorAll('.flour-pct-input').forEach(el => {
     el.style.color = ok ? 'var(--success)' : 'var(--error)';
   });
+  document.querySelectorAll('.mvs-mel-row').forEach(el => {
+    el.classList.toggle('mel-pct-err', !ok);
+  });
 }
 
 function renderFlourList() {
@@ -3312,16 +3398,21 @@ function renderFlourList() {
   renderMiniFlours();
 }
 
-// Renders the minimalist view Mel/Vann/Salt rows (and extra Mel 2/3/... rows)
+// Renders the minimalist view Mel/Vann/Salt rows (all in one column)
 function renderMiniFlours() {
   const top = document.getElementById('miniFlourRow');
   const extra = document.getElementById('miniFlourExtraRow');
   if (!top || !extra) return;
+  extra.innerHTML = '';   // extras are now inserted inline in top
   const flours = S.flourTypes;
   const multi = flours.length > 1;
 
-  // First flour cell (Mel or Mel 1). Add-button only in Mel cell when single flour;
-  // when multi, the add-button appears at the end of the extras row.
+  // Flour % error state
+  const flourSum = flours.reduce((s, f) => s + (parseFloat(f.pct)||0), 0);
+  const pctOk = Math.abs(flourSum - 100) < 0.05;
+  const errCls = pctOk ? '' : ' mel-pct-err';
+
+  // First flour cell (Mel or Mel 1)
   const first = flours[0];
   const melLabel = multi ? 'Mel 1' : 'Mel';
   const melInner = multi
@@ -3333,12 +3424,24 @@ function renderMiniFlours() {
        <span class="mvs-unit">%</span>
        <button class="mini-flour-add" onclick="addFlour()" title="Legg til meltype">+</button>`;
   const melCell = `
-    <div class="form-row">
+    <div class="form-row mvs-mel-row${errCls}">
       <div class="form-label">${melLabel}</div>
-      <div class="stepper">
-        ${melInner}
-      </div>
+      <div class="stepper">${melInner}</div>
     </div>`;
+
+  // Extra flours (Mel 2, Mel 3, ...) — placed between Mel 1 and Vann
+  const extras = flours.slice(1);
+  const extraCells = extras.map((f, idx) => `
+    <div class="form-row mvs-extra-cell mvs-mel-row${errCls}">
+      <div class="form-label">Mel ${idx + 2}</div>
+      <div class="stepper">
+        <button class="step-btn" onclick="adjFlourPct(${f.id},-1)">−</button>
+        <input class="step-input" id="miniFlourPct_${f.id}" type="number" value="${f.pct}" min="0" max="100" step="1" oninput="setFlourPct(${f.id},this.value)">
+        <button class="step-btn" onclick="adjFlourPct(${f.id},1)">+</button>
+        <button class="mini-flour-add-inline" onclick="addFlour()" title="Legg til meltype">+</button>
+        <button class="mini-flour-del" onclick="removeFlour(${f.id})" title="Fjern">×</button>
+      </div>
+    </div>`).join('');
 
   const vannCell = `
     <div class="form-row">
@@ -3362,29 +3465,8 @@ function renderMiniFlours() {
       </div>
     </div>`;
 
-  top.innerHTML = melCell + vannCell + saltCell;
-
-  // Extra flours (Mel 2, Mel 3, ...) go into extra row.
-  // Add button is always placed at the very end of the extras.
-  const extras = flours.slice(1);
-  if (extras.length === 0) {
-    extra.innerHTML = '';
-  } else {
-    const cells = extras.map((f, idx) => `
-      <div class="form-row mvs-extra-cell">
-        <button class="mini-flour-del" onclick="removeFlour(${f.id})" title="Fjern">×</button>
-        <div class="form-label">Mel ${idx + 2}</div>
-        <div class="stepper">
-          <button class="step-btn" onclick="adjFlourPct(${f.id},-1)">−</button>
-          <input class="step-input" id="miniFlourPct_${f.id}" type="number" value="${f.pct}" min="0" max="100" step="1" oninput="setFlourPct(${f.id},this.value)">
-          <button class="step-btn" onclick="adjFlourPct(${f.id},1)">+</button>
-          <span class="mvs-unit">%</span>
-        </div>
-      </div>`);
-    // Add button: compact square right after the last extra cell
-    cells.push(`<button class="mini-flour-add-sq" onclick="addFlour()" title="Legg til meltype">+</button>`);
-    extra.innerHTML = cells.join('');
-  }
+  // Order: Mel 1, Mel 2/3..., Vann, Salt
+  top.innerHTML = melCell + extraCells + vannCell + saltCell;
 }
 
 // Nudge flour percent by delta (for mini-view +/- buttons)

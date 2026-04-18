@@ -234,7 +234,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
-      align-items: stretch;
+      align-items: center;
     }
     body.minimalist .mvs-mini-row:empty {
       display: none;
@@ -283,6 +283,19 @@
       font-size: 20px; font-weight: 800;
       margin: 0;
     }
+    /* Square add button inline after the last extra flour cell */
+    body.minimalist .mvs-mini-group .mini-flour-add-sq {
+      flex: 0 0 auto;
+      align-self: center;
+      width: 40px; height: 40px;
+      border-radius: 8px;
+      font-size: 22px; font-weight: 800;
+      margin: 0;
+      background: var(--orange, #E26726); color: #fff;
+      border: none; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    body.minimalist .mvs-mini-group .mini-flour-add-sq:hover { filter: brightness(1.08); }
     body.minimalist .mvs-mini-group .form-label {
       font-size: 9px; font-weight: 700; color: var(--muted2);
       text-transform: uppercase; letter-spacing: 0.3px; flex: 0 0 auto;
@@ -319,7 +332,7 @@
       background: var(--orange, #E26726); color: #fff;
       border: none; border-radius: 6px;
       font-size: 15px; font-weight: 700; line-height: 1;
-      padding: 0; margin-left: 2px;
+      padding: 0; margin-left: auto;
       display: inline-flex; align-items: center; justify-content: center;
       cursor: pointer;
     }
@@ -3233,8 +3246,8 @@ function renderMiniFlours() {
           <span class="mvs-unit">%</span>
         </div>
       </div>`);
-    // Add button always at the end
-    cells.push(`<div class="form-row mvs-ghost mvs-ghost-add"><button class="mini-flour-add mini-flour-add-solo" onclick="addFlour()" title="Legg til meltype">+</button></div>`);
+    // Add button: compact square right after the last extra cell
+    cells.push(`<button class="mini-flour-add mini-flour-add-sq" onclick="addFlour()" title="Legg til meltype">+</button>`);
     extra.innerHTML = cells.join('');
   }
 }

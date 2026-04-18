@@ -1353,20 +1353,20 @@
     body.minimalist .extra-field input[type="range"] { display: none; }
     body.minimalist .water-salt-group .slider-header { flex-wrap: wrap; }
 
-    /* ⊕ knapp ved siden av vann/salt i minimalist — lik flour-add-mini */
-    body.minimalist .water-salt-row         { display: flex; align-items: flex-start; gap: 8px; }
-    body.minimalist .water-salt-row .water-salt-group { flex: 1; }
+    /* ⊕ knapp ved siden av vann/salt i minimalist */
+    .add-mini-icon { display: none; }  /* hidden in full view */
+    body.minimalist .water-salt-row         { display: flex; align-items: flex-start; gap: 6px; }
+    body.minimalist .water-salt-row .water-salt-group { flex: 0 0 auto; }
     body.minimalist .water-salt-row .extras-add-btn {
-      flex-shrink: 0; width: 26px; height: 26px; margin-top: 0; padding: 0;
+      flex-shrink: 0; width: auto; height: auto; margin-top: 0;
+      padding: 5px 9px; align-self: stretch;
       border: 1.5px solid var(--border); border-style: solid;
-      border-radius: 6px; align-self: center;
-      font-size: 17px; font-weight: 700;
+      border-radius: 8px; font-size: 12px; font-weight: 600;
+      display: flex; align-items: center; gap: 4px; white-space: nowrap;
     }
-    body.minimalist .add-lbl  { display: none; }
-    body.minimalist .add-icon { font-size: 17px; font-weight: 700; line-height: 1; }
-    body.minimalist .water-salt-row .extras-add-btn .add-icon::before { content: '+'; }
-    body.minimalist .water-salt-row .extras-add-btn .add-icon         { font-size: 0; }
-    body.minimalist .water-salt-row .extras-add-btn .add-icon::before { font-size: 17px; }
+    body.minimalist .add-symbol   { display: none; }
+    body.minimalist .add-lbl      { display: inline; font-size: 12px; }
+    body.minimalist .add-mini-icon { display: inline; font-size: 15px; font-weight: 700; }
 
     /* Antall emner + vekt side om side — kompakt som vann/salt */
     body.minimalist .pieces-weight-group     { display: flex; gap: 6px; align-items: center; }
@@ -2073,7 +2073,7 @@
           <input type="range" id="saltSlider" min="0" max="6" value="3" step="0.1" oninput="sliderDrag('salt',this.value)">
         </div>
       </div>
-      <button class="extras-add-btn" onclick="openExtras()"><span class="add-icon">⊕</span><span class="add-lbl"> Legg til ingrediens</span></button>
+      <button class="extras-add-btn" onclick="openExtras()"><span class="add-symbol">⊕</span><span class="add-lbl"> Legg til ingrediens </span><span class="add-mini-icon">+</span></button>
       </div>
 
       <!-- Extra: Sukker -->

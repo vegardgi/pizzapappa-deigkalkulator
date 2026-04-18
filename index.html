@@ -756,9 +756,9 @@
       letter-spacing: -0.5px;
     }
     .yeast-sug-val .mvs-unit {
-      font-size: 15px;
-      font-weight: 500;
-      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+      color: inherit;
       margin-left: 2px;
     }
     .yeast-sug-sub {
@@ -3255,7 +3255,7 @@ function renderCalc() {
     if (overrideActive) {
       sugBoxHtml = `
         <div class="yeast-sug-lbl" style="color:var(--red)">Overstyrt</div>
-        <div class="yeast-sug-val">${fmt1(r.yeastG)} g ${yName}</div>
+        <div class="yeast-sug-val">${fmt1(r.yeastG)}<span class="mvs-unit">g</span> ${yName}</div>
         <div class="yeast-sug-strike">
           Beregnet: <s>${fmt1(sugG)} g</s> &nbsp;<s style="font-size:12px;color:var(--muted)">${sugPct.toFixed(3)} %</s>
         </div>

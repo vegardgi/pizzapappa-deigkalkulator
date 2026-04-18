@@ -290,7 +290,7 @@
       width: 40px; height: 40px;
       border-radius: 8px;
       font-size: 22px; font-weight: 800;
-      margin: 0;
+      margin: 0; margin-left: 4px;
       background: var(--orange, #E26726); color: #fff;
       border: none; cursor: pointer;
       display: inline-flex; align-items: center; justify-content: center;
@@ -325,14 +325,22 @@
     body.minimalist .mvs-mini-group .mvs-unit {
       font-size: 10px; color: var(--muted); margin-left: 1px;
     }
-    /* Legg til meltype-knapp (inne i Mel-cellen, mellom Mel og Vann) */
+    /* Mel-celle med statisk 100 — sentrer "100 %" og pin + til høyre kant */
+    body.minimalist .mvs-mini-group .form-row:has(.mvs-static) {
+      position: relative;
+    }
+    body.minimalist .mvs-mini-group .stepper:has(.mvs-static) {
+      justify-content: center;
+    }
+    /* Legg til meltype-knapp: absolutt-posisjonert til høyre kant av Mel-cellen */
     body.minimalist .mvs-mini-group .mini-flour-add {
-      flex: 0 0 auto;
+      position: absolute;
+      right: 6px; top: 50%; transform: translateY(-50%);
       width: 22px; height: 26px;
       background: var(--orange, #E26726); color: #fff;
       border: none; border-radius: 6px;
       font-size: 15px; font-weight: 700; line-height: 1;
-      padding: 0; margin-left: auto;
+      padding: 0;
       display: inline-flex; align-items: center; justify-content: center;
       cursor: pointer;
     }
@@ -1667,17 +1675,30 @@
     body.minimalist .pieces-weight-group .step-btn              { width: 36px; height: 36px; font-size: 19px; font-weight: 800; }
     body.minimalist .pieces-weight-group > div > div[style]     { display: contents; }
 
-    /* Hevetid: 2-kolonne grid med kompakte tid+temp-kontroller i minimalist */
-    body.minimalist .time-grid                { grid-template-columns: 1fr 1fr; gap: 5px; }
-    body.minimalist .time-card                { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 4px; padding: 5px 7px; }
-    body.minimalist .time-card .time-lbl      { grid-column: 1 / -1; font-size: 9px; }
+    /* Hevetid: én rad per tidskort — same design as pieces-weight-group */
+    body.minimalist .time-grid {
+      grid-template-columns: 1fr; gap: 6px;
+    }
+    body.minimalist .time-card {
+      display: flex; flex-direction: row;
+      align-items: center; gap: 6px;
+      padding: 4px 8px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 8px;
+    }
+    body.minimalist .time-card .time-lbl {
+      font-size: 10px; font-weight: 700; color: var(--muted2);
+      text-transform: uppercase; letter-spacing: 0.3px;
+      flex: 1; white-space: nowrap; grid-column: unset;
+    }
     body.minimalist .time-card .temp-bar-wrap { display: none; }
-    body.minimalist .time-card .time-stepper  { gap: 1px; padding: 1px 0; }
-    body.minimalist .time-card .temp-row      { gap: 1px; padding: 1px 0; }
-    body.minimalist .time-card .step-btn      { width: 32px; height: 40px; font-size: 17px; font-weight: 800; }
-    body.minimalist .time-card .step-input    { width: 22px; padding: 0; font-size: 12px; font-weight: 700; text-align: center; height: 34px; }
+    body.minimalist .time-card .time-stepper  { gap: 2px; padding: 0; }
+    body.minimalist .time-card .temp-row      { gap: 2px; padding: 0; }
+    body.minimalist .time-card .step-btn      { width: 36px; height: 36px; font-size: 19px; font-weight: 800; }
+    body.minimalist .time-card .step-input    { width: 28px; padding: 0; font-size: 14px; font-weight: 700; text-align: center; height: 26px; }
     body.minimalist .time-card .time-unit,
-    body.minimalist .time-card .temp-unit     { font-size: 9px; padding-right: 2px; color: var(--muted); }
+    body.minimalist .time-card .temp-unit     { font-size: 10px; color: var(--muted); }
 
     /* Surdeig settings — same compact style as pieces-weight-group in minimalist */
     body.minimalist #surdeigSettings                     { display: flex; gap: 6px; align-items: stretch; margin-bottom: 8px; }
@@ -3247,7 +3268,7 @@ function renderMiniFlours() {
         </div>
       </div>`);
     // Add button: compact square right after the last extra cell
-    cells.push(`<button class="mini-flour-add mini-flour-add-sq" onclick="addFlour()" title="Legg til meltype">+</button>`);
+    cells.push(`<button class="mini-flour-add-sq" onclick="addFlour()" title="Legg til meltype">+</button>`);
     extra.innerHTML = cells.join('');
   }
 }

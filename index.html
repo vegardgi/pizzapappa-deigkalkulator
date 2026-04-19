@@ -3404,7 +3404,7 @@ function renderCalc() {
   }
 
   // Salt always shown
-  html += ingRow('Salt', r.saltG, `${S.saltPct} % av mel`);
+  html += ingRow('Salt', Math.round(r.saltG), `${S.saltPct} % av mel`);
   // Yeast or surdeig
   if (S.yeastType === 'surdeig') {
     // surdeig is shown in the preferment section; skip yeast line

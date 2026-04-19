@@ -2759,7 +2759,7 @@
       <div class="time-grid">
 
         <div class="time-card">
-          <div class="time-lbl">Romtemp <i class="help-icon" data-tooltip="Heving ved romtemperatur før eventuell kjøling. Lengre tid og høyere temp = mer gjæraktivitet = kalkulatoren foreslår mindre gjær.">?</i></div>
+          <div class="time-lbl">Romtemp <i class="help-icon" data-tooltip="Endre TIMER og TEMP under. Heving ved romtemperatur før eventuell kjøling. Lengre tid og høyere temp = mer gjæraktivitet = kalkulatoren foreslår mindre gjær.">?</i></div>
           <div class="stepper time-stepper">
             <button class="step-btn" onclick="adj('rtHours',-1)">−</button>
             <input  class="step-input" id="rtHours" type="number" value="8" min="0" max="72" onchange="upd('rtHours',this.value)">
@@ -2779,7 +2779,7 @@
         </div>
 
         <div class="time-card">
-          <div class="time-lbl">Kjøleskap <i class="help-icon" data-tooltip="Kaldheving i kjøleskap bremser gjæren og gir mer smak via enzymatisk aktivitet. Typisk 3–5 °C i 12–72 timer. Sett 0 timer om du ikke bruker kjøleskap.">?</i></div>
+          <div class="time-lbl">Kjøleskap <i class="help-icon" data-tooltip="Endre TIMER og TEMP under. Kaldheving i kjøleskap bremser gjæren og gir mer smak via enzymatisk aktivitet. Typisk 3–5 °C i 12–72 timer. Sett 0 timer om du ikke bruker kjøleskap.">?</i></div>
           <div class="stepper time-stepper">
             <button class="step-btn" onclick="adj('coldHours',-1)">−</button>
             <input  class="step-input" id="coldHours" type="number" value="0" min="0" max="120" onchange="upd('coldHours',this.value)">
@@ -2896,7 +2896,7 @@
 <script>
 // ═══════════════════════════════════════════════════════
 //  STATE
-// ═════════��═════════════════════════════════════════════
+// ═══════���═��═════════════════════════════════════════════
 const S = {
   mode:          'pizza',
   numDoughs:     1,
@@ -4256,7 +4256,7 @@ function dismissIntro() {
 
 // ═══════════════════════════════════════════════════════
 //  TEMP BAR DRAG
-// ═══════════════════════════════════════════════════════
+// ════════════════════════════════��══════════════════════
 function initTempDrag(barId, markerId, field, min, max) {
   const bar    = document.getElementById(barId);
   const marker = document.getElementById(markerId);

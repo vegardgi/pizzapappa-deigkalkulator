@@ -1018,6 +1018,8 @@
       letter-spacing: 0.2px;
     }
     .bump-btn:hover { border-color: var(--red); color: var(--red); }
+    .bump-reset { color: var(--muted); border-color: var(--border-light); font-size: 12px; padding: 5px 10px; }
+    .bump-reset:hover { color: var(--red); border-color: var(--red); }
     .bump-plus  { color: var(--success); border-color: rgba(91,174,110,0.4); }
     .bump-plus:hover  { background: rgba(91,174,110,0.1); border-color: var(--success); color: var(--success); }
     .bump-minus { color: var(--error); border-color: rgba(224,82,82,0.4); }
@@ -3262,6 +3264,7 @@ function renderCalc() {
           <button class="bump-btn bump-minus" onclick="bumpYeastRel(-5)" title="−5%">−5 %</button>
           <span class="bump-label ${bumpClass}">${bumpText}</span>
           <button class="bump-btn bump-plus"  onclick="bumpYeastRel(5)"  title="+5%">+5 %</button>
+          <button class="bump-btn bump-reset" onclick="resetYeastBump()" title="Tilbakestill">Tilbakestill</button>
         </div>`;
       if (S.yeastBumpPct !== 0) {
         sugBoxHtml = `
@@ -3317,6 +3320,7 @@ function renderCalc() {
           <button class="bump-btn bump-minus" onclick="bumpYeastRel(-5)" title="−5%">−5 %</button>
           <span class="bump-label ${bumpClass}">${bumpText}</span>
           <button class="bump-btn bump-plus"  onclick="bumpYeastRel(5)"  title="+5%">+5 %</button>
+          <button class="bump-btn bump-reset" onclick="resetYeastBump()" title="Tilbakestill">Tilbakestill</button>
         </div>`;
       if (S.yeastBumpPct !== 0) {
         sugBoxHtml = `
@@ -3860,6 +3864,10 @@ function bumpYeastG(dg) {
     S.yeastBumpPct = Math.max(-10, S.yeastBumpPct + (dg / r.flourG) * 100);
     renderCalc();
   }
+}
+function resetYeastBump() {
+  S.yeastBumpPct = 0;
+  renderCalc();
 }
 // Bump yeast by pct% of the currently displayed gram amount
 function bumpYeastRel(pct) {

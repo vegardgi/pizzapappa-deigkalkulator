@@ -3021,17 +3021,20 @@ function loadStoredPresets() {
 //  Model: freshPct = A · e^(−B · effH)
 //  effH = equivalent hours at 22 °C using Q10 = 2 (Arrhenius, Ea ≈ 53 kJ/mol)
 //
-//  Mode-specific constants calibrated against:
-//  Pizza — AVPN 2024 Disciplinare + fond.kitchen table (Neapolitan)
-//  Bread — MENY.no + King Arthur + Norwegian home-baking standards
+//  Constants calibrated to the UPPER tier of published ranges:
+//  Pizza — AVPN 2024 Disciplinare (0.05–0.30 % fresh), pizzapappa.no table
+//          (1 g fresh / kg flour @ 20 °C / 24 h = 0.10 %), PizzaBlab RT guide.
+//          Target: ~0.18 % fresh @ 8 h/22 °C, ~0.11 % @ 24 h/20 °C.
+//  Bread — King Arthur, Forkish FWSY, Norwegian home-baking (upper range).
+//          Target: ~0.82 % dry @ 1 h/22 °C, ~0.38 % dry @ 8 h/20 °C.
 //
 //  Q10 = 2 applies to CO₂ production (fermentation), not cell division.
 //  Published Ea for S. cerevisiae fermentation: 40–65 kJ/mol → Q10 ≈ 2.0–2.5.
 //  Q10 = 2 is the conservative / bread-friendly end of that range.
 // ═══════════════════════════════════════════════════════
 const YEAST_PARAMS = {
-  pizza: { A: 0.15,  B: 0.043, maxPct: 0.8,  minPct: 0.001 },
-  bread: { A: 2.1,   B: 0.136, maxPct: 7.0,  minPct: 0.05  }
+  pizza: { A: 0.25,  B: 0.040, maxPct: 0.8,  minPct: 0.001 },
+  bread: { A: 2.8,   B: 0.130, maxPct: 7.0,  minPct: 0.05  }
 };
 
 function calcYeast(rtH, coldH) {

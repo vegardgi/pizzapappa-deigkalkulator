@@ -2517,7 +2517,7 @@
   <!-- ── 0. Oppskrifter ── -->
   <div class="card recipes-card" id="recipesCard">
     <div class="card-header" onclick="toggleRecipes()">
-      <span class="card-title">Oppskrifter</span>
+      <span class="card-title" id="recipeCardTitle">Oppskrifter</span>
       <span class="recipes-chevron">▼</span>
     </div>
     <div class="card-body">
@@ -4126,6 +4126,8 @@ function confirmRename(id) {
 
 function renderRecipes() {
   const container = document.getElementById('recipeList');
+  const titleEl = document.getElementById('recipeCardTitle');
+  if (titleEl) titleEl.textContent = S.mode === 'pizza' ? 'Pizzaoppskrifter' : 'Brødoppskrifter';
   const visible = recipes.filter(r => r.mode === S.mode);
   if (!visible.length) {
     container.innerHTML = '<div class="recipes-empty">Ingen lagrede oppskrifter ennå</div>';

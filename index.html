@@ -4132,7 +4132,7 @@ function renderRecipes() {
     return;
   }
   container.innerHTML = visible.map(r => {
-    const icon    = r.mode === 'pizza' ? 'P' : 'B';
+    const icon    = r.mode === 'pizza' ? '🍕' : '🍞';
     const isActive = r.id === activeId;
     const isRenaming = r.id === renamingId;
     const nameHtml = isRenaming

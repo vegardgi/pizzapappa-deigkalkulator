@@ -3224,6 +3224,7 @@ function renderCalc() {
       S.prefHours + ' t @ ' + S.prefTemp + ' °C';
 
     if (overrideActive) {
+      const mainSugG = S.yeastType === 'fresh' ? r.sugMainFreshG : r.sugMainDryG;
       sugBoxHtml = `
         <div class="yeast-sug-lbl" style="color:var(--red)">Overstyrt (hoved-deig)</div>
         <div style="display:flex;flex-direction:column;gap:4px;margin:4px 0">
@@ -3231,10 +3232,15 @@ function renderCalc() {
             <span style="color:var(--muted)">${prefLabel}-gjær</span>
             <span style="font-weight:700">${fmt1(r.prefYeastG)} g ${yNameS}</span>
           </div>
-          <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px">
-            <span style="color:var(--muted)">Hoved-deig</span>
-            <span style="font-weight:700">${fmt1(r.mainYeastG)} g ${yNameS}</span>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="color:var(--muted);font-size:13px">Hoved-deig</span>
+            <div class="yeast-sug-val" style="margin:0">
+              <span class="bump-val-inline">${fmt1(r.mainYeastG)}</span><span class="mvs-unit">g</span>
+            </div>
           </div>
+        </div>
+        <div class="yeast-sug-strike">
+          Forslag: <s>${fmt1(mainSugG)} g</s>
         </div>
         <div class="yeast-sug-sub">${prefSubLine}</div>
         <div class="yeast-sug-sub">${subLine}</div>`;
@@ -3298,9 +3304,11 @@ function renderCalc() {
     if (overrideActive) {
       sugBoxHtml = `
         <div class="yeast-sug-lbl" style="color:var(--red)">Overstyrt</div>
-        <div class="yeast-sug-val">${fmt1(r.yeastG)}<span class="mvs-unit">g</span> ${yName}</div>
+        <div class="yeast-sug-val">
+          <span class="bump-val-inline">${fmt1(r.yeastG)}</span><span class="mvs-unit">g</span>
+        </div>
         <div class="yeast-sug-strike">
-          Beregnet: <s>${fmt1(sugG)} g</s> &nbsp;<s style="font-size:12px;color:var(--muted)">${sugPct.toFixed(3)} %</s>
+          Forslag: <s>${fmt1(sugG)} g</s> &nbsp;<s style="font-size:12px;color:var(--muted)">${sugPct.toFixed(3)} %</s>
         </div>
         <div class="yeast-sug-sub">${subLine}</div>`;
     } else {

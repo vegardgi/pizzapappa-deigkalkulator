@@ -2842,7 +2842,7 @@
       <div class="override-row">
         <label class="check-label">
           <input type="checkbox" id="overrideCheck" onchange="toggleOverride(this.checked)">
-          Overstyr gjær <i class="help-icon" data-tooltip="Skriv inn ønsket gjærmengde manuelt — f.eks. fra en ferdig oppskrift — i stedet for den beregnede verdien.">?</i>
+          Overstyr gjær <i class="help-icon" data-tooltip="Velg å skrive inn ønsket gjærmengde manuelt.">?</i>
         </label>
         <div class="override-unit-toggle" id="overrideUnitToggle">
           <button class="override-unit-btn active" id="btnOvGram" onclick="setOverrideUnit('gram')">g</button>
@@ -2894,9 +2894,9 @@
 </main>
 
 <script>
-// ════════════════════════════════════════════════���══════
-//  STATE
 // ═══════════════════════════════════════════════════════
+//  STATE
+// ═════════��═════════════════════════════════════════════
 const S = {
   mode:          'pizza',
   numDoughs:     1,
@@ -3191,9 +3191,10 @@ function renderCalc() {
     // ── Preferment mode: show two lines (fordeig + hoved-deig) ──
     const prefIcon = '';
     const prefLabel = hasExtra('poolish') ? 'Poolish' : 'Biga';
-    const subLine = r.mainYeastPct.toFixed(1) + ' % av mel  ·  ' +
-      S.rtHours + ' t @ ' + S.rtTemp + ' °C' +
-      (S.coldHours > 0 ? '  +  ' + S.coldHours + ' t @ ' + S.coldTemp + ' °C' : '');
+    const subLine = r.mainYeastPct.toFixed(3) + ' % av mel  ·  ' +
+      S.rtHours + ' t @ ' + S.rtTemp + ' °C  +  ' +
+      S.coldHours + ' t @ ' + S.coldTemp + ' °C' +
+      '';
     const prefSubLine = r.prefYeastPct.toFixed(3) + ' % av fordeig-mel  ·  ' +
       S.prefHours + ' t @ ' + S.prefTemp + ' °C';
 
@@ -3246,9 +3247,10 @@ function renderCalc() {
     const sugG   = S.yeastType === 'fresh' ? r.sugFreshG : r.sugDryG;
     const sugPct = S.yeastType === 'fresh' ? r.yc.freshPct : r.yc.dryPct;
     const displayPct = overrideActive ? r.yeastPct : (sugPct + S.yeastBumpPct);
-    const subLine = displayPct.toFixed(1) + ' % av mel  ·  ' +
-      S.rtHours + ' t @ ' + S.rtTemp + ' °C' +
-      (S.coldHours > 0 ? '  +  ' + S.coldHours + ' t @ ' + S.coldTemp + ' °C' : '');
+    const subLine = displayPct.toFixed(3) + ' % av mel  ·  ' +
+      S.rtHours + ' t @ ' + S.rtTemp + ' °C  +  ' +
+      S.coldHours + ' t @ ' + S.coldTemp + ' °C' +
+      '';
 
     if (overrideActive) {
       sugBoxHtml = `
@@ -4254,7 +4256,7 @@ function dismissIntro() {
 
 // ═══════════════════════════════════════════════════════
 //  TEMP BAR DRAG
-// ══════════════���════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 function initTempDrag(barId, markerId, field, min, max) {
   const bar    = document.getElementById(barId);
   const marker = document.getElementById(markerId);

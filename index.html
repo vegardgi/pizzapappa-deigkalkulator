@@ -3241,8 +3241,8 @@ function renderCalc() {
       const bumpClass = S.yeastBumpPct > 0 ? 'bumped-up' : S.yeastBumpPct < 0 ? 'bumped-down' : '';
       const bumpOffG  = Math.abs((S.yeastBumpPct / 100) * r.flourG);
       const bumpText  = S.yeastBumpPct === 0 ? 'Hoved-deig' : bumpSign + fmt1(bumpOffG) + ' g';
-      sugBoxHtml = `
-        <div class="yeast-sug-lbl">${yLblCap}</div>
+      const mainSugG  = S.yeastType === 'fresh' ? r.sugMainFreshG : r.sugMainDryG;
+      const twoRows = `
         <div style="display:flex;flex-direction:column;gap:4px;margin:4px 0">
           <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px">
             <span style="color:var(--muted)">${prefLabel}-gjær</span>
@@ -3256,14 +3256,31 @@ function renderCalc() {
               <button class="bump-btn bump-plus bump-inline"  onclick="bumpYeastRel(5)"  title="+5%">+</button>
             </div>
           </div>
-        </div>
-        <div class="yeast-sug-sub">${prefSubLine}</div>
-        <div class="yeast-sug-sub">${subLine}</div>
+        </div>`;
+      const bumpRow = `
         <div class="yeast-bump-row">
           <button class="bump-btn bump-minus" onclick="bumpYeastRel(-5)" title="−5%">−5 %</button>
           <span class="bump-label ${bumpClass}">${bumpText}</span>
           <button class="bump-btn bump-plus"  onclick="bumpYeastRel(5)"  title="+5%">+5 %</button>
         </div>`;
+      if (S.yeastBumpPct !== 0) {
+        sugBoxHtml = `
+          <div class="yeast-sug-lbl" style="color:var(--red)">Justert (hoved-deig)</div>
+          ${twoRows}
+          <div class="yeast-sug-strike">
+            Forslag: <s>${fmt1(mainSugG)} g</s>
+          </div>
+          <div class="yeast-sug-sub">${prefSubLine}</div>
+          <div class="yeast-sug-sub">${subLine}</div>
+          ${bumpRow}`;
+      } else {
+        sugBoxHtml = `
+          <div class="yeast-sug-lbl">${yLblCap}</div>
+          ${twoRows}
+          <div class="yeast-sug-sub">${prefSubLine}</div>
+          <div class="yeast-sug-sub">${subLine}</div>
+          ${bumpRow}`;
+      }
     }
   } else {
     // ── Straight dough mode (no preferment) ──
@@ -3289,19 +3306,34 @@ function renderCalc() {
       const bumpOffG  = Math.abs((S.yeastBumpPct / 100) * r.flourG);
       const bumpText  = S.yeastBumpPct === 0 ? 'Forslag' : bumpSign + fmt1(bumpOffG) + ' g';
       const yeastValG = fmt1(Math.max(0, sugG + (S.yeastBumpPct/100)*(r.flourG)));
-      sugBoxHtml = `
-        <div class="yeast-sug-lbl">${yLblCap}</div>
+      const valWithBtns = `
         <div class="yeast-sug-val">
           <button class="bump-btn bump-minus bump-inline" onclick="bumpYeastRel(-5)" title="−5%">−</button>
           <span class="bump-val-inline">${yeastValG}</span><span class="mvs-unit">g</span>
           <button class="bump-btn bump-plus bump-inline"  onclick="bumpYeastRel(5)"  title="+5%">+</button>
-        </div>
-        <div class="yeast-sug-sub">${subLine}</div>
+        </div>`;
+      const bumpRow = `
         <div class="yeast-bump-row">
           <button class="bump-btn bump-minus" onclick="bumpYeastRel(-5)" title="−5%">−5 %</button>
           <span class="bump-label ${bumpClass}">${bumpText}</span>
           <button class="bump-btn bump-plus"  onclick="bumpYeastRel(5)"  title="+5%">+5 %</button>
         </div>`;
+      if (S.yeastBumpPct !== 0) {
+        sugBoxHtml = `
+          <div class="yeast-sug-lbl" style="color:var(--red)">Justert</div>
+          ${valWithBtns}
+          <div class="yeast-sug-strike">
+            Forslag: <s>${fmt1(sugG)} g</s> &nbsp;<s style="font-size:12px;color:var(--muted)">${sugPct.toFixed(3)} %</s>
+          </div>
+          <div class="yeast-sug-sub">${subLine}</div>
+          ${bumpRow}`;
+      } else {
+        sugBoxHtml = `
+          <div class="yeast-sug-lbl">${yLblCap}</div>
+          ${valWithBtns}
+          <div class="yeast-sug-sub">${subLine}</div>
+          ${bumpRow}`;
+      }
     }
   }
 

@@ -2568,7 +2568,7 @@
         <div class="form-row">
           <div class="form-label">
             <span class="label-full">Vekt i gram per emne</span><span class="label-mini">Gram pr deig</span>
-            <i class="help-icon" data-tooltip="Ønsket vekt på ferdig produkt per stykke — f.eks. 250–280 g for en napolitansk pizzabunn. Rådeigvekten justeres automatisk opp om svinn er satt.">?</i>
+            <i class="help-icon" data-tooltip="Ønsket vekt per deigemne — f.eks. 250–280 g for en napolitansk pizzabunn.">?</i>
           </div>
           <div class="stepper">
             <button class="step-btn" onclick="adj('weightPerPiece',-5)">−</button>
@@ -2624,7 +2624,7 @@
       <div class="water-salt-group">
         <div class="slider-row">
           <div class="slider-header">
-            <span class="slider-label">Vann <i class="help-icon" data-tooltip="Baker's percent: vann måles som % av melvekt. 65 % = 650 g vann per 1 000 g mel. Høyere % gir luftigere skorpe og mer sprø pizza, men er vanskeligere å håndtere og må stekes på lavere temperatur.">?</i></span>
+            <span class="slider-label">Vann <i class="help-icon" data-tooltip="Vann måles som % av melvekt. 65 % = 650 g vann per 1 000 g mel. Vanlige prosent for napolitansk pizza er 60-65%. Høyere % gir luftigere skorpe og mer sprø pizza, men er vanskeligere å håndtere og må stekes på lavere temperatur.">?</i></span>
             <input class="slider-val-input" id="waterInput" type="number" value="63" min="40" max="100" step="0.5" onchange="sliderInput('water',this.value)">
             <span class="unit">%</span>
           </div>
@@ -2646,7 +2646,7 @@
       <!-- Extra: Sukker -->
       <div class="extra-field" id="extraSukker">
         <div class="extra-field-header">
-          <span class="extra-field-lbl">Sukker <i class="help-icon" data-tooltip="Baker's prosent. Sukker hjelper bruning ved lavere steketemperatur og gir litt søtere smak. Typisk 1–3 % for NY-pizza og loff, 3–5 % for brioche.">?</i></span>
+          <span class="extra-field-lbl">Sukker <i class="help-icon" data-tooltip="Baker's prosent. Sukker hjelper bruning ved lavere steketemperatur og gir litt søtere smak. Typisk 1–3 % for NY-pizza.">?</i></span>
           <button class="extra-remove" onclick="toggleExtra('sukker')" title="Fjern sukker">×</button>
         </div>
         <div class="slider-row" style="margin-bottom:0">
@@ -2662,7 +2662,7 @@
       <!-- Extra: Olje -->
       <div class="extra-field" id="extraOlje">
         <div class="extra-field-header">
-          <span class="extra-field-lbl">🫒 Olje <i class="help-icon" data-tooltip="Baker's prosent. Olje gir mørere krumme, bedre holdbarhet og hjelper deigen å slippe formen. Typisk 2–3 % for NY-pizza, 5–8 % for focaccia. Tilsettes mot slutten av eltingen.">?</i></span>
+          <span class="extra-field-lbl">🫒 Olje <i class="help-icon" data-tooltip="Baker's prosent. Typisk 2–3 % for NY-pizza, 5–8 % for focaccia. Tilsettes mot slutten av eltingen.">?</i></span>
           <button class="extra-remove" onclick="toggleExtra('olje')" title="Fjern olje">×</button>
         </div>
         <div class="slider-row" style="margin-bottom:0">
@@ -2692,7 +2692,7 @@
       </div>
       <div class="pref-settings" id="extraPoolish">
         <div class="pref-row">
-          <span class="pref-lbl" style="font-size:11px;color:var(--muted)">Andel poolish <i class="help-icon" data-tooltip="Poolishens totalvekt som andel av melvekt (100 % hydrering — like deler mel og vann). 30 % av 1 000 g mel = 300 g poolish (150 g mel + 150 g vann). Fermenteres 12–16 t ved romtemp. Typisk 20–40 %. Gir luftig krumme og mild syrlig aroma.">?</i></span>
+          <span class="pref-lbl" style="font-size:11px;color:var(--muted)">Andel poolish <i class="help-icon" data-tooltip="Poolish skal ha 100 % hydrering (like deler mel og vann). 30 % av 1000 g mel = 300 g poolish (150 g mel + 150 g vann). Fermenteres 12–16 t ved romtemp. Typisk andel poolish er 20–40 %.">?</i></span>
           <div class="stepper">
             <button class="step-btn" onclick="adjExtra('poolishPct',-5,5,80)">−</button>
             <input class="step-input" id="poolishPctInput" type="number" value="30" min="5" max="80" style="width:46px" onchange="updExtra('poolishPct',this.value,5,80)">
@@ -2703,7 +2703,7 @@
       </div>
       <div class="pref-settings" id="extraBiga">
         <div class="pref-row">
-          <span class="pref-lbl" style="font-size:11px;color:var(--muted)">Andel biga <i class="help-icon" data-tooltip="Bigaens totalvekt som andel av melvekt. 40 % av 1 000 g mel = 400 g biga, fordelt på mel og vann etter valgt hydrering (50 % → ~267 g mel + ~133 g vann). Settes i kjøleskap 16–24 t. Typisk 30–60 %. Gir seig, åpen krumme og nøtteaktig smak.">?</i></span>
+          <span class="pref-lbl" style="font-size:11px;color:var(--muted)">Andel biga <i class="help-icon" data-tooltip="Biga lages ofte med ca. 40 % hydrasjon. Settes i kjøleskap 16–24 t. Typisk andel biga er 30–60 % av melvekt. ">?</i></span>
           <div class="stepper">
             <button class="step-btn" onclick="adjExtra('bigaPct',-5,5,80)">−</button>
             <input class="step-input" id="bigaPctInput" type="number" value="40" min="5" max="80" style="width:46px" onchange="updExtra('bigaPct',this.value,5,80)">

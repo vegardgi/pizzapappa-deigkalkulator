@@ -95,6 +95,8 @@
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    /* Prevent double-tap zoom on buttons */
+    button { touch-action: manipulation; }
 
     :root {
       --bg:          #F0E6D8;
@@ -1593,6 +1595,35 @@
     .min-btn:hover { opacity: 0.85; }
     .min-btn .min-icon { font-size: 14px; }
     body.minimalist .min-btn { background: var(--red); color: #fff; }
+
+    /* ── Wake lock button ── */
+    .wakelock-btn {
+      display: none;
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      font-size: 17px;
+      cursor: pointer;
+      z-index: 80;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,.13);
+      opacity: .6;
+      transition: opacity .2s, border-color .2s, background .2s;
+    }
+    body.minimalist .wakelock-btn { display: flex; }
+    .wakelock-btn:hover { opacity: 1; }
+    .wakelock-btn.active {
+      background: rgba(196,43,28,.1);
+      border-color: var(--red);
+      opacity: 1;
+    }
+
     .min-btn-x {
       width: 26px; height: 26px;
       border-radius: 50%;
@@ -4504,6 +4535,45 @@ async function submitContact(e) {
     alert('Noe gikk galt — prøv igjen.');
   }
 }
+
+// ── Screen Wake Lock ──────────────────────────────────────────────────────────
+let wakeLock = null;
+
+async function toggleWakeLock() {
+  if (wakeLock) {
+    await wakeLock.release();
+    wakeLock = null;
+  } else if ('wakeLock' in navigator) {
+    try {
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', () => {
+        wakeLock = null;
+        updateWakeLockBtn();
+      });
+    } catch (e) { /* ikke støttet */ }
+  }
+  updateWakeLockBtn();
+}
+
+function updateWakeLockBtn() {
+  const btn = document.getElementById('wakeLockBtn');
+  if (!btn) return;
+  const on = !!wakeLock;
+  btn.classList.toggle('active', on);
+  btn.textContent = on ? '☀️' : '💤';
+  btn.title = on ? 'Skjermen holdes på – trykk for å slå av' : 'Hold skjermen på';
+}
+
+// Gjenopprett wake lock dersom fanen kommer tilbake i forgrunnen
+document.addEventListener('visibilitychange', async () => {
+  if (wakeLock !== null && document.visibilityState === 'visible') {
+    try {
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', () => { wakeLock = null; updateWakeLockBtn(); });
+      updateWakeLockBtn();
+    } catch (e) {}
+  }
+});
 </script>
 
 <!-- ── Footer ── -->
@@ -4559,6 +4629,8 @@ async function submitContact(e) {
     </div>
   </div>
 </div>
+
+<button class="wakelock-btn" id="wakeLockBtn" onclick="toggleWakeLock()" title="Hold skjermen på">💤</button>
 
 </body>
 </html>

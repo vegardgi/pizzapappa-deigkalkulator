@@ -1598,7 +1598,7 @@
 
     /* ── Wake lock button ── */
     .wakelock-btn {
-      display: none;
+      display: flex;
       position: fixed;
       bottom: 16px;
       right: 16px;
@@ -1616,7 +1616,6 @@
       opacity: .6;
       transition: opacity .2s, border-color .2s, background .2s;
     }
-    body.minimalist .wakelock-btn { display: flex; }
     .wakelock-btn:hover { opacity: 1; }
     .wakelock-btn.active {
       background: rgba(196,43,28,.1);

@@ -204,6 +204,10 @@
       color: var(--red);
       font-weight: 600;
     }
+    .intro-wake-hint { display: none; }
+    @media (hover: none) and (pointer: coarse) {
+      .intro-wake-hint { display: block; }
+    }
     .intro-close {
       position: absolute;
       top: 6px;
@@ -2585,6 +2589,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <button class="intro-close" onclick="dismissIntro()" aria-label="Lukk">✕</button>
     <p>Still inn <strong>antall deigemner</strong> og <strong>vekt</strong>, og juster vann, salt, heve­tid og temperatur. Kalkulatoren regner ut riktig mengde gjær for ditt tids- og temperatur­oppsett.</p>
     <p>Alle ingrediensene — med eventuell fordeig (poolish, biga, surdeig) — dukker opp <strong>nederst på siden</strong> så snart du endrer noe.</p>
+    <p class="intro-wake-hint">Tips: trykk <strong>💤-knappen</strong> nede til venstre for å hindre at skjermen slukner mens du lager mat.</p>
   </div>
 
   <!-- ── 0. Oppskrifter ── -->

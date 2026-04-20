@@ -3507,7 +3507,8 @@ function renderCalc() {
     const yLbl  = S.yeastType === 'fresh' ? 'Fersk gjær' : 'Tørrgjær';
     const yG    = r.hasPrefYeast ? r.mainYeastG   : r.yeastG;
     const yPct  = r.hasPrefYeast ? r.mainYeastPct : r.yeastPct;
-    const ySub  = yPct.toFixed(1) + ' %' + (r.hasPrefYeast ? ' · Hoveddeig' : '') + (S.override ? ' · overstyrt' : '');
+    const yPctFmt = yPct.toFixed(2).endsWith('0') ? yPct.toFixed(1) : yPct.toFixed(2);
+    const ySub  = yPctFmt + ' %' + (r.hasPrefYeast ? ' · Hoveddeig' : '') + (S.override ? ' · overstyrt' : '');
     html += `<div class="ing-item">
       <div><div class="ing-name">${yLbl}</div>
       <div class="ing-sub">${ySub}</div></div>

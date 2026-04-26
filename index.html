@@ -2781,7 +2781,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
       <div class="pref-settings" id="extraBiga">
         <div class="pref-row">
-          <span class="pref-lbl" style="font-size:11px;color:var(--muted)">Andel biga <i class="help-icon" data-tooltip="Bigaens totalvekt som andel av melvekt. 40 % av 1 000 g mel = 400 g biga, fordelt på mel og vann etter valgt hydrering (50 % → ~267 g mel + ~133 g vann). Settes i kjøleskap 16–24 t. Typisk 30–60 %. Gir seig, åpen krumme og nøtteaktig smak.">?</i></span>
+          <span class="pref-lbl" style="font-size:11px;color:var(--muted)">Andel biga <i class="help-icon" data-tooltip="Andel av melet som går i bigaen. 40 % av 1 000 g mel = 400 g mel i biga + vann etter hydrering (50 % → 400 g mel + 200 g vann = 600 g biga totalt). 100 % betyr at alt melet er i bigaen. Settes i kjøleskap 16–24 t. Gir seig, åpen krumme og nøtteaktig smak.">?</i></span>
           <div class="stepper">
             <button class="step-btn" onclick="adjExtra('bigaPct',-5,5,100)">−</button>
             <input class="step-input" id="bigaPctInput" type="number" value="40" min="5" max="100" style="width:46px" onchange="updExtra('bigaPct',this.value,5,100)">
@@ -3156,7 +3156,7 @@ function calc() {
   if (hasExtra('biga')) {
     const bh = (S.bigaHydration||50) / 100;
     // total = mel × (1 + bh)  →  mel = total / (1 + bh)
-    bigaFlourG = flourG * (S.bigaPct||40) / 100 / (1 + bh);
+    bigaFlourG = flourG * (S.bigaPct||40) / 100;
     bigaWaterG = bigaFlourG * bh;
   }
   let surdeigFlourG = 0, surdeigWaterG = 0;

@@ -3185,8 +3185,9 @@ function calc() {
     prefYeastPct    = S.yeastType === 'fresh' ? idyPct * 3 : idyPct;
     prefYeastG      = prefFlourG * prefYeastPct / 100;
 
-    // Main-dough yeast: same Q10 model but on non-prefermented flour only
-    const mainFlourG    = flourG - prefFlourG;
+    // Main-dough yeast: for biga, always based on total flour so the main dough
+    // always gets a yeast boost regardless of biga %. For poolish, only non-prefermented flour.
+    const mainFlourG    = hasExtra('biga') ? flourG : flourG - prefFlourG;
     const overrideActive = S.override && S.overrideVal != null && S.overrideVal > 0;
     if (!overrideActive) {
       mainYeastPct  = Math.max(0.001, (S.yeastType === 'fresh' ? yc.freshPct : yc.dryPct) + S.yeastBumpPct);

@@ -3181,13 +3181,16 @@ function calc() {
     // Preferment yeast (always small — based on prefHours/prefTemp)
     const actPref   = Math.pow(Q10_pref, ((S.prefTemp||20) - 22) / 10);
     const effHPref  = Math.max(0.5, (S.prefHours||14) * actPref);
-    const idyPct    = Math.max(0.01, Math.min(0.5, 1.426 * Math.exp(-0.234 * effHPref)));
+    const idyPct    = Math.max(0.01, Math.min(0.5, 1.6 * Math.exp(-0.234 * effHPref)));
     prefYeastPct    = S.yeastType === 'fresh' ? idyPct * 3 : idyPct;
     prefYeastG      = prefFlourG * prefYeastPct / 100;
 
-    // Main-dough yeast: for biga, always based on total flour so the main dough
-    // always gets a yeast boost regardless of biga %. For poolish, only non-prefermented flour.
-    const mainFlourG    = hasExtra('biga') ? flourG : flourG - prefFlourG;
+    // Main-dough yeast: based on remaining (non-prefermented) flour.
+    // For biga: floor at 20% of total flour so the main dough always gets a small
+    // yeast boost even at 100% biga. For poolish: only non-prefermented flour.
+    const mainFlourG    = hasExtra('biga')
+      ? Math.max(flourG * 0.20, flourG - prefFlourG)
+      : flourG - prefFlourG;
     const overrideActive = S.override && S.overrideVal != null && S.overrideVal > 0;
     if (!overrideActive) {
       mainYeastPct  = Math.max(0.001, (S.yeastType === 'fresh' ? yc.freshPct : yc.dryPct) + S.yeastBumpPct);

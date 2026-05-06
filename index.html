@@ -2843,26 +2843,49 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
       <!-- Fermentering — vises under valgt type -->
       <div id="prefTimeContent" style="display:none">
-        <div style="font-size:11px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:0.5px;padding:10px 0 6px;border-top:1px solid var(--border);margin-top:8px">Heving</div>
-        <div class="time-grid" style="grid-template-columns:1fr 1fr;min-width:0">
+        <div style="font-size:11px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:0.5px;padding:10px 0 6px;border-top:1px solid var(--border);margin-top:8px">Heving av fordeig</div>
+        <div class="time-grid">
+
           <div class="time-card">
-            <div class="time-lbl">Fermentering <i class="help-icon" data-tooltip="Poolish fermenteres typisk 12–16 t ved romtemperatur (18–22 °C). Biga fermenteres 8–12 t ved romtemperatur eller 16–24 t i kjøleskap (4–8 °C).">?</i></div>
+            <div class="time-lbl">Romtemp <i class="help-icon" data-tooltip="Heving av fordeigen ved romtemperatur. Poolish: typisk 12–16 t ved 18–22 °C. Biga: 8–12 t ved romtemp, eller flytt over i kjøleskap. Sett 0 timer hvis du kun bruker kjøleskap.">?</i></div>
             <div class="stepper time-stepper">
-              <button class="step-btn" onclick="adj('prefHours',-1)">−</button>
-              <input  class="step-input" id="prefHours" type="number" value="14" min="1" max="48" onchange="upd('prefHours',this.value)">
-              <button class="step-btn" onclick="adj('prefHours',1)">+</button>
+              <button class="step-btn" onclick="adj('prefRtHours',-1)">−</button>
+              <input  class="step-input" id="prefRtHours" type="number" value="14" min="0" max="48" onchange="upd('prefRtHours',this.value)">
+              <button class="step-btn" onclick="adj('prefRtHours',1)">+</button>
               <span class="time-unit">t</span>
             </div>
-          </div>
-          <div class="time-card">
-            <div class="time-lbl">Temperatur</div>
             <div class="temp-row">
-              <button class="step-btn" onclick="adj('prefTemp',-1)">−</button>
-              <input  class="step-input" id="prefTemp" type="number" value="20" min="0" max="40" onchange="upd('prefTemp',this.value)">
-              <button class="step-btn" onclick="adj('prefTemp',1)">+</button>
+              <button class="step-btn" onclick="adj('prefRtTemp',-1)">−</button>
+              <input  class="step-input" id="prefRtTemp" type="number" value="20" min="10" max="40" onchange="upd('prefRtTemp',this.value)">
+              <button class="step-btn" onclick="adj('prefRtTemp',1)">+</button>
               <span class="temp-unit">°C</span>
             </div>
+            <div class="temp-bar-wrap" id="prefRtTempWrap">
+              <div class="temp-bar temp-bar-rt" id="prefRtTempBar"></div>
+              <div class="temp-bar-marker" id="prefRtTempMarker"></div>
+            </div>
           </div>
+
+          <div class="time-card">
+            <div class="time-lbl">Kjøleskap <i class="help-icon" data-tooltip="Kaldheving av fordeigen i kjøleskap (3–5 °C). Biga: typisk 16–24 t. Poolish: opptil 24 t. Bremser gjæren og gir mer smak. Sett 0 timer om du ikke bruker kjøleskap.">?</i></div>
+            <div class="stepper time-stepper">
+              <button class="step-btn" onclick="adj('prefColdHours',-1)">−</button>
+              <input  class="step-input" id="prefColdHours" type="number" value="0" min="0" max="72" onchange="upd('prefColdHours',this.value)">
+              <button class="step-btn" onclick="adj('prefColdHours',1)">+</button>
+              <span class="time-unit">t</span>
+            </div>
+            <div class="temp-row">
+              <button class="step-btn" onclick="adj('prefColdTemp',-1)">−</button>
+              <input  class="step-input" id="prefColdTemp" type="number" value="4" min="0" max="15" onchange="upd('prefColdTemp',this.value)">
+              <button class="step-btn" onclick="adj('prefColdTemp',1)">+</button>
+              <span class="temp-unit">°C</span>
+            </div>
+            <div class="temp-bar-wrap" id="prefColdTempWrap">
+              <div class="temp-bar temp-bar-cold" id="prefColdTempBar"></div>
+              <div class="temp-bar-marker" id="prefColdTempMarker"></div>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -3044,8 +3067,10 @@ const S = {
   bigaHydration:    50,
   surdeigPct:       20,
   surdeigHydration: 100,
-  prefHours:        14,
-  prefTemp:         20
+  prefRtHours:      14,
+  prefRtTemp:       20,
+  prefColdHours:    0,
+  prefColdTemp:     4
 };
 
 let _fid = 2;  // next flour id
@@ -3125,6 +3150,16 @@ const YEAST_PARAMS = {
   pizza: { A: 0.25,  B: 0.040, maxPct: 0.8,  minPct: 0.001 },
   bread: { A: 2.8,   B: 0.130, maxPct: 7.0,  minPct: 0.05  }
 };
+
+function prefTimeStr() {
+  const rt   = (S.prefRtHours   || 0) > 0;
+  const cold = (S.prefColdHours || 0) > 0;
+  const rtP  = `${S.prefRtHours} t @ ${S.prefRtTemp} °C`;
+  const cP   = `${S.prefColdHours} t @ ${S.prefColdTemp} °C`;
+  if (rt && cold) return `${rtP} + ${cP}`;
+  if (cold)       return cP;
+  return rtP;
+}
 
 function calcYeast(rtH, coldH) {
   const Q10 = 2;
@@ -3219,9 +3254,12 @@ function calc() {
   let mainYeastG = yeastG, mainYeastPct = yeastPct; // yeast for the main dough
 
   if (hasPrefYeast) {
-    // Preferment yeast (always small — based on prefHours/prefTemp)
-    const actPref   = Math.pow(Q10_pref, ((S.prefTemp||20) - 22) / 10);
-    const effHPref  = Math.max(0.5, (S.prefHours||14) * actPref);
+    // Preferment yeast (always small — based on prefRt + prefCold)
+    const actPrefRt   = Math.pow(Q10_pref, ((S.prefRtTemp||20)   - 22) / 10);
+    const actPrefCold = Math.pow(Q10_pref, ((S.prefColdTemp||4)  - 22) / 10);
+    const effHPref    = Math.max(0.5,
+      (S.prefRtHours||0)   * actPrefRt +
+      (S.prefColdHours||0) * actPrefCold);
     const idyPct    = Math.max(0.01, Math.min(0.5, 1.6 * Math.exp(-0.234 * effHPref)));
     prefYeastPct    = S.yeastType === 'fresh' ? idyPct * 3 : idyPct;
     prefYeastG      = prefFlourG * prefYeastPct / 100;
@@ -3295,6 +3333,10 @@ function renderCalc() {
     ((S.rtTemp - 10) / (40 - 10) * 100).toFixed(1) + '%';
   document.getElementById('coldTempMarker').style.left =
     ((S.coldTemp - 0) / (15 - 0) * 100).toFixed(1) + '%';
+  { const m = document.getElementById('prefRtTempMarker');
+    if (m) m.style.left = ((S.prefRtTemp - 10) / (40 - 10) * 100).toFixed(1) + '%'; }
+  { const m = document.getElementById('prefColdTempMarker');
+    if (m) m.style.left = ((S.prefColdTemp - 0) / (15 - 0) * 100).toFixed(1) + '%'; }
 
   // Sliders fill
   fillSlider('waterSlider', S.waterPct, 40, 100);
@@ -3322,7 +3364,7 @@ function renderCalc() {
       S.coldHours + ' t @ ' + S.coldTemp + ' °C' +
       '';
     const prefSubLine = r.prefYeastPct.toFixed(3) + ' % av fordeig-mel  ·  ' +
-      S.prefHours + ' t @ ' + S.prefTemp + ' °C';
+      prefTimeStr();
 
     if (overrideActive) {
       const mainSugG = S.yeastType === 'fresh' ? r.sugMainFreshG : r.sugMainDryG;
@@ -3484,7 +3526,7 @@ function renderCalc() {
     const prefTot    = r.poolishFlourG + r.poolishWaterG + r.prefYeastG;
     const prefTotFmt = S.roundIngredients ? gfmt(prefTot) : precise(prefTot);
     html += `<div class="pref-block">`;
-    html += `<div class="pref-block-hdr">Poolish<span class="pref-block-hint"> — ${S.prefHours} t @ ${S.prefTemp} °C</span></div>`;
+    html += `<div class="pref-block-hdr">Poolish<span class="pref-block-hint"> — ${prefTimeStr()}</span></div>`;
     r.flourBreakdown.forEach((f, i) => {
       const pg = r.poolishFlourG * (f.normalizedPct / 100);
       html += ingRow(fName(i), pg, multi ? `${f.pct} % av mel` : null);
@@ -3507,7 +3549,7 @@ function renderCalc() {
     const prefTot    = r.bigaFlourG + r.bigaWaterG + r.prefYeastG;
     const prefTotFmt = S.roundIngredients ? gfmt(prefTot) : precise(prefTot);
     html += `<div class="pref-block">`;
-    html += `<div class="pref-block-hdr">Biga<span class="pref-block-hint"> — ${S.prefHours} t @ ${S.prefTemp} °C · ${S.bigaHydration} % hydrering</span></div>`;
+    html += `<div class="pref-block-hdr">Biga<span class="pref-block-hint"> — ${prefTimeStr()} · ${S.bigaHydration} % hydrering</span></div>`;
     r.flourBreakdown.forEach((f, i) => {
       const bg = r.bigaFlourG * (f.normalizedPct / 100);
       html += ingRow(fName(i), bg, multi ? `${f.pct} % av mel` : null);
@@ -3864,8 +3906,10 @@ const LIMITS = {
   coldHours:    [0, 120],
   coldTemp:     [0, 15],
   svinnPct:     [0, 50],
-  prefHours:    [1, 48],
-  prefTemp:     [0, 40]
+  prefRtHours:  [0, 48],
+  prefRtTemp:   [10, 40],
+  prefColdHours:[0, 72],
+  prefColdTemp: [0, 15]
 };
 
 function adj(field, delta) {
@@ -3939,8 +3983,10 @@ function setMode(mode) {
   document.getElementById('rtTemp').value         = S.rtTemp;
   document.getElementById('coldHours').value      = S.coldHours;
   document.getElementById('coldTemp').value       = S.coldTemp;
-  document.getElementById('prefHours').value      = S.prefHours;
-  document.getElementById('prefTemp').value       = S.prefTemp;
+  document.getElementById('prefRtHours').value    = S.prefRtHours;
+  document.getElementById('prefRtTemp').value     = S.prefRtTemp;
+  document.getElementById('prefColdHours').value  = S.prefColdHours;
+  document.getElementById('prefColdTemp').value   = S.prefColdTemp;
   document.getElementById('btnPizza').className = 'mode-btn' + (mode==='pizza' ? ' active' : '');
   document.getElementById('btnBread').className = 'mode-btn' + (mode==='bread' ? ' active' : '');
   activeId = null;
@@ -4173,8 +4219,10 @@ function snapshotState() {
     bigaHydration: S.bigaHydration,
     surdeigPct: S.surdeigPct,
     surdeigHydration: S.surdeigHydration,
-    prefHours: S.prefHours,
-    prefTemp: S.prefTemp
+    prefRtHours: S.prefRtHours,
+    prefRtTemp: S.prefRtTemp,
+    prefColdHours: S.prefColdHours,
+    prefColdTemp: S.prefColdTemp
   };
 }
 
@@ -4220,8 +4268,11 @@ function loadRecipe(id) {
     bigaHydration: p.bigaHydration ?? S.bigaHydration,
     surdeigPct: p.surdeigPct ?? S.surdeigPct,
     surdeigHydration: p.surdeigHydration ?? S.surdeigHydration,
-    prefHours: p.prefHours ?? S.prefHours,
-    prefTemp: p.prefTemp ?? S.prefTemp
+    // Migrate legacy single prefHours/prefTemp to romtemp slot, cold = 0
+    prefRtHours:   p.prefRtHours   ?? p.prefHours ?? S.prefRtHours,
+    prefRtTemp:    p.prefRtTemp    ?? p.prefTemp  ?? S.prefRtTemp,
+    prefColdHours: p.prefColdHours ?? S.prefColdHours,
+    prefColdTemp:  p.prefColdTemp  ?? S.prefColdTemp
   });
   // Sync surdeig extra with yeast type so legacy recipes stay consistent
   if (S.yeastType === 'surdeig') {
@@ -4245,8 +4296,10 @@ function loadRecipe(id) {
   document.getElementById('rtTemp').value         = S.rtTemp;
   document.getElementById('coldHours').value      = S.coldHours;
   document.getElementById('coldTemp').value       = S.coldTemp;
-  document.getElementById('prefHours').value      = S.prefHours;
-  document.getElementById('prefTemp').value       = S.prefTemp;
+  document.getElementById('prefRtHours').value    = S.prefRtHours;
+  document.getElementById('prefRtTemp').value     = S.prefRtTemp;
+  document.getElementById('prefColdHours').value  = S.prefColdHours;
+  document.getElementById('prefColdTemp').value   = S.prefColdTemp;
   document.getElementById('overrideCheck').checked = false;
   document.getElementById('overrideInput').disabled = true;
   document.getElementById('overrideInput').value  = '';
@@ -4357,7 +4410,7 @@ const STATE_FIELDS = ['mode','numDoughs','piecesPerDough','weightPerPiece',
   'yeastType','yeastBumpPct','svinnPct',
   'override','overrideUnit','overrideVal','roundIngredients',
   'extras','sukkerPct','oljePct','poolishPct','bigaPct','bigaHydration','surdeigPct','surdeigHydration',
-  'prefHours','prefTemp'];
+  'prefRtHours','prefRtTemp','prefColdHours','prefColdTemp'];
 
 function saveState() {
   const snap = {};
@@ -4372,9 +4425,13 @@ function restoreState() {
     if (!raw) return;
     const snap = JSON.parse(raw);
     STATE_FIELDS.forEach(k => { if (snap[k] !== undefined) S[k] = snap[k]; });
+    // Migrate legacy single prefHours/prefTemp → romtemp slot
+    if (snap.prefHours !== undefined && snap.prefRtHours === undefined) S.prefRtHours = snap.prefHours;
+    if (snap.prefTemp  !== undefined && snap.prefRtTemp  === undefined) S.prefRtTemp  = snap.prefTemp;
     _fid = Math.max(...S.flourTypes.map(f => f.id), 0) + 1;
     // Sync all DOM inputs
-    ['numDoughs','piecesPerDough','weightPerPiece','rtHours','rtTemp','coldHours','coldTemp']
+    ['numDoughs','piecesPerDough','weightPerPiece','rtHours','rtTemp','coldHours','coldTemp',
+     'prefRtHours','prefRtTemp','prefColdHours','prefColdTemp']
       .forEach(id => { const el = document.getElementById(id); if (el) el.value = S[id]; });
     document.getElementById('waterInput').value  = S.waterPct;
     document.getElementById('waterSlider').value = S.waterPct;
@@ -4483,8 +4540,10 @@ restoreState();
 // no auto-loaded recipe, so users see the canonical starting values.
 renderRecipes();
 render();
-initTempDrag('rtTempBar',   'rtTempMarker',   'rtTemp',   10, 40);
-initTempDrag('coldTempBar', 'coldTempMarker', 'coldTemp',  0, 15);
+initTempDrag('rtTempBar',       'rtTempMarker',       'rtTemp',       10, 40);
+initTempDrag('coldTempBar',     'coldTempMarker',     'coldTemp',      0, 15);
+initTempDrag('prefRtTempBar',   'prefRtTempMarker',   'prefRtTemp',   10, 40);
+initTempDrag('prefColdTempBar', 'prefColdTempMarker', 'prefColdTemp',  0, 15);
 
 // ── Minimalist mode ─────────────────────────────────────
 const MIN_KEY    = 'deigkalkulator_minimalist';

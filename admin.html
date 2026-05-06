@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin — Deigkalkulator</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+           background: #f2f0ed; color: #221608; font-size: 14px; }
+
+    /* ── Header ── */
+    header { background: #c42b1c; color: #fff; padding: 14px 20px;
+             display: flex; align-items: center; justify-content: space-between; gap: 12px;
+             position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+    header h1 { margin: 0; font-size: 17px; font-weight: 800; letter-spacing: -.3px; }
+    .hdr-btns { display: flex; gap: 8px; align-items: center; }
+    button { cursor: pointer; border: none; border-radius: 7px; font-family: inherit;
+             font-size: 13px; font-weight: 700; padding: 8px 14px; transition: opacity .15s; }
+    button:hover { opacity: .85; }
+    button:disabled { opacity: .4; cursor: not-allowed; }
+    .btn-reload { background: rgba(255,255,255,.22); color: #fff; }
+    .btn-save   { background: #fff; color: #c42b1c; }
+    .status     { font-size: 12px; color: rgba(255,255,255,.75); }
+
+    /* ── Tabs ── */
+    .tab-bar { background: #fff; border-bottom: 1px solid #e0d9d0;
+               display: flex; overflow-x: auto; padding: 0 16px;
+               position: sticky; top: 53px; z-index: 90; }
+    .tab { background: none; border-radius: 0; padding: 12px 16px; font-size: 13px;
+           font-weight: 600; color: #907a6a; border-bottom: 3px solid transparent; }
+    .tab.active { color: #c42b1c; border-bottom-color: #c42b1c; }
+
+    /* ── Panels ── */
+    .panel { display: none; padding: 20px 20px 60px; max-width: 780px; margin: 0 auto; }
+    .panel.active { display: block; }
+
+    /* ── Cards ── */
+    .card { background: #fff; border-radius: 10px; padding: 16px;
+            margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,.07); }
+    .card-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+    .tip-num-badge { width: 24px; height: 24px; border-radius: 50%; background: #f0ebe5;
+                     color: #907a6a; font-size: 11px; font-weight: 800;
+                     display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .panel-label { font-size: 11px; font-weight: 700; text-transform: uppercase;
+                   letter-spacing: .6px; color: #c42b1c; }
+
+    /* ── Fields ── */
+    .field { margin-bottom: 10px; }
+    .field:last-child { margin-bottom: 0; }
+    label { display: block; font-size: 11px; font-weight: 700; color: #907a6a;
+            text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+    input[type=text], textarea, select {
+      width: 100%; border: 1.5px solid #e0d9d0; border-radius: 7px;
+      padding: 8px 10px; font-family: inherit; font-size: 13px; color: #221608;
+      background: #faf8f5; resize: vertical; transition: border-color .15s;
+    }
+    input[type=text]:focus, textarea:focus, select:focus {
+      outline: none; border-color: #c42b1c; background: #fff;
+    }
+    textarea { min-height: 72px; }
+    .badge-row { display: flex; gap: 8px; }
+    .badge-row input { flex: 1; }
+    .badge-row select { width: 130px; flex-shrink: 0; }
+    .badge-preview { display: inline-flex; align-items: center; padding: 2px 8px;
+                     border-radius: 4px; font-size: 11px; font-weight: 700; margin-top: 4px; }
+    .badge-preview.badge-orange { background: rgba(196,43,28,.12); color: #b54200; }
+    .badge-preview.badge-green  { background: rgba(91,174,110,.14); color: #2d7a45; }
+    .badge-preview.badge-red    { background: rgba(180,32,32,.1);   color: #b42020; }
+    .links-list { font-size: 12px; color: #907a6a; }
+    .links-list a { color: #c42b1c; word-break: break-all; }
+    .tt-context { font-size: 12px; color: #907a6a; font-weight: 600; margin-bottom: 6px; }
+    .sec-heading { font-size: 11px; font-weight: 800; text-transform: uppercase;
+                   letter-spacing: .6px; color: #907a6a; margin: 18px 0 8px; }
+    .sec-heading:first-child { margin-top: 0; }
+
+    /* ── Visibility toggle ── */
+    .card--hidden { opacity: .4; }
+    .card--hidden .tip-num-badge { background: #e0d9d0; color: #bbb; }
+    .vis-btn { background: #f0ebe5; color: #907a6a; padding: 5px 10px; font-size: 12px;
+               border-radius: 6px; margin-left: auto; font-weight: 700; }
+    .vis-btn.is-hidden { background: #fde8e5; color: #c42b1c; }
+
+    /* ── Loading / error ── */
+    #loadingMsg { padding: 60px 20px; text-align: center; color: #907a6a; font-size: 15px; }
+
+    /* ── Toast ── */
+    #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+             background: #221608; color: #fff; padding: 10px 20px; border-radius: 8px;
+             font-weight: 700; font-size: 13px; opacity: 0; transition: opacity .2s;
+             pointer-events: none; z-index: 999; white-space: nowrap; }
+    #toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🍕 Deigkalkulator — Admin</h1>
+  <div class="hdr-btns">
+    <button class="btn-reload" onclick="loadContent()">↺ Last på nytt</button>
+    <button class="btn-save" id="btnSave" onclick="saveContent()" disabled>🚀 Endre og push</button>
+    <span class="status" id="statusMsg"></span>
+  </div>
+</header>
+
+<div id="loadingMsg">Laster index.html…</div>
+
+<div id="appShell" style="display:none">
+  <div class="tab-bar" id="tabBar"></div>
+  <div id="panels"></div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ─────────────────────────────────────────────
+//  CONFIG
+// ─────────────────────────────────────────────
+const PANELS = [
+  { id: 'panelHand',      name: 'For hånd' },
+  { id: 'panelMachine',   name: 'I maskin' },
+  { id: 'panelHeving',    name: 'Heving' },
+  { id: 'panelEltefritt', name: 'Eltefritt' },
+  { id: 'panelFordeig',   name: 'Fordeig' },
+  { id: 'panelSteking',   name: 'Steking' },
+];
+
+// ─────────────────────────────────────────────
+//  STATE
+// ─────────────────────────────────────────────
+let originalHtml = '';
+const fields     = new Map(); // key → { type, orig, badgeCls? }
+const hiddenState = new Map(); // bk → boolean (true = hidden)
+
+// ─────────────────────────────────────────────
+//  API
+// ─────────────────────────────────────────────
+async function loadContent() {
+  document.getElementById('loadingMsg').style.display = 'block';
+  document.getElementById('appShell').style.display = 'none';
+  setStatus('Laster…');
+  try {
+    const r = await fetch('/api/content');
+    const { ok, content, error } = await r.json();
+    if (!ok) throw new Error(error);
+    originalHtml = content;
+    fields.clear();
+    parseAndRender(content);
+    document.getElementById('loadingMsg').style.display = 'none';
+    document.getElementById('appShell').style.display = 'block';
+    document.getElementById('btnSave').disabled = false;
+    setStatus(`Lastet  ${new Date().toLocaleTimeString('no')}`);
+  } catch (e) {
+    document.getElementById('loadingMsg').textContent = '❌ Kunne ikke laste index.html: ' + e.message;
+    setStatus('Feil');
+  }
+}
+
+async function saveContent() {
+  const newHtml = applyChanges(originalHtml);
+  const btn = document.getElementById('btnSave');
+  btn.disabled = true;
+  btn.textContent = '⏳ Pusher…';
+  setStatus('Committer og pusher…');
+  try {
+    const r = await fetch('/api/save-and-push', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        content: newHtml,
+        message: `Admin: oppdater innhold ${new Date().toLocaleDateString('no')}`
+      })
+    });
+    const { ok, error, output } = await r.json();
+    if (!ok) throw new Error(error);
+    originalHtml = newHtml;
+    toast('✅ Pushet til GitHub!');
+    setStatus(`Pushet  ${new Date().toLocaleTimeString('no')}`);
+  } catch (e) {
+    toast('❌ Feil: ' + e.message);
+    setStatus('Push feilet');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🚀 Endre og push';
+  }
+}
+
+// ─────────────────────────────────────────────
+//  PARSE
+// ─────────────────────────────────────────────
+function parseAndRender(html) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+
+  // --- Tooltips ---
+  // Extract raw values by regex (preserves exact encoding)
+  const rawTooltipVals = [];
+  const ttRe = /data-tooltip="([^"]*)"/g;
+  let m;
+  while ((m = ttRe.exec(html)) !== null) rawTooltipVals.push(m[1]);
+
+  hiddenState.clear();
+
+  const icons = doc.querySelectorAll('i.help-icon[data-tooltip]');
+  const tooltips = [];
+
+  icons.forEach((icon, i) => {
+    // Label: parent text minus the "?" icon
+    const clone = icon.parentElement.cloneNode(true);
+    clone.querySelectorAll('i').forEach(el => el.remove());
+    const label = clone.textContent.trim().replace(/\s+/g, ' ') || `Tooltip ${i + 1}`;
+
+    // Section: walk up to find card-title
+    let section = 'Annet';
+    let el = icon.parentElement;
+    for (let d = 0; d < 8; d++) {
+      if (!el) break;
+      const hdr = el.closest('.card-header');
+      if (hdr) {
+        const t = hdr.querySelector('.card-title');
+        if (t) { section = t.textContent.trim().replace(/\?.*/, '').trim(); break; }
+      }
+      el = el.parentElement;
+    }
+
+    const key = `tt_${i}`;
+    const rawVal = rawTooltipVals[i] ?? icon.getAttribute('data-tooltip');
+    fields.set(key, { type: 'tooltip', orig: rawVal });
+    tooltips.push({ key, label, section, rawVal });
+  });
+
+  // --- Tips ---
+  const tipsByPanel = {};
+  PANELS.forEach(p => {
+    const panelEl = doc.getElementById(p.id);
+    if (!panelEl) return;
+    const items = [];
+    panelEl.querySelectorAll('.tip-item').forEach((item, idx) => {
+      const titleEl = item.querySelector('.tip-title');
+      const descEl  = item.querySelector('.tip-desc');
+      const badgeEl = item.querySelector('.tip-badge');
+      const numEl   = item.querySelector('.tip-num');
+
+      const titleOrig = titleEl ? titleEl.innerHTML : '';
+      const descOrig  = descEl  ? descEl.innerHTML  : '';
+      const badgeOrig = badgeEl ? badgeEl.textContent.trim() : '';
+      const badgeCls  = badgeEl ? (badgeEl.className.match(/badge-\w+/) || ['badge-orange'])[0] : 'badge-orange';
+
+      const bk = `${p.id}_${idx}`;
+      const hidden = item.style.display === 'none';
+      if (titleOrig) fields.set(`${bk}_title`, { type: 'tip-title', orig: titleOrig });
+      if (descOrig)  fields.set(`${bk}_desc`,  { type: 'tip-desc',  orig: descOrig });
+      if (badgeOrig) fields.set(`${bk}_badge`,  { type: 'tip-badge', orig: badgeOrig, badgeCls });
+      hiddenState.set(bk, hidden);
+
+      const links = [...item.querySelectorAll('.tip-link')].map(a => ({
+        href: a.getAttribute('href'), text: a.textContent.trim()
+      }));
+
+      items.push({
+        num: numEl ? numEl.textContent.trim() : idx + 1,
+        bk, titleOrig, descOrig, badgeOrig, badgeCls, links, hidden
+      });
+    });
+    tipsByPanel[p.id] = items;
+  });
+
+  renderUI(tooltips, tipsByPanel);
+}
+
+// ─────────────────────────────────────────────
+//  RENDER
+// ─────────────────────────────────────────────
+function renderUI(tooltips, tipsByPanel) {
+  const tabBar = document.getElementById('tabBar');
+  const panels = document.getElementById('panels');
+
+  const tabs = [{ id: 'tooltips', name: 'Tooltips' }, ...PANELS];
+  tabBar.innerHTML = tabs.map((t, i) =>
+    `<button class="tab${i === 0 ? ' active' : ''}" data-tab="${t.id}" onclick="switchTab('${t.id}')">${t.name}</button>`
+  ).join('');
+
+  panels.innerHTML = '';
+
+  // ── Tooltip panel ──
+  const ttPanel = makePanel('tooltips', true);
+  const sections = {};
+  tooltips.forEach(tt => {
+    (sections[tt.section] = sections[tt.section] || []).push(tt);
+  });
+  Object.entries(sections).forEach(([sec, tts]) => {
+    ttPanel.insertAdjacentHTML('beforeend', `<div class="sec-heading">${esc(sec)}</div>`);
+    tts.forEach(tt => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <div class="tt-context">${esc(tt.label)}</div>
+        <div class="field">
+          <label>Tooltip-tekst</label>
+          <textarea id="f_${tt.key}" data-key="${tt.key}" rows="3">${esc(tt.rawVal)}</textarea>
+        </div>`;
+      ttPanel.appendChild(card);
+    });
+  });
+  panels.appendChild(ttPanel);
+
+  // ── Tips panels ──
+  PANELS.forEach(p => {
+    const panel = makePanel(p.id, false);
+    const items = tipsByPanel[p.id] || [];
+    if (!items.length) {
+      panel.insertAdjacentHTML('beforeend', '<p style="color:#907a6a;padding:20px 0">Ingen tips funnet.</p>');
+    }
+    items.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'card' + (item.hidden ? ' card--hidden' : '');
+      card.id = `card_${item.bk}`;
+      card.innerHTML = `
+        <div class="card-meta">
+          <div class="tip-num-badge">${item.num}</div>
+          <span class="panel-label">${p.name}</span>
+          <button class="vis-btn${item.hidden ? ' is-hidden' : ''}" id="vb_${item.bk}" onclick="toggleHidden('${item.bk}')">${item.hidden ? '🙈 Skjult' : '👁 Synlig'}</button>
+        </div>
+        <div class="field">
+          <label>Tittel</label>
+          <input type="text" id="f_${item.bk}_title" data-key="${item.bk}_title" value="${esc(item.titleOrig)}">
+        </div>
+        <div class="field">
+          <label>Beskrivelse</label>
+          <textarea id="f_${item.bk}_desc" data-key="${item.bk}_desc" rows="4">${esc(item.descOrig)}</textarea>
+        </div>
+        ${item.badgeOrig ? `
+        <div class="field">
+          <label>Badge</label>
+          <div class="badge-row">
+            <input type="text" id="f_${item.bk}_badge" data-key="${item.bk}_badge" value="${esc(item.badgeOrig)}">
+            <select id="fs_${item.bk}" onchange="updateBadgePreview('${item.bk}')">
+              <option value="badge-orange"${item.badgeCls === 'badge-orange' ? ' selected' : ''}>🟠 Oransje</option>
+              <option value="badge-green"${item.badgeCls  === 'badge-green'  ? ' selected' : ''}>🟢 Grønn</option>
+              <option value="badge-red"${item.badgeCls    === 'badge-red'    ? ' selected' : ''}>🔴 Rød</option>
+            </select>
+          </div>
+          <span class="badge-preview ${item.badgeCls}" id="bp_${item.bk}">${esc(item.badgeOrig)}</span>
+        </div>` : ''}
+        ${item.links.length ? `
+        <div class="field">
+          <label>Lenker</label>
+          <div class="links-list">${item.links.map(l => `<div><a href="${esc(l.href)}" target="_blank">${esc(l.text)}</a></div>`).join('')}</div>
+        </div>` : ''}`;
+      panel.appendChild(card);
+    });
+    panels.appendChild(panel);
+  });
+
+  // Live badge text preview on input
+  panels.addEventListener('input', e => {
+    const el = e.target;
+    const key = el.dataset.key;
+    if (key && key.endsWith('_badge') && el.tagName === 'INPUT') {
+      const bk = key.slice(0, -6);
+      const preview = document.getElementById(`bp_${bk}`);
+      if (preview) preview.textContent = el.value;
+    }
+  });
+}
+
+function makePanel(id, active) {
+  const div = document.createElement('div');
+  div.className = 'panel' + (active ? ' active' : '');
+  div.id = `panel_${id}`;
+  return div;
+}
+
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === id));
+  document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === `panel_${id}`));
+}
+
+function updateBadgePreview(bk) {
+  const sel = document.getElementById(`fs_${bk}`);
+  const preview = document.getElementById(`bp_${bk}`);
+  if (sel && preview) preview.className = `badge-preview ${sel.value}`;
+}
+
+function toggleHidden(bk) {
+  const isNowHidden = !hiddenState.get(bk);
+  hiddenState.set(bk, isNowHidden);
+  const card = document.getElementById(`card_${bk}`);
+  const btn  = document.getElementById(`vb_${bk}`);
+  if (card) card.classList.toggle('card--hidden', isNowHidden);
+  if (btn) {
+    btn.textContent = isNowHidden ? '🙈 Skjult' : '👁 Synlig';
+    btn.classList.toggle('is-hidden', isNowHidden);
+  }
+}
+
+// ─────────────────────────────────────────────
+//  SAVE
+// ─────────────────────────────────────────────
+function setTipHidden(html, titleOrig, hide) {
+  // Find the tip-title div with this original title
+  const titleMarker = `<div class="tip-title">${titleOrig}</div>`;
+  const titleIdx = html.indexOf(titleMarker);
+  if (titleIdx === -1) return html;
+  // Walk backwards to the opening .tip-item tag
+  const before = html.slice(0, titleIdx);
+  const tipItemIdx = before.lastIndexOf('<div class="tip-item');
+  if (tipItemIdx === -1) return html;
+  const tagEnd = html.indexOf('>', tipItemIdx);
+  const newTag = hide
+    ? '<div class="tip-item" style="display:none">'
+    : '<div class="tip-item">';
+  return html.slice(0, tipItemIdx) + newTag + html.slice(tagEnd + 1);
+}
+
+function applyChanges(html) {
+  let out = html;
+  let n = 0;
+
+  // 1. Apply visibility changes first (uses original titles to locate items)
+  hiddenState.forEach((isHidden, bk) => {
+    const titleField = fields.get(`${bk}_title`);
+    if (!titleField) return;
+    const before = out;
+    out = setTipHidden(out, titleField.orig, isHidden);
+    if (out !== before) n++;
+  });
+
+  // 2. Apply text field changes
+  fields.forEach((field, key) => {
+    const inputEl = document.getElementById(`f_${key}`);
+    if (!inputEl) return;
+    const newVal = inputEl.value;
+
+    if (field.type === 'tooltip') {
+      const oldAttr = `data-tooltip="${field.orig}"`;
+      const newAttr = `data-tooltip="${newVal}"`;
+      if (oldAttr !== newAttr && out.includes(oldAttr)) {
+        out = out.replace(oldAttr, newAttr); n++;
+      }
+    } else if (field.type === 'tip-title') {
+      const o = `<div class="tip-title">${field.orig}</div>`;
+      const nw = `<div class="tip-title">${newVal}</div>`;
+      if (o !== nw && out.includes(o)) { out = out.replace(o, nw); n++; }
+    } else if (field.type === 'tip-desc') {
+      const o = `<div class="tip-desc">${field.orig}</div>`;
+      const nw = `<div class="tip-desc">${newVal}</div>`;
+      if (o !== nw && out.includes(o)) { out = out.replace(o, nw); n++; }
+    } else if (field.type === 'tip-badge') {
+      const bk  = key.slice(0, -6);
+      const sel = document.getElementById(`fs_${bk}`);
+      const newCls = sel ? sel.value : field.badgeCls;
+      const o  = `<span class="tip-badge ${field.badgeCls}">${field.orig}</span>`;
+      const nw = `<span class="tip-badge ${newCls}">${newVal}</span>`;
+      if (o !== nw && out.includes(o)) { out = out.replace(o, nw); n++; }
+    }
+  });
+
+  console.log(`${n} felt endret`);
+  return out;
+}
+
+// ─────────────────────────────────────────────
+//  UTILS
+// ─────────────────────────────────────────────
+function esc(str) {
+  return String(str ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+let toastTimer;
+function toast(msg, ms = 2800) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), ms);
+}
+
+function setStatus(msg) {
+  document.getElementById('statusMsg').textContent = msg;
+}
+
+// ─────────────────────────────────────────────
+//  INIT
+// ─────────────────────────────────────────────
+loadContent();
+</script>
+</body>
+</html>

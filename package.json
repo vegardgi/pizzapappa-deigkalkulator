@@ -1,0 +1,9 @@
+{
+  "name": "pizzapappa-deigkalkulator",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "admin": "node admin-server.js",
+    "preview": "npx serve@latest . -l 8080 --no-clipboard"
+  }
+}

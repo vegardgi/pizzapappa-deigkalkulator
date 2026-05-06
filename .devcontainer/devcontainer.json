@@ -1,0 +1,31 @@
+{
+  "name": "Pizzapappa Deigkalkulator",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
+
+  "forwardPorts": [9898, 8080],
+  "portsAttributes": {
+    "9898": {
+      "label": "Admin panel",
+      "onAutoForward": "silent"
+    },
+    "8080": {
+      "label": "Kalkulator preview",
+      "onAutoForward": "silent"
+    }
+  },
+
+  "postCreateCommand": "npm install -g @anthropic-ai/claude-code",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ritwickdey.LiveServer"
+      ],
+      "settings": {
+        "liveServer.settings.port": 8080,
+        "liveServer.settings.donotShowInfoMsg": true,
+        "liveServer.settings.donotVerifyTags": true
+      }
+    }
+  }
+}

@@ -1977,6 +1977,62 @@
     .runner-go-score { font-size: 52px; font-weight: 800; color: #F5C842; line-height: 1; }
     .runner-go-hs    { font-size: 14px; color: rgba(255,255,255,0.6); margin-bottom: 8px; }
 
+    /* ── Game picker ── */
+    .gamepicker-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 202;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .gamepicker-overlay.open { opacity: 1; pointer-events: auto; }
+    .gamepicker-sheet {
+      background: var(--card);
+      border-radius: 20px 20px 0 0;
+      width: 100%;
+      max-width: 480px;
+      padding: 22px 20px 36px;
+      transform: translateY(100%);
+      transition: transform 0.28s cubic-bezier(0.32,0,0.67,0);
+      box-shadow: 0 -8px 40px rgba(0,0,0,0.4);
+    }
+    .gamepicker-overlay.open .gamepicker-sheet { transform: translateY(0); }
+    .gamepicker-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .gamepicker-title { font-size: 16px; font-weight: 800; color: var(--text); }
+    .gamepicker-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .gamepicker-card {
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 12px 16px;
+      background: var(--surface);
+      cursor: pointer;
+      text-align: center;
+      transition: border-color 0.15s, background 0.15s;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .gamepicker-card:hover {
+      border-color: var(--red);
+      background: rgba(196,43,28,0.07);
+    }
+    .gamepicker-card-icon { font-size: 36px; line-height: 1; }
+    .gamepicker-card-name { font-size: 14px; font-weight: 800; color: var(--text); }
+    .gamepicker-card-desc { font-size: 12px; color: var(--muted); line-height: 1.4; }
+
     .min-btn-x {
       width: 26px; height: 26px;
       border-radius: 50%;
@@ -2498,8 +2554,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <button class="mode-btn" onclick="openTips()">Tips</button>
     <button class="mode-btn active" id="btnPizza" onclick="setMode('pizza')">Pizza</button>
     <button class="mode-btn" id="btnBread" onclick="setMode('bread')">Brød</button>
-    <button class="game-btn" onclick="openStack()" title="Spill Dough Stack">🍕 Stack</button>
-    <button class="game-btn" onclick="openRunner()" title="Spill Pizza Runner">🏃 Runner</button>
+    <button class="game-btn" onclick="openGamePicker()" title="Spill">🎮 Spill</button>
   </div>
 </header>
 
@@ -5507,6 +5562,16 @@ function stackDrawBlock(ctx, x, y, w, color, alpha) {
   ctx.globalAlpha = 1;
 }
 
+// ── Game Picker ───────────────────────────────────────────────────────────────
+function openGamePicker() {
+  document.getElementById('gamePickerOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeGamePicker() {
+  document.getElementById('gamePickerOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
 // ── Pizza Runner Game ─────────────────────────────────────────────────────────
 const RUNNER_HS_KEY = 'deigkalkulator_runner_hs';
 const RUN_W = 360, RUN_H = 320;
@@ -5919,6 +5984,28 @@ function runnerGameOver() {
     </div>
   </div>
 </footer>
+
+<!-- ── Game picker ── -->
+<div class="gamepicker-overlay" id="gamePickerOverlay" onclick="if(event.target===this)closeGamePicker()">
+  <div class="gamepicker-sheet">
+    <div class="gamepicker-header">
+      <span class="gamepicker-title">Velg spill</span>
+      <button class="modal-close" onclick="closeGamePicker()">✕</button>
+    </div>
+    <div class="gamepicker-grid">
+      <div class="gamepicker-card" onclick="closeGamePicker();openStack()">
+        <div class="gamepicker-card-icon">🍕</div>
+        <div class="gamepicker-card-name">Pizzastabling</div>
+        <div class="gamepicker-card-desc">Stable pizzaer så høyt du kan</div>
+      </div>
+      <div class="gamepicker-card" onclick="closeGamePicker();openRunner()">
+        <div class="gamepicker-card-icon">🏃</div>
+        <div class="gamepicker-card-name">Super Pizza Man</div>
+        <div class="gamepicker-card-desc">Løp, hopp og kjemp mot fiender</div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ── Pizza Runner game ── -->
 <div class="runner-overlay" id="runnerOverlay">

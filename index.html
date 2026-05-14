@@ -5165,12 +5165,15 @@ function timerUpdateNotifHint() {
 // ── Dough Stack Game ─────────────────────────────────────────────────────────
 const STACK_HS_KEY = 'deigkalkulator_stack_hs';
 const STACK_W = 320, STACK_H = 480;
-const STACK_BH = 26;        // block height px
-const STACK_START_W = 0.78; // fraction of canvas width
-const STACK_SPEED_START = 2.2;
-const STACK_SPEED_INC   = 0.13;
-const STACK_SPEED_MAX   = 7;
+const STACK_BH = 52;        // vertical advance per layer (pizza overlap)
+const STACK_START_W = 0.78;
+const STACK_SPEED_START = 3.4;
+const STACK_SPEED_INC   = 0.22;
+const STACK_SPEED_MAX   = 10;
 const STACK_COLORS = ['#C42B1C','#F5C842','#E8732A','#D93020','#F0C020'];
+
+const _stackImg = new Image();
+_stackImg.src = 'pizza.png';
 
 let _stackRunning = false;
 let _stackRaf     = null;
@@ -5338,22 +5341,22 @@ function stackDraw() {
   ctx.textAlign = 'center';
   ctx.fillText(_stackScore, cw / 2, 36);
 
-  // Draw stacked blocks (skip chips here, drawn separately)
-  _stackBlocks.forEach(b => stackDrawBlock(ctx, b.x, b.y, b.w, STACK_BH, b.color));
+  // Draw stacked blocks bottom-to-top (later draws on top = correct overlap)
+  _stackBlocks.forEach(b => stackDrawBlock(ctx, b.x, b.y, b.w, b.color));
 
   // Draw falling chip animations
   _stackBlocks.forEach(b => {
-    if (b.chip && b.chip.y < ch + 40) {
-      stackDrawBlock(ctx, b.chip.x, b.chip.y, b.chip.w, STACK_BH, b.chip.color, 0.6);
+    if (b.chip && b.chip.y < ch + 120) {
+      stackDrawBlock(ctx, b.chip.x, b.chip.y, b.chip.w, b.chip.color, 0.55);
     }
   });
 
-  // Draw current moving block
+  // Draw current moving block (on top of everything)
   if (_stackCurrent) {
-    stackDrawBlock(ctx, _stackCurrent.x, _stackCurrent.y, _stackCurrent.w, STACK_BH, _stackCurrent.color);
-    // Subtle guide line
+    stackDrawBlock(ctx, _stackCurrent.x, _stackCurrent.y, _stackCurrent.w, _stackCurrent.color);
+    // Subtle guide lines
     ctx.setLineDash([4, 6]);
-    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+    ctx.strokeStyle = 'rgba(255,255,255,0.10)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(_stackCurrent.x, 0);
@@ -5366,27 +5369,38 @@ function stackDraw() {
   }
 }
 
-function stackDrawBlock(ctx, x, y, w, h, color, alpha) {
+function stackDrawBlock(ctx, x, y, w, color, alpha) {
   if (w <= 0) return;
-  const r = Math.min(8, w / 2, h / 2);
-  ctx.globalAlpha = alpha || 1;
-  ctx.fillStyle = color;
-  ctx.beginPath();
-  ctx.roundRect(x, y, w, h, r);
-  ctx.fill();
+  ctx.globalAlpha = alpha != null ? alpha : 1;
 
-  // Highlight top edge (cheese/sauce sheen)
-  ctx.fillStyle = 'rgba(255,255,255,0.18)';
-  ctx.beginPath();
-  ctx.roundRect(x + 2, y + 2, w - 4, 5, 3);
-  ctx.fill();
-
-  // Dark border
-  ctx.strokeStyle = 'rgba(0,0,0,0.35)';
-  ctx.lineWidth = 1.5;
-  ctx.beginPath();
-  ctx.roundRect(x, y, w, h, r);
-  ctx.stroke();
+  if (_stackImg.complete && _stackImg.naturalWidth > 0) {
+    const aspect = _stackImg.naturalWidth / _stackImg.naturalHeight;
+    const imgH   = w / aspect;
+    // Clip to block width so trimmed pieces don't bleed outside their column
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(x, -9999, w, 99999);
+    ctx.clip();
+    ctx.drawImage(_stackImg, x, y, w, imgH);
+    ctx.restore();
+  } else {
+    // Fallback: colored rounded rect
+    const h = STACK_BH;
+    const r = Math.min(8, w / 2, h / 2);
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.roundRect(x, y, w, h, r);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.18)';
+    ctx.beginPath();
+    ctx.roundRect(x + 2, y + 2, w - 4, 5, 3);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.roundRect(x, y, w, h, r);
+    ctx.stroke();
+  }
 
   ctx.globalAlpha = 1;
 }

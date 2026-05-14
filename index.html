@@ -5228,8 +5228,8 @@ function stackInit() {
   const startW = Math.round(STACK_W * STACK_START_W);
   const startX = Math.round((STACK_W - startW) / 2);
 
-  // Base block (fixed, at bottom)
-  _stackBlocks.push({ x: startX, y: STACK_H - stackPizzaH(startW) - 12, w: startW, color: STACK_COLORS[0] });
+  // Base block — y = bottom of pizza, so full pizza is visible at start
+  _stackBlocks.push({ x: startX, y: STACK_H, w: startW, color: STACK_COLORS[0] });
 
   stackSpawnCurrent();
 
@@ -5290,10 +5290,11 @@ function stackDrop() {
   _stackBlocks.push({ x: overlapLeft, y: cur.y, w: overlapW, color: cur.color, chip: cur.chip });
   _stackScore++;
 
-  // Scroll view: shift all blocks up when tower gets tall
+  // Scroll view: shift all blocks down (canvas coords) when tower gets tall
+  // y is pizza bottom; scroll when bottom of last block rises above 70% of canvas
   const topY = _stackBlocks[_stackBlocks.length - 1].y;
-  if (topY < STACK_H * 0.35) {
-    const shift = Math.round(STACK_H * 0.2);
+  if (topY < STACK_H * 0.70) {
+    const shift = Math.round(STACK_H * 0.22);
     _stackBlocks.forEach(b => { b.y += shift; });
   }
 
@@ -5357,52 +5358,50 @@ function stackDraw() {
   ctx.textAlign = 'center';
   ctx.fillText(_stackScore, cw / 2, 36);
 
-  // Draw stacked blocks — each clipped to its visible band height
-  _stackBlocks.forEach(b => stackDrawBlock(ctx, b.x, b.y, b.w, b.color, 1, false));
+  // Draw stacked blocks bottom-to-top.
+  // y = pizza bottom; each block draws its pizza upward from y,
+  // so only stackLayerH(w) px peek out below the pizza stacked on top.
+  _stackBlocks.forEach(b => stackDrawBlock(ctx, b.x, b.y, b.w, b.color, 1));
 
   // Draw falling chip animations
   _stackBlocks.forEach(b => {
-    if (b.chip && b.chip.y < ch + 120) {
-      stackDrawBlock(ctx, b.chip.x, b.chip.y, b.chip.w, b.chip.color, 0.55, false);
+    if (b.chip && b.chip.y < ch + 200) {
+      stackDrawBlock(ctx, b.chip.x, b.chip.y, b.chip.w, b.chip.color, 0.55);
     }
   });
 
-  // Draw current moving block at full height (clearly above the stack)
+  // Draw current moving block (on top of everything)
   if (_stackCurrent) {
-    stackDrawBlock(ctx, _stackCurrent.x, _stackCurrent.y, _stackCurrent.w, _stackCurrent.color, 1, true);
-    // Subtle guide lines
+    stackDrawBlock(ctx, _stackCurrent.x, _stackCurrent.y, _stackCurrent.w, _stackCurrent.color, 1);
+    // Subtle guide lines from top of canvas to top of current pizza
+    const curImgH = stackPizzaH(_stackCurrent.w);
     ctx.setLineDash([4, 6]);
     ctx.strokeStyle = 'rgba(255,255,255,0.10)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(_stackCurrent.x, 0);
-    ctx.lineTo(_stackCurrent.x, _stackCurrent.y);
+    ctx.lineTo(_stackCurrent.x, _stackCurrent.y - curImgH);
     ctx.stroke();
     ctx.moveTo(_stackCurrent.x + _stackCurrent.w, 0);
-    ctx.lineTo(_stackCurrent.x + _stackCurrent.w, _stackCurrent.y);
+    ctx.lineTo(_stackCurrent.x + _stackCurrent.w, _stackCurrent.y - curImgH);
     ctx.stroke();
     ctx.setLineDash([]);
   }
 }
 
-function stackDrawBlock(ctx, x, y, w, color, alpha, fullHeight) {
+// y = BOTTOM of pizza. Pizza drawn upward from y.
+// Each placed pizza peeks out by stackLayerH(w) below the pizza on top.
+function stackDrawBlock(ctx, x, y, w, color, alpha) {
   if (w <= 0) return;
   ctx.globalAlpha = alpha != null ? alpha : 1;
 
   if (_stackImg.complete && _stackImg.naturalWidth > 0) {
-    const aspect = _stackImg.naturalWidth / _stackImg.naturalHeight;
-    const imgH   = w / aspect;
+    const imgH = stackPizzaH(w);
     ctx.save();
     ctx.beginPath();
-    if (fullHeight) {
-      // Current block: clip only horizontally, show full pizza
-      ctx.rect(x, y - imgH, w, imgH * 2);
-    } else {
-      // Placed block: clip to visible band so stack stays clean
-      ctx.rect(x, y, w, stackLayerH(w));
-    }
+    ctx.rect(x, y - imgH, w, imgH); // horizontal + vertical bounds
     ctx.clip();
-    ctx.drawImage(_stackImg, x, y, w, imgH);
+    ctx.drawImage(_stackImg, x, y - imgH, w, imgH);
     ctx.restore();
   } else {
     // Fallback: colored rounded rect
@@ -5410,16 +5409,12 @@ function stackDrawBlock(ctx, x, y, w, color, alpha, fullHeight) {
     const r = Math.min(8, w / 2, h / 2);
     ctx.fillStyle = color;
     ctx.beginPath();
-    ctx.roundRect(x, y, w, h, r);
-    ctx.fill();
-    ctx.fillStyle = 'rgba(255,255,255,0.18)';
-    ctx.beginPath();
-    ctx.roundRect(x + 2, y + 2, w - 4, 5, 3);
+    ctx.roundRect(x, y - h, w, h, r);
     ctx.fill();
     ctx.strokeStyle = 'rgba(0,0,0,0.35)';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.roundRect(x, y, w, h, r);
+    ctx.roundRect(x, y - h, w, h, r);
     ctx.stroke();
   }
 

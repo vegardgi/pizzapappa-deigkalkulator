@@ -1803,6 +1803,95 @@
       min-height: 18px;
     }
 
+    /* ── Dough Stack game ── */
+    .game-btn {
+      padding: 6px 18px;
+      border-radius: 20px;
+      border: 2px solid rgba(255,255,255,0.45);
+      background: transparent;
+      color: rgba(255,255,255,0.75);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.18s;
+      letter-spacing: 0.2px;
+    }
+    .game-btn:hover {
+      border-color: rgba(255,255,255,0.8);
+      color: #fff;
+    }
+    .stack-overlay {
+      position: fixed; inset: 0;
+      background: rgba(30,10,5,0.92);
+      z-index: 201;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .stack-overlay.open { opacity: 1; pointer-events: auto; }
+    .stack-container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .stack-close {
+      position: absolute;
+      top: -44px;
+      right: 0;
+      color: rgba(255,255,255,0.7);
+      background: rgba(255,255,255,0.1);
+      border-radius: 50%;
+      width: 36px; height: 36px;
+      font-size: 18px;
+      border: none;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .stack-close:hover { color: #fff; background: rgba(255,255,255,0.2); }
+    #stackCanvas {
+      border-radius: 14px;
+      display: block;
+      touch-action: none;
+      max-width: min(320px, 90vw);
+      width: min(320px, 90vw);
+      height: auto;
+      aspect-ratio: 320/480;
+    }
+    .stack-gameover {
+      position: absolute;
+      inset: 0;
+      border-radius: 14px;
+      background: rgba(30,10,5,0.78);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 24px;
+    }
+    .stack-go-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 1px;
+    }
+    .stack-go-score {
+      font-size: 48px;
+      font-weight: 800;
+      color: #F5C842;
+      line-height: 1;
+    }
+    .stack-go-hs {
+      font-size: 14px;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 8px;
+    }
+
     .min-btn-x {
       width: 26px; height: 26px;
       border-radius: 50%;
@@ -2324,6 +2413,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <button class="mode-btn" onclick="openTips()">Tips</button>
     <button class="mode-btn active" id="btnPizza" onclick="setMode('pizza')">Pizza</button>
     <button class="mode-btn" id="btnBread" onclick="setMode('bread')">Brød</button>
+    <button class="game-btn" onclick="openStack()" title="Spill Dough Stack">🍕 Spill</button>
   </div>
 </header>
 
@@ -5072,6 +5162,235 @@ function timerUpdateNotifHint() {
   }
 }
 
+// ── Dough Stack Game ─────────────────────────────────────────────────────────
+const STACK_HS_KEY = 'deigkalkulator_stack_hs';
+const STACK_W = 320, STACK_H = 480;
+const STACK_BH = 26;        // block height px
+const STACK_START_W = 0.78; // fraction of canvas width
+const STACK_SPEED_START = 2.2;
+const STACK_SPEED_INC   = 0.13;
+const STACK_SPEED_MAX   = 7;
+const STACK_COLORS = ['#C42B1C','#F5C842','#E8732A','#D93020','#F0C020'];
+
+let _stackRunning = false;
+let _stackRaf     = null;
+let _stackBlocks  = [];
+let _stackCurrent = null;
+let _stackScore   = 0;
+let _stackCanvas  = null;
+let _stackCtx     = null;
+let _stackDropped = false; // prevent double-drop per frame
+
+function openStack() {
+  document.getElementById('stackOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  if (!_stackRunning) stackInit();
+}
+
+function closeStack() {
+  document.getElementById('stackOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  stackStop();
+}
+
+function stackStop() {
+  _stackRunning = false;
+  if (_stackRaf) { cancelAnimationFrame(_stackRaf); _stackRaf = null; }
+}
+
+function stackInit() {
+  _stackCanvas = document.getElementById('stackCanvas');
+  _stackCtx    = _stackCanvas.getContext('2d');
+  _stackScore  = 0;
+  _stackBlocks = [];
+  _stackRunning = true;
+  document.getElementById('stackGameOver').style.display = 'none';
+
+  const startW = Math.round(STACK_W * STACK_START_W);
+  const startX = Math.round((STACK_W - startW) / 2);
+
+  // Base block (fixed, at bottom)
+  _stackBlocks.push({ x: startX, y: STACK_H - STACK_BH, w: startW, color: STACK_COLORS[0] });
+
+  stackSpawnCurrent();
+
+  _stackCanvas.addEventListener('click', stackHandleInput, { once: false });
+  _stackCanvas.addEventListener('touchstart', stackHandleInput, { once: false, passive: true });
+
+  if (_stackRaf) cancelAnimationFrame(_stackRaf);
+  _stackRaf = requestAnimationFrame(stackLoop);
+}
+
+function stackSpawnCurrent() {
+  const top    = _stackBlocks[_stackBlocks.length - 1];
+  const speed  = Math.min(STACK_SPEED_START + _stackScore * STACK_SPEED_INC, STACK_SPEED_MAX);
+  const colorI = (_stackScore + 1) % STACK_COLORS.length;
+  _stackCurrent = {
+    x:     -top.w,
+    y:     top.y - STACK_BH,
+    w:     top.w,
+    dir:   1,
+    speed: speed,
+    color: STACK_COLORS[colorI],
+    chip: null  // falling chip animation
+  };
+  _stackDropped = false;
+}
+
+function stackHandleInput(e) {
+  e.preventDefault && e.preventDefault();
+  if (!_stackRunning || _stackDropped) return;
+  _stackDropped = true;
+  stackDrop();
+}
+
+function stackDrop() {
+  if (!_stackCurrent) return;
+  const cur  = _stackCurrent;
+  const prev = _stackBlocks[_stackBlocks.length - 1];
+
+  const overlapLeft  = Math.max(cur.x, prev.x);
+  const overlapRight = Math.min(cur.x + cur.w, prev.x + prev.w);
+  const overlapW     = overlapRight - overlapLeft;
+
+  if (overlapW <= 0) {
+    // Complete miss
+    cur.chip = { x: cur.x, y: cur.y, w: cur.w, vy: 1, color: cur.color };
+    stackGameOver();
+    return;
+  }
+
+  // Chip off the hanging piece
+  if (overlapW < cur.w) {
+    const chipX = cur.x < prev.x ? cur.x : overlapRight;
+    const chipW = cur.w - overlapW;
+    cur.chip = { x: chipX, y: cur.y, w: chipW, vy: 1, color: cur.color };
+  }
+
+  // Place trimmed block
+  _stackBlocks.push({ x: overlapLeft, y: cur.y, w: overlapW, color: cur.color, chip: cur.chip });
+  _stackScore++;
+
+  // Scroll view: shift all blocks up when tower gets tall
+  const topY = _stackBlocks[_stackBlocks.length - 1].y;
+  if (topY < STACK_H * 0.45) {
+    const shift = Math.round(STACK_H * 0.2);
+    _stackBlocks.forEach(b => { b.y += shift; });
+  }
+
+  if (overlapW < 8) {
+    stackGameOver();
+    return;
+  }
+
+  stackSpawnCurrent();
+}
+
+function stackGameOver() {
+  _stackRunning = false;
+
+  const hs = parseInt(localStorage.getItem(STACK_HS_KEY) || '0', 10);
+  if (_stackScore > hs) localStorage.setItem(STACK_HS_KEY, String(_stackScore));
+  const newHs = Math.max(_stackScore, hs);
+
+  document.getElementById('stackGoScore').textContent = _stackScore;
+  document.getElementById('stackGoHs').textContent =
+    _stackScore > hs && hs > 0 ? `Ny rekord! 🎉` : `Rekord: ${newHs}`;
+  document.getElementById('stackGameOver').style.display = 'flex';
+}
+
+function stackLoop() {
+  if (!_stackRunning) return;
+  stackUpdate();
+  stackDraw();
+  _stackRaf = requestAnimationFrame(stackLoop);
+}
+
+function stackUpdate() {
+  if (!_stackCurrent) return;
+  const cur = _stackCurrent;
+  cur.x += cur.dir * cur.speed;
+  const prev = _stackBlocks[_stackBlocks.length - 1];
+  if (cur.x + cur.w > STACK_W + 20) cur.dir = -1;
+  if (cur.x < -20) cur.dir = 1;
+
+  // Animate chip
+  _stackBlocks.forEach(b => {
+    if (b.chip) { b.chip.y += b.chip.vy; b.chip.vy += 0.35; }
+  });
+}
+
+function stackDraw() {
+  const ctx = _stackCtx;
+  const cw = STACK_W, ch = STACK_H;
+  ctx.clearRect(0, 0, cw, ch);
+
+  // Background gradient
+  const grad = ctx.createLinearGradient(0, 0, 0, ch);
+  grad.addColorStop(0, '#1a0a04');
+  grad.addColorStop(1, '#3a1a0a');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, cw, ch);
+
+  // Score
+  ctx.fillStyle = 'rgba(255,255,255,0.85)';
+  ctx.font = 'bold 22px system-ui';
+  ctx.textAlign = 'center';
+  ctx.fillText(_stackScore, cw / 2, 36);
+
+  // Draw stacked blocks (skip chips here, drawn separately)
+  _stackBlocks.forEach(b => stackDrawBlock(ctx, b.x, b.y, b.w, STACK_BH, b.color));
+
+  // Draw falling chip animations
+  _stackBlocks.forEach(b => {
+    if (b.chip && b.chip.y < ch + 40) {
+      stackDrawBlock(ctx, b.chip.x, b.chip.y, b.chip.w, STACK_BH, b.chip.color, 0.6);
+    }
+  });
+
+  // Draw current moving block
+  if (_stackCurrent) {
+    stackDrawBlock(ctx, _stackCurrent.x, _stackCurrent.y, _stackCurrent.w, STACK_BH, _stackCurrent.color);
+    // Subtle guide line
+    ctx.setLineDash([4, 6]);
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(_stackCurrent.x, 0);
+    ctx.lineTo(_stackCurrent.x, _stackCurrent.y);
+    ctx.stroke();
+    ctx.moveTo(_stackCurrent.x + _stackCurrent.w, 0);
+    ctx.lineTo(_stackCurrent.x + _stackCurrent.w, _stackCurrent.y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+}
+
+function stackDrawBlock(ctx, x, y, w, h, color, alpha) {
+  if (w <= 0) return;
+  const r = Math.min(8, w / 2, h / 2);
+  ctx.globalAlpha = alpha || 1;
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.roundRect(x, y, w, h, r);
+  ctx.fill();
+
+  // Highlight top edge (cheese/sauce sheen)
+  ctx.fillStyle = 'rgba(255,255,255,0.18)';
+  ctx.beginPath();
+  ctx.roundRect(x + 2, y + 2, w - 4, 5, 3);
+  ctx.fill();
+
+  // Dark border
+  ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.roundRect(x, y, w, h, r);
+  ctx.stroke();
+
+  ctx.globalAlpha = 1;
+}
+
 // Gjenoppretter timer fra localStorage ved sideinnlasting
 (function timerRestoreFromStorage() {
   const stored = localStorage.getItem(TIMER_END_KEY);
@@ -5118,6 +5437,20 @@ function timerUpdateNotifHint() {
     </div>
   </div>
 </footer>
+
+<!-- ── Dough Stack game ── -->
+<div class="stack-overlay" id="stackOverlay">
+  <div class="stack-container">
+    <button class="stack-close" onclick="closeStack()">✕</button>
+    <canvas id="stackCanvas" width="320" height="480"></canvas>
+    <div id="stackGameOver" class="stack-gameover" style="display:none">
+      <div class="stack-go-title">Game over</div>
+      <div class="stack-go-score" id="stackGoScore">0</div>
+      <div class="stack-go-hs" id="stackGoHs"></div>
+      <button class="timer-action-btn" style="max-width:200px" onclick="stackInit()">Spill igjen</button>
+    </div>
+  </div>
+</div>
 
 <!-- ── Timer sheet ── -->
 <div class="timer-overlay" id="timerOverlay" onclick="if(event.target===this)closeTimer()">

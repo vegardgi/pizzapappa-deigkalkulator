@@ -5175,10 +5175,10 @@ const STACK_COLORS = ['#C42B1C','#F5C842','#E8732A','#D93020','#F0C020'];
 const _stackImg = new Image();
 _stackImg.src = 'pizza.png';
 
-// Vertical advance per layer = 18% of pizza image height at that width
+// Vertical advance per layer = 22% of pizza image height at that width
 function stackLayerH(w) {
   if (_stackImg.complete && _stackImg.naturalWidth > 0) {
-    return Math.max(8, (w / (_stackImg.naturalWidth / _stackImg.naturalHeight)) * 0.18);
+    return Math.max(10, (w / (_stackImg.naturalWidth / _stackImg.naturalHeight)) * 0.22);
   }
   return STACK_BH;
 }
@@ -5349,19 +5349,19 @@ function stackDraw() {
   ctx.textAlign = 'center';
   ctx.fillText(_stackScore, cw / 2, 36);
 
-  // Draw stacked blocks bottom-to-top (later draws on top = correct overlap)
-  _stackBlocks.forEach(b => stackDrawBlock(ctx, b.x, b.y, b.w, b.color));
+  // Draw stacked blocks — each clipped to its visible band height
+  _stackBlocks.forEach(b => stackDrawBlock(ctx, b.x, b.y, b.w, b.color, 1, false));
 
   // Draw falling chip animations
   _stackBlocks.forEach(b => {
     if (b.chip && b.chip.y < ch + 120) {
-      stackDrawBlock(ctx, b.chip.x, b.chip.y, b.chip.w, b.chip.color, 0.55);
+      stackDrawBlock(ctx, b.chip.x, b.chip.y, b.chip.w, b.chip.color, 0.55, false);
     }
   });
 
-  // Draw current moving block (on top of everything)
+  // Draw current moving block at full height (clearly above the stack)
   if (_stackCurrent) {
-    stackDrawBlock(ctx, _stackCurrent.x, _stackCurrent.y, _stackCurrent.w, _stackCurrent.color);
+    stackDrawBlock(ctx, _stackCurrent.x, _stackCurrent.y, _stackCurrent.w, _stackCurrent.color, 1, true);
     // Subtle guide lines
     ctx.setLineDash([4, 6]);
     ctx.strokeStyle = 'rgba(255,255,255,0.10)';
@@ -5377,23 +5377,28 @@ function stackDraw() {
   }
 }
 
-function stackDrawBlock(ctx, x, y, w, color, alpha) {
+function stackDrawBlock(ctx, x, y, w, color, alpha, fullHeight) {
   if (w <= 0) return;
   ctx.globalAlpha = alpha != null ? alpha : 1;
 
   if (_stackImg.complete && _stackImg.naturalWidth > 0) {
     const aspect = _stackImg.naturalWidth / _stackImg.naturalHeight;
     const imgH   = w / aspect;
-    // Clip to block width so trimmed pieces don't bleed outside their column
     ctx.save();
     ctx.beginPath();
-    ctx.rect(x, -9999, w, 99999);
+    if (fullHeight) {
+      // Current block: clip only horizontally, show full pizza
+      ctx.rect(x, y - imgH, w, imgH * 2);
+    } else {
+      // Placed block: clip to visible band so stack stays clean
+      ctx.rect(x, y, w, stackLayerH(w));
+    }
     ctx.clip();
     ctx.drawImage(_stackImg, x, y, w, imgH);
     ctx.restore();
   } else {
     // Fallback: colored rounded rect
-    const h = STACK_BH;
+    const h = stackLayerH(w);
     const r = Math.min(8, w / 2, h / 2);
     ctx.fillStyle = color;
     ctx.beginPath();

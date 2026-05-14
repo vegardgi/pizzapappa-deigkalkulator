@@ -1892,6 +1892,91 @@
       margin-bottom: 8px;
     }
 
+    /* ── Pizza Runner game ── */
+    .runner-overlay {
+      position: fixed; inset: 0;
+      background: rgba(30,10,5,0.92);
+      z-index: 201;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .runner-overlay.open { opacity: 1; pointer-events: auto; }
+    .runner-container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+    .runner-close {
+      position: absolute;
+      top: -44px; right: 0;
+      color: rgba(255,255,255,0.7);
+      background: rgba(255,255,255,0.1);
+      border-radius: 50%;
+      width: 36px; height: 36px;
+      font-size: 18px;
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .runner-close:hover { color:#fff; background:rgba(255,255,255,0.2); }
+    #runnerCanvas {
+      display: block;
+      border-radius: 14px 14px 0 0;
+      touch-action: none;
+      max-width: min(360px, 96vw);
+      width: min(360px, 96vw);
+      height: auto;
+      aspect-ratio: 360/320;
+    }
+    .runner-btns {
+      display: flex;
+      width: min(360px, 96vw);
+      gap: 4px;
+    }
+    .runner-btn {
+      flex: 1;
+      padding: 18px 0;
+      border: none;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      color: #fff;
+      letter-spacing: 0.3px;
+      transition: opacity 0.1s;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .runner-btn:active { opacity: 0.75; }
+    .runner-btn-left {
+      background: #C42B1C;
+      border-radius: 0 0 0 14px;
+    }
+    .runner-btn-right {
+      background: #2a7a3e;
+      border-radius: 0 0 14px 0;
+    }
+    .runner-gameover {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: calc(100% - 60px);
+      border-radius: 14px 14px 0 0;
+      background: rgba(20,5,2,0.82);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 24px;
+    }
+    .runner-go-title { font-size: 24px; font-weight: 800; color: #fff; }
+    .runner-go-score { font-size: 52px; font-weight: 800; color: #F5C842; line-height: 1; }
+    .runner-go-hs    { font-size: 14px; color: rgba(255,255,255,0.6); margin-bottom: 8px; }
+
     .min-btn-x {
       width: 26px; height: 26px;
       border-radius: 50%;
@@ -2413,7 +2498,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <button class="mode-btn" onclick="openTips()">Tips</button>
     <button class="mode-btn active" id="btnPizza" onclick="setMode('pizza')">Pizza</button>
     <button class="mode-btn" id="btnBread" onclick="setMode('bread')">Brød</button>
-    <button class="game-btn" onclick="openStack()" title="Spill Dough Stack">🍕 Spill</button>
+    <button class="game-btn" onclick="openStack()" title="Spill Dough Stack">🍕 Stack</button>
+    <button class="game-btn" onclick="openRunner()" title="Spill Pizza Runner">🏃 Runner</button>
   </div>
 </header>
 
@@ -5421,6 +5507,372 @@ function stackDrawBlock(ctx, x, y, w, color, alpha) {
   ctx.globalAlpha = 1;
 }
 
+// ── Pizza Runner Game ─────────────────────────────────────────────────────────
+const RUNNER_HS_KEY = 'deigkalkulator_runner_hs';
+const RUN_W = 360, RUN_H = 320;
+const RUN_GROUND = 252;   // y where player feet stand
+const RUN_GRAVITY = 0.55;
+const RUN_JUMP_VY = -13;
+const RUN_PLAYER_X = 70;
+
+let _runRunning   = false;
+let _runRaf       = null;
+let _runPlayer    = null;
+let _runEnemies   = [];
+let _runProj      = [];
+let _runScore     = 0;
+let _runFrames    = 0;
+let _runSpawnIn   = 90;   // frames until next enemy
+let _runBg        = [];   // background parallax layers
+let _runCanvas    = null;
+let _runCtx       = null;
+let _runLeftHeld  = false;
+let _runLeftTimer = null;  // distinguish tap(jump) vs hold(spade)
+let _runSpadeActive = false;
+let _runSpadeTimer  = 0;
+let _runInvincible  = 0;   // invincibility frames after hit
+let _runHits        = 0;   // player has 3 lives
+
+function openRunner() {
+  document.getElementById('runnerOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  if (!_runRunning) runnerInit();
+}
+function closeRunner() {
+  document.getElementById('runnerOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  runnerStop();
+}
+function runnerStop() {
+  _runRunning = false;
+  if (_runRaf) { cancelAnimationFrame(_runRaf); _runRaf = null; }
+}
+
+function runnerInit() {
+  _runCanvas = document.getElementById('runnerCanvas');
+  _runCtx    = _runCanvas.getContext('2d');
+  _runRunning  = true;
+  _runScore    = 0;
+  _runFrames   = 0;
+  _runSpawnIn  = 90;
+  _runHits     = 0;
+  _runInvincible = 0;
+  _runSpadeActive = false;
+  _runSpadeTimer  = 0;
+  _runEnemies  = [];
+  _runProj     = [];
+  _runPlayer   = { x: RUN_PLAYER_X, y: RUN_GROUND, vy: 0, onGround: true, throwTimer: 0 };
+
+  // Build parallax bg layers
+  _runBg = [
+    { x: 0, speed: 0.3, color: '#2a0e06', rects: runBgRects(8, 20, 60, 40, 80) },
+    { x: 0, speed: 0.7, color: '#3d1508', rects: runBgRects(5, 60, 120, 50, 110) },
+  ];
+
+  document.getElementById('runnerGameOver').style.display = 'none';
+  if (_runRaf) cancelAnimationFrame(_runRaf);
+  _runRaf = requestAnimationFrame(runnerLoop);
+}
+
+function runBgRects(n, yMin, yMax, wMin, wMax) {
+  const arr = [];
+  for (let i = 0; i < n; i++) {
+    arr.push({
+      x: Math.random() * RUN_W,
+      y: yMin + Math.random() * (yMax - yMin),
+      w: wMin + Math.random() * (wMax - wMin),
+      h: 8 + Math.random() * 14
+    });
+  }
+  return arr;
+}
+
+// ── Input ──
+function runnerLeftDown() {
+  if (!_runRunning) return;
+  _runLeftHeld = true;
+  // Short press = jump, long press activates spade
+  _runLeftTimer = setTimeout(() => {
+    if (_runLeftHeld) runnerSpade();
+  }, 220);
+  runnerJump();
+}
+function runnerLeftUp() {
+  _runLeftHeld = false;
+  clearTimeout(_runLeftTimer);
+}
+function runnerJump() {
+  if (!_runRunning) return;
+  if (_runPlayer.onGround) {
+    _runPlayer.vy = RUN_JUMP_VY;
+    _runPlayer.onGround = false;
+  }
+}
+function runnerSpade() {
+  if (!_runRunning) return;
+  _runSpadeActive = true;
+  _runSpadeTimer  = 22; // frames active
+}
+function runnerThrow() {
+  if (!_runRunning) return;
+  _runProj.push({ x: _runPlayer.x + 24, y: _runPlayer.y - 20, vx: 9, r: 9 });
+  _runPlayer.throwTimer = 14;
+}
+
+// ── Game loop ──
+function runnerLoop() {
+  if (!_runRunning) return;
+  runnerUpdate();
+  runnerDraw();
+  _runRaf = requestAnimationFrame(runnerLoop);
+}
+
+function runnerUpdate() {
+  _runFrames++;
+  const speed = 2.2 + _runFrames * 0.0012; // gradual acceleration
+
+  // Player physics
+  const p = _runPlayer;
+  p.vy += RUN_GRAVITY;
+  p.y  += p.vy;
+  if (p.y >= RUN_GROUND) { p.y = RUN_GROUND; p.vy = 0; p.onGround = true; }
+  if (p.throwTimer > 0) p.throwTimer--;
+
+  // Spade timer
+  if (_runSpadeTimer > 0) { _runSpadeTimer--; if (_runSpadeTimer === 0) _runSpadeActive = false; }
+  if (_runInvincible > 0) _runInvincible--;
+
+  // Score = time survived (in half-seconds)
+  if (_runFrames % 30 === 0) _runScore++;
+
+  // Spawn enemies
+  _runSpawnIn--;
+  if (_runSpawnIn <= 0) {
+    const flying = Math.random() < 0.3;
+    const ey     = flying ? RUN_GROUND - 85 : RUN_GROUND;
+    const ew     = flying ? 28 : 32;
+    const eh     = flying ? 22 : 30;
+    _runEnemies.push({ x: RUN_W + ew, y: ey, w: ew, h: eh, flying, hp: 1 });
+    _runSpawnIn = Math.max(38, 110 - Math.floor(_runFrames / 90));
+  }
+
+  // Move enemies
+  _runEnemies.forEach(e => { e.x -= speed; });
+
+  // Move projectiles
+  _runProj.forEach(pr => { pr.x += pr.vx; });
+  _runProj = _runProj.filter(pr => pr.x < RUN_W + 20);
+
+  // Move bg
+  _runBg.forEach(layer => {
+    layer.rects.forEach(r => {
+      r.x -= layer.speed;
+      if (r.x + r.w < 0) r.x = RUN_W + r.w;
+    });
+  });
+
+  // Projectile vs enemy
+  _runProj = _runProj.filter(pr => {
+    for (let i = _runEnemies.length - 1; i >= 0; i--) {
+      const e = _runEnemies[i];
+      if (pr.x + pr.r > e.x - e.w/2 && pr.x - pr.r < e.x + e.w/2 &&
+          pr.y + pr.r > e.y - e.h   && pr.y - pr.r < e.y) {
+        _runEnemies.splice(i, 1);
+        _runScore += 3;
+        return false; // remove projectile
+      }
+    }
+    return true;
+  });
+
+  // Spade vs enemy
+  if (_runSpadeActive) {
+    const sx = p.x + 20, sw = 70;
+    _runEnemies = _runEnemies.filter(e => {
+      const hit = e.x - e.w/2 < sx + sw && e.x + e.w/2 > sx &&
+                  e.y - e.h < p.y + 4   && e.y > p.y - 60;
+      if (hit) _runScore += 2;
+      return !hit;
+    });
+  }
+
+  // Enemy vs player
+  if (_runInvincible === 0) {
+    for (let i = _runEnemies.length - 1; i >= 0; i--) {
+      const e = _runEnemies[i];
+      const hit = e.x - e.w/2 < p.x + 18 && e.x + e.w/2 > p.x - 18 &&
+                  e.y - e.h   < p.y + 4   && e.y          > p.y - 52;
+      if (hit) {
+        _runEnemies.splice(i, 1);
+        _runHits++;
+        _runInvincible = 80;
+        if (_runHits >= 3) { runnerGameOver(); return; }
+      }
+    }
+  }
+
+  // Remove off-screen enemies
+  _runEnemies = _runEnemies.filter(e => e.x > -60);
+}
+
+function runnerDraw() {
+  const ctx = _runCtx;
+  ctx.clearRect(0, 0, RUN_W, RUN_H);
+
+  // Sky gradient
+  const sky = ctx.createLinearGradient(0, 0, 0, RUN_H);
+  sky.addColorStop(0, '#1a0904');
+  sky.addColorStop(1, '#3d1205');
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, RUN_W, RUN_H);
+
+  // Parallax bg
+  _runBg.forEach(layer => {
+    ctx.fillStyle = layer.color;
+    layer.rects.forEach(r => ctx.fillRect(r.x, r.y, r.w, r.h));
+  });
+
+  // Ground
+  ctx.fillStyle = '#5a2200';
+  ctx.fillRect(0, RUN_GROUND + 2, RUN_W, RUN_H - RUN_GROUND - 2);
+  ctx.fillStyle = '#8b3a00';
+  ctx.fillRect(0, RUN_GROUND, RUN_W, 4);
+
+  // Projectiles
+  const p = _runPlayer;
+  _runProj.forEach(pr => {
+    ctx.beginPath();
+    ctx.arc(pr.x, pr.y, pr.r, 0, Math.PI * 2);
+    ctx.fillStyle = '#F5C842';
+    ctx.fill();
+    ctx.strokeStyle = '#C42B1C';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  });
+
+  // Enemies
+  _runEnemies.forEach(e => {
+    const ex = e.x - e.w / 2;
+    const ey = e.y - e.h;
+    ctx.fillStyle = e.flying ? '#7a1aaa' : '#aa2200';
+    ctx.beginPath();
+    ctx.roundRect(ex, ey, e.w, e.h, 5);
+    ctx.fill();
+    // Eyes
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(ex + e.w * 0.3, ey + e.h * 0.35, 4, 0, Math.PI * 2);
+    ctx.arc(ex + e.w * 0.7, ey + e.h * 0.35, 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#000';
+    ctx.beginPath();
+    ctx.arc(ex + e.w * 0.3 + 1, ey + e.h * 0.35, 2, 0, Math.PI * 2);
+    ctx.arc(ex + e.w * 0.7 + 1, ey + e.h * 0.35, 2, 0, Math.PI * 2);
+    ctx.fill();
+    if (e.flying) {
+      // Wings
+      ctx.fillStyle = 'rgba(180,100,255,0.5)';
+      ctx.beginPath();
+      ctx.ellipse(ex - 8, ey + 6, 10, 6, -0.4, 0, Math.PI * 2);
+      ctx.ellipse(ex + e.w + 8, ey + 6, 10, 6, 0.4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  });
+
+  // Spade hitbox flash
+  if (_runSpadeActive) {
+    ctx.fillStyle = 'rgba(255,220,80,0.35)';
+    ctx.beginPath();
+    ctx.roundRect(p.x + 20, p.y - 55, 70, 55, 6);
+    ctx.fill();
+    ctx.strokeStyle = '#F5C842';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+
+  // Player (pizza figure)
+  const blink = _runInvincible > 0 && Math.floor(_runInvincible / 5) % 2 === 0;
+  if (!blink) {
+    // Body (pizza circle)
+    ctx.beginPath();
+    ctx.arc(p.x, p.y - 22, 20, 0, Math.PI * 2);
+    ctx.fillStyle = '#F5C842';
+    ctx.fill();
+    ctx.strokeStyle = '#C42B1C';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    // Toppings (basil dots)
+    ctx.fillStyle = '#2a7a3e';
+    [[p.x - 6, p.y - 26],[p.x + 7, p.y - 18],[p.x - 2, p.y - 14]].forEach(([cx, cy]) => {
+      ctx.beginPath(); ctx.arc(cx, cy, 4, 0, Math.PI * 2); ctx.fill();
+    });
+    // Legs
+    ctx.strokeStyle = '#C42B1C';
+    ctx.lineWidth = 4;
+    ctx.lineCap = 'round';
+    const legOff = Math.sin(_runFrames * 0.25) * 6;
+    ctx.beginPath();
+    ctx.moveTo(p.x - 6, p.y - 4);
+    ctx.lineTo(p.x - 6 + legOff, p.y + 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(p.x + 6, p.y - 4);
+    ctx.lineTo(p.x + 6 - legOff, p.y + 2);
+    ctx.stroke();
+    // Arm / spade
+    if (_runSpadeActive) {
+      ctx.strokeStyle = '#8b4513';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(p.x + 14, p.y - 22);
+      ctx.lineTo(p.x + 60, p.y - 30);
+      ctx.stroke();
+      ctx.fillStyle = '#C0C0C0';
+      ctx.beginPath();
+      ctx.ellipse(p.x + 65, p.y - 32, 10, 7, -0.3, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (p.throwTimer > 0) {
+      ctx.strokeStyle = '#F5C842';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(p.x + 14, p.y - 22);
+      ctx.lineTo(p.x + 40, p.y - 30);
+      ctx.stroke();
+    }
+  }
+
+  // HUD: lives
+  for (let i = 0; i < 3; i++) {
+    ctx.globalAlpha = i < (3 - _runHits) ? 1 : 0.2;
+    ctx.beginPath();
+    ctx.arc(16 + i * 22, 16, 8, 0, Math.PI * 2);
+    ctx.fillStyle = '#F5C842';
+    ctx.fill();
+    ctx.strokeStyle = '#C42B1C';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+
+  // HUD: score
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
+  ctx.font = 'bold 18px system-ui';
+  ctx.textAlign = 'right';
+  ctx.fillText(_runScore, RUN_W - 10, 24);
+  ctx.textAlign = 'left';
+}
+
+function runnerGameOver() {
+  _runRunning = false;
+  const hs = parseInt(localStorage.getItem(RUNNER_HS_KEY) || '0', 10);
+  if (_runScore > hs) localStorage.setItem(RUNNER_HS_KEY, String(_runScore));
+  const newHs = Math.max(_runScore, hs);
+  document.getElementById('runnerGoScore').textContent = _runScore;
+  document.getElementById('runnerGoHs').textContent =
+    _runScore > hs && hs > 0 ? 'Ny rekord! 🎉' : `Rekord: ${newHs}`;
+  document.getElementById('runnerGameOver').style.display = 'flex';
+}
+
 // Gjenoppretter timer fra localStorage ved sideinnlasting
 (function timerRestoreFromStorage() {
   const stored = localStorage.getItem(TIMER_END_KEY);
@@ -5467,6 +5919,32 @@ function stackDrawBlock(ctx, x, y, w, color, alpha) {
     </div>
   </div>
 </footer>
+
+<!-- ── Pizza Runner game ── -->
+<div class="runner-overlay" id="runnerOverlay">
+  <div class="runner-container">
+    <button class="runner-close" onclick="closeRunner()">✕</button>
+    <canvas id="runnerCanvas" width="360" height="320"></canvas>
+    <div class="runner-btns">
+      <button class="runner-btn runner-btn-left"
+              ontouchstart="runnerLeftDown()" ontouchend="runnerLeftUp()"
+              onmousedown="runnerLeftDown()" onmouseup="runnerLeftUp()">
+        ⬆ HOPP &nbsp;/&nbsp; 🍕🔨 SPADE
+      </button>
+      <button class="runner-btn runner-btn-right"
+              ontouchstart="runnerThrow();event.preventDefault()"
+              onmousedown="runnerThrow()">
+        🍕 KAST
+      </button>
+    </div>
+    <div id="runnerGameOver" class="runner-gameover" style="display:none">
+      <div class="runner-go-title">Game over</div>
+      <div class="runner-go-score" id="runnerGoScore">0</div>
+      <div class="runner-go-hs" id="runnerGoHs"></div>
+      <button class="timer-action-btn" style="max-width:200px" onclick="runnerInit()">Spill igjen</button>
+    </div>
+  </div>
+</div>
 
 <!-- ── Dough Stack game ── -->
 <div class="stack-overlay" id="stackOverlay">

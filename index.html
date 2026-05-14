@@ -5175,6 +5175,14 @@ const STACK_COLORS = ['#C42B1C','#F5C842','#E8732A','#D93020','#F0C020'];
 const _stackImg = new Image();
 _stackImg.src = 'pizza.png';
 
+// Vertical advance per layer = 18% of pizza image height at that width
+function stackLayerH(w) {
+  if (_stackImg.complete && _stackImg.naturalWidth > 0) {
+    return Math.max(8, (w / (_stackImg.naturalWidth / _stackImg.naturalHeight)) * 0.18);
+  }
+  return STACK_BH;
+}
+
 let _stackRunning = false;
 let _stackRaf     = null;
 let _stackBlocks  = [];
@@ -5213,7 +5221,7 @@ function stackInit() {
   const startX = Math.round((STACK_W - startW) / 2);
 
   // Base block (fixed, at bottom)
-  _stackBlocks.push({ x: startX, y: STACK_H - STACK_BH, w: startW, color: STACK_COLORS[0] });
+  _stackBlocks.push({ x: startX, y: STACK_H - stackLayerH(startW), w: startW, color: STACK_COLORS[0] });
 
   stackSpawnCurrent();
 
@@ -5230,7 +5238,7 @@ function stackSpawnCurrent() {
   const colorI = (_stackScore + 1) % STACK_COLORS.length;
   _stackCurrent = {
     x:     -top.w,
-    y:     top.y - STACK_BH,
+    y:     top.y - stackLayerH(top.w),
     w:     top.w,
     dir:   1,
     speed: speed,

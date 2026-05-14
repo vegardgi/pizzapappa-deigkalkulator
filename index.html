@@ -5579,6 +5579,15 @@ const RUN_GROUND = 252;   // y where player feet stand
 const RUN_GRAVITY = 0.55;
 const RUN_JUMP_VY = -13;
 const RUN_PLAYER_X = 70;
+const RUN_SPRITE_H  = 78;   // draw height of player sprite in px
+const RUN_ANIM_SPD  = 6;    // game frames per sprite frame
+
+// Load 5 running frames
+const _runSpriteFrames = Array.from({length: 5}, (_, i) => {
+  const img = new Image(); img.src = `player-f${i+1}.png`; return img;
+});
+let _runAnimFrame = 0;
+let _runAnimTimer = 0;
 
 let _runRunning   = false;
 let _runRaf       = null;
@@ -5624,6 +5633,8 @@ function runnerInit() {
   _runInvincible = 0;
   _runSpadeActive = false;
   _runSpadeTimer  = 0;
+  _runAnimFrame = 0;
+  _runAnimTimer = 0;
   _runEnemies  = [];
   _runProj     = [];
   _runPlayer   = { x: RUN_PLAYER_X, y: RUN_GROUND, vy: 0, onGround: true, throwTimer: 0 };
@@ -5702,6 +5713,13 @@ function runnerUpdate() {
   p.y  += p.vy;
   if (p.y >= RUN_GROUND) { p.y = RUN_GROUND; p.vy = 0; p.onGround = true; }
   if (p.throwTimer > 0) p.throwTimer--;
+
+  // Sprite animation
+  _runAnimTimer++;
+  if (_runAnimTimer >= RUN_ANIM_SPD) {
+    _runAnimTimer = 0;
+    _runAnimFrame = (_runAnimFrame + 1) % 5;
+  }
 
   // Spade timer
   if (_runSpadeTimer > 0) { _runSpadeTimer--; if (_runSpadeTimer === 0) _runSpadeActive = false; }
@@ -5855,54 +5873,13 @@ function runnerDraw() {
     ctx.stroke();
   }
 
-  // Player (pizza figure)
+  // Player sprite
   const blink = _runInvincible > 0 && Math.floor(_runInvincible / 5) % 2 === 0;
   if (!blink) {
-    // Body (pizza circle)
-    ctx.beginPath();
-    ctx.arc(p.x, p.y - 22, 20, 0, Math.PI * 2);
-    ctx.fillStyle = '#F5C842';
-    ctx.fill();
-    ctx.strokeStyle = '#C42B1C';
-    ctx.lineWidth = 3;
-    ctx.stroke();
-    // Toppings (basil dots)
-    ctx.fillStyle = '#2a7a3e';
-    [[p.x - 6, p.y - 26],[p.x + 7, p.y - 18],[p.x - 2, p.y - 14]].forEach(([cx, cy]) => {
-      ctx.beginPath(); ctx.arc(cx, cy, 4, 0, Math.PI * 2); ctx.fill();
-    });
-    // Legs
-    ctx.strokeStyle = '#C42B1C';
-    ctx.lineWidth = 4;
-    ctx.lineCap = 'round';
-    const legOff = Math.sin(_runFrames * 0.25) * 6;
-    ctx.beginPath();
-    ctx.moveTo(p.x - 6, p.y - 4);
-    ctx.lineTo(p.x - 6 + legOff, p.y + 2);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(p.x + 6, p.y - 4);
-    ctx.lineTo(p.x + 6 - legOff, p.y + 2);
-    ctx.stroke();
-    // Arm / spade
-    if (_runSpadeActive) {
-      ctx.strokeStyle = '#8b4513';
-      ctx.lineWidth = 4;
-      ctx.beginPath();
-      ctx.moveTo(p.x + 14, p.y - 22);
-      ctx.lineTo(p.x + 60, p.y - 30);
-      ctx.stroke();
-      ctx.fillStyle = '#C0C0C0';
-      ctx.beginPath();
-      ctx.ellipse(p.x + 65, p.y - 32, 10, 7, -0.3, 0, Math.PI * 2);
-      ctx.fill();
-    } else if (p.throwTimer > 0) {
-      ctx.strokeStyle = '#F5C842';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(p.x + 14, p.y - 22);
-      ctx.lineTo(p.x + 40, p.y - 30);
-      ctx.stroke();
+    const frame = _runSpriteFrames[_runAnimFrame];
+    if (frame && frame.complete && frame.naturalWidth > 0) {
+      const sw = RUN_SPRITE_H * (frame.naturalWidth / frame.naturalHeight);
+      ctx.drawImage(frame, p.x - sw * 0.42, p.y - RUN_SPRITE_H, sw, RUN_SPRITE_H);
     }
   }
 

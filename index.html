@@ -1639,12 +1639,20 @@
     .min-btn .min-icon { font-size: 14px; }
     body.minimalist .min-btn { background: var(--red); color: #fff; }
 
-    /* ── Wake lock button ── */
-    .wakelock-btn {
-      display: flex;
+    /* ── Bottom-left button cluster ── */
+    .bottom-btns {
       position: fixed;
       bottom: 16px;
       left: 16px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      z-index: 80;
+    }
+
+    /* ── Wake lock button ── */
+    .wakelock-btn {
+      display: flex;
       width: 40px;
       height: 40px;
       border-radius: 50%;
@@ -1652,7 +1660,6 @@
       border: 1.5px solid var(--border);
       font-size: 17px;
       cursor: pointer;
-      z-index: 80;
       align-items: center;
       justify-content: center;
       box-shadow: 0 2px 8px rgba(0,0,0,.13);
@@ -1664,6 +1671,136 @@
       background: rgba(196,43,28,.1);
       border-color: var(--red);
       opacity: 1;
+    }
+
+    /* ── Timer button ── */
+    .timer-btn {
+      display: flex;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      font-size: 17px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,.13);
+      opacity: .6;
+      transition: opacity .2s, border-color .2s, background .2s, font-size .2s;
+    }
+    .timer-btn:hover { opacity: 1; }
+    .timer-btn.running {
+      background: rgba(196,43,28,.1);
+      border-color: var(--red);
+      opacity: 1;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--red);
+      letter-spacing: -0.5px;
+    }
+
+    /* ── Timer overlay / sheet ── */
+    .timer-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 200;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .timer-overlay.open { opacity: 1; pointer-events: auto; }
+    .timer-sheet {
+      background: var(--card);
+      border-radius: 20px 20px 0 0;
+      width: 100%;
+      max-width: 540px;
+      padding: 22px 22px 36px;
+      transform: translateY(100%);
+      transition: transform 0.28s cubic-bezier(0.32,0,0.67,0);
+      box-shadow: 0 -8px 40px rgba(0,0,0,0.3);
+    }
+    .timer-overlay.open .timer-sheet { transform: translateY(0); }
+    .timer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .timer-title { font-size: 16px; font-weight: 800; color: var(--text); }
+
+    .timer-setup {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .timer-setup-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: var(--muted2);
+    }
+    .timer-stepper .step-input { width: 80px; font-size: 22px; font-weight: 800; height: 44px; }
+    .timer-stepper .step-btn  { width: 44px; height: 44px; font-size: 22px; }
+    .timer-presets { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+    .timer-preset-btn {
+      padding: 6px 14px;
+      border-radius: 16px;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      color: var(--muted2);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .timer-preset-btn:hover, .timer-preset-btn.sel {
+      border-color: var(--red);
+      background: rgba(196,43,28,0.09);
+      color: var(--text);
+    }
+
+    .timer-display { text-align: center; margin-bottom: 18px; display: none; }
+    .timer-display.visible { display: block; }
+    .timer-countdown {
+      font-size: 72px;
+      font-weight: 800;
+      letter-spacing: -2px;
+      color: var(--text);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    .timer-countdown.alarm-flash { animation: timerFlash 0.5s ease-in-out infinite; }
+    @keyframes timerFlash { 0%,100% { color: var(--text); } 50% { color: var(--red); } }
+    .timer-subtitle { font-size: 13px; color: var(--muted); margin-top: 6px; }
+
+    .timer-action-btn {
+      width: 100%;
+      background: var(--red);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .timer-action-btn:hover { opacity: 0.88; }
+    .timer-action-btn.stop { background: var(--text); }
+    .timer-action-btn.dismiss { background: var(--success); }
+    .timer-notif-hint {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 10px;
+      min-height: 18px;
     }
 
     .min-btn-x {
@@ -4685,6 +4822,275 @@ document.addEventListener('visibilitychange', async () => {
     } catch (e) {}
   }
 });
+
+// ── Countdown Timer ───────────────────────────────────────────────────────────
+const TIMER_END_KEY = 'deigkalkulator_timer_end';
+
+let _timerInterval    = null;
+let _timerEndMs       = null;
+let _timerAlarmFiring = false;
+let _timerMinutes     = 5;
+let _alarmCtx         = null;
+let _alarmGain        = null;
+let _alarmBeepTO      = null;
+
+function openTimer() {
+  document.getElementById('timerOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  timerUpdateNotifHint();
+  timerRenderState();
+}
+
+function closeTimer() {
+  document.getElementById('timerOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function timerSetMinutes(m) {
+  _timerMinutes = Math.max(1, Math.min(999, Math.round(m) || 1));
+  const input = document.getElementById('timerMinInput');
+  if (input) input.value = _timerMinutes;
+  document.querySelectorAll('.timer-preset-btn').forEach(btn => {
+    const v = btn.textContent === '1 t' ? 60 : parseInt(btn.textContent);
+    btn.classList.toggle('sel', v === _timerMinutes);
+  });
+}
+
+function timerAdjMin(delta) {
+  timerSetMinutes((_timerMinutes || 5) + delta);
+}
+
+function timerToggle() {
+  if (_timerAlarmFiring) {
+    timerDismiss();
+  } else if (_timerInterval) {
+    timerStop();
+  } else {
+    timerStart();
+  }
+}
+
+async function timerStart() {
+  const mins = _timerMinutes || 5;
+  _timerEndMs = Date.now() + mins * 60 * 1000;
+  localStorage.setItem(TIMER_END_KEY, String(_timerEndMs));
+
+  if (!wakeLock && 'wakeLock' in navigator) {
+    try {
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', () => { wakeLock = null; updateWakeLockBtn(); });
+      updateWakeLockBtn();
+    } catch (e) {}
+  }
+
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission().then(() => timerUpdateNotifHint());
+  }
+
+  _timerInterval = setInterval(timerTick, 500);
+  timerRenderState();
+  updateTimerBtn();
+}
+
+function timerStop() {
+  clearInterval(_timerInterval);
+  _timerInterval    = null;
+  _timerEndMs       = null;
+  _timerAlarmFiring = false;
+  localStorage.removeItem(TIMER_END_KEY);
+  timerStopAlarmSound();
+  timerRenderState();
+  updateTimerBtn();
+}
+
+function timerTick() {
+  if (!_timerEndMs) return;
+  const remaining = _timerEndMs - Date.now();
+  if (remaining <= 0) {
+    clearInterval(_timerInterval);
+    _timerInterval = null;
+    localStorage.removeItem(TIMER_END_KEY);
+    timerFireAlarm();
+  } else {
+    timerUpdateCountdownDisplay(remaining);
+    updateTimerBtn();
+  }
+}
+
+function timerFireAlarm() {
+  _timerAlarmFiring = true;
+  timerPlayAlarmSound();
+  timerVibrate();
+  timerShowNotification();
+  timerRenderState();
+  updateTimerBtn();
+}
+
+function timerDismiss() {
+  _timerAlarmFiring = false;
+  _timerEndMs       = null;
+  timerStopAlarmSound();
+  timerRenderState();
+  updateTimerBtn();
+}
+
+function timerRenderState() {
+  const setup     = document.getElementById('timerSetup');
+  const display   = document.getElementById('timerDisplay');
+  const btn       = document.getElementById('timerActionBtn');
+  const countdown = document.getElementById('timerCountdown');
+  if (!setup || !display || !btn || !countdown) return;
+
+  if (_timerAlarmFiring) {
+    setup.style.display = 'none';
+    display.classList.add('visible');
+    countdown.textContent = '00:00';
+    countdown.classList.add('alarm-flash');
+    btn.textContent = 'Stopp alarm';
+    btn.className   = 'timer-action-btn dismiss';
+  } else if (_timerInterval) {
+    setup.style.display = 'none';
+    display.classList.add('visible');
+    countdown.classList.remove('alarm-flash');
+    btn.textContent = 'Avbryt';
+    btn.className   = 'timer-action-btn stop';
+    timerUpdateCountdownDisplay(_timerEndMs - Date.now());
+    timerUpdateSubtitle();
+  } else {
+    setup.style.display = '';
+    display.classList.remove('visible');
+    countdown.classList.remove('alarm-flash');
+    btn.textContent = 'Start';
+    btn.className   = 'timer-action-btn';
+  }
+}
+
+function timerUpdateCountdownDisplay(ms) {
+  ms = Math.max(0, ms);
+  const totalSec = Math.ceil(ms / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  const str = h > 0
+    ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+    : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  const el = document.getElementById('timerCountdown');
+  if (el) el.textContent = str;
+}
+
+function timerUpdateSubtitle() {
+  if (!_timerEndMs) return;
+  const end = new Date(_timerEndMs);
+  const hh  = String(end.getHours()).padStart(2,'0');
+  const mm  = String(end.getMinutes()).padStart(2,'0');
+  const el  = document.getElementById('timerSubtitle');
+  if (el) el.textContent = `Ferdig kl. ${hh}:${mm}`;
+}
+
+function updateTimerBtn() {
+  const btn = document.getElementById('timerBtn');
+  if (!btn) return;
+  if (_timerAlarmFiring) {
+    btn.classList.add('running');
+    btn.textContent  = '🔔';
+    btn.style.fontSize = '';
+  } else if (_timerInterval && _timerEndMs) {
+    btn.classList.add('running');
+    const remaining = Math.max(0, _timerEndMs - Date.now());
+    const totalSec  = Math.ceil(remaining / 1000);
+    const m = Math.floor(totalSec / 60);
+    const s = totalSec % 60;
+    btn.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  } else {
+    btn.classList.remove('running');
+    btn.textContent    = '⏱';
+    btn.style.fontSize = '';
+  }
+}
+
+function timerPlayAlarmSound() {
+  if (!window.AudioContext && !window.webkitAudioContext) return;
+  try {
+    _alarmCtx  = new (window.AudioContext || window.webkitAudioContext)();
+    _alarmGain = _alarmCtx.createGain();
+    _alarmGain.gain.value = 0.55;
+    _alarmGain.connect(_alarmCtx.destination);
+    let beepCount = 0;
+    function beep() {
+      if (!_alarmCtx) return;
+      const osc = _alarmCtx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = 880;
+      osc.connect(_alarmGain);
+      const now = _alarmCtx.currentTime;
+      osc.start(now);
+      osc.stop(now + 0.18);
+      beepCount++;
+      const delay = (beepCount % 3 === 0) ? 1100 : 280;
+      _alarmBeepTO = setTimeout(beep, delay);
+    }
+    beep();
+  } catch (e) {}
+}
+
+function timerStopAlarmSound() {
+  clearTimeout(_alarmBeepTO);
+  _alarmBeepTO = null;
+  if (_alarmCtx) {
+    try { _alarmCtx.close(); } catch (e) {}
+    _alarmCtx  = null;
+    _alarmGain = null;
+  }
+}
+
+function timerVibrate() {
+  if ('vibrate' in navigator) navigator.vibrate([400,200,400,200,400]);
+}
+
+function timerShowNotification() {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  try {
+    new Notification('Pizzapappa – Timer ferdig! 🍕', {
+      body:     'Nedtellingstimeren er ferdig.',
+      icon:     'https://kalkulator.pizzapappa.no/favicon-32.png',
+      tag:      'pizzapappa-timer',
+      renotify: true
+    });
+  } catch (e) {}
+}
+
+function timerUpdateNotifHint() {
+  const el = document.getElementById('timerNotifHint');
+  if (!el) return;
+  if (!('Notification' in window)) { el.textContent = ''; return; }
+  if (Notification.permission === 'granted') {
+    el.textContent = 'Varsling aktivert – du får varsel selv om skjermen er dimmet';
+  } else if (Notification.permission === 'denied') {
+    el.textContent = 'Varsling blokkert i nettleserinnstillingene';
+  } else {
+    el.textContent = 'Tillat varsling for å få alarm selv om nettleseren er i bakgrunnen';
+  }
+}
+
+// Gjenoppretter timer fra localStorage ved sideinnlasting
+(function timerRestoreFromStorage() {
+  const stored = localStorage.getItem(TIMER_END_KEY);
+  if (!stored) return;
+  const endMs = parseInt(stored, 10);
+  if (isNaN(endMs)) { localStorage.removeItem(TIMER_END_KEY); return; }
+  const remaining = endMs - Date.now();
+  if (remaining <= 0) {
+    localStorage.removeItem(TIMER_END_KEY);
+    _timerEndMs       = null;
+    _timerAlarmFiring = true;
+    timerFireAlarm();
+  } else {
+    _timerEndMs     = endMs;
+    _timerMinutes   = Math.max(1, Math.ceil(remaining / 60000));
+    _timerInterval  = setInterval(timerTick, 500);
+    updateTimerBtn();
+  }
+})();
 </script>
 
 <!-- ── Footer ── -->
@@ -4712,6 +5118,42 @@ document.addEventListener('visibilitychange', async () => {
     </div>
   </div>
 </footer>
+
+<!-- ── Timer sheet ── -->
+<div class="timer-overlay" id="timerOverlay" onclick="if(event.target===this)closeTimer()">
+  <div class="timer-sheet">
+    <div class="timer-header">
+      <span class="timer-title">Nedtellingstimer</span>
+      <button class="modal-close" onclick="closeTimer()">✕</button>
+    </div>
+
+    <div class="timer-setup" id="timerSetup">
+      <div class="timer-setup-label">Minutter</div>
+      <div class="stepper timer-stepper">
+        <button class="step-btn" onclick="timerAdjMin(-5)">−</button>
+        <input class="step-input timer-min-input" id="timerMinInput"
+               type="number" min="1" max="999" value="5"
+               oninput="timerSetMinutes(+this.value)">
+        <button class="step-btn" onclick="timerAdjMin(5)">+</button>
+      </div>
+      <div class="timer-presets">
+        <button class="timer-preset-btn" onclick="timerSetMinutes(5)">5 min</button>
+        <button class="timer-preset-btn" onclick="timerSetMinutes(10)">10 min</button>
+        <button class="timer-preset-btn" onclick="timerSetMinutes(20)">20 min</button>
+        <button class="timer-preset-btn" onclick="timerSetMinutes(30)">30 min</button>
+        <button class="timer-preset-btn" onclick="timerSetMinutes(60)">1 t</button>
+      </div>
+    </div>
+
+    <div class="timer-display" id="timerDisplay">
+      <div class="timer-countdown" id="timerCountdown">00:00</div>
+      <div class="timer-subtitle" id="timerSubtitle"></div>
+    </div>
+
+    <button class="timer-action-btn" id="timerActionBtn" onclick="timerToggle()">Start</button>
+    <div class="timer-notif-hint" id="timerNotifHint"></div>
+  </div>
+</div>
 
 <!-- ── Contact modal ── -->
 <div class="contact-overlay" id="contactOverlay" onclick="if(event.target===this)closeContact()">
@@ -4741,7 +5183,10 @@ document.addEventListener('visibilitychange', async () => {
   </div>
 </div>
 
-<button class="wakelock-btn" id="wakeLockBtn" onclick="toggleWakeLock()" title="Hold skjermen på">💤</button>
+<div class="bottom-btns">
+  <button class="timer-btn" id="timerBtn" onclick="openTimer()" title="Nedtellingstimer">⏱</button>
+  <button class="wakelock-btn" id="wakeLockBtn" onclick="toggleWakeLock()" title="Hold skjermen på">💤</button>
+</div>
 
 </body>
 </html>

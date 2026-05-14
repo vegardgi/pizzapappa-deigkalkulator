@@ -5183,6 +5183,14 @@ function stackLayerH(w) {
   return STACK_BH;
 }
 
+// Full rendered pizza height at a given block width
+function stackPizzaH(w) {
+  if (_stackImg.complete && _stackImg.naturalWidth > 0) {
+    return w / (_stackImg.naturalWidth / _stackImg.naturalHeight);
+  }
+  return w * 0.67;
+}
+
 let _stackRunning = false;
 let _stackRaf     = null;
 let _stackBlocks  = [];
@@ -5221,7 +5229,7 @@ function stackInit() {
   const startX = Math.round((STACK_W - startW) / 2);
 
   // Base block (fixed, at bottom)
-  _stackBlocks.push({ x: startX, y: STACK_H - stackLayerH(startW), w: startW, color: STACK_COLORS[0] });
+  _stackBlocks.push({ x: startX, y: STACK_H - stackPizzaH(startW) - 12, w: startW, color: STACK_COLORS[0] });
 
   stackSpawnCurrent();
 
@@ -5284,7 +5292,7 @@ function stackDrop() {
 
   // Scroll view: shift all blocks up when tower gets tall
   const topY = _stackBlocks[_stackBlocks.length - 1].y;
-  if (topY < STACK_H * 0.45) {
+  if (topY < STACK_H * 0.35) {
     const shift = Math.round(STACK_H * 0.2);
     _stackBlocks.forEach(b => { b.y += shift; });
   }

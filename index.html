@@ -1966,16 +1966,20 @@
     @media (min-width: 601px) {
       .runner-container {
         width: calc(80vh * 9 / 16);
+        height: 80vh;
+        justify-content: flex-end;
       }
       #runnerCanvas {
-        width: calc(80vh * 9 / 16);
-        height: auto;
+        width: 100%;
+        flex: 1;
+        height: 0;
         max-width: none;
-        aspect-ratio: 360/320;
+        aspect-ratio: unset;
         border-radius: 14px 14px 0 0;
       }
       .runner-btns {
-        width: calc(80vh * 9 / 16);
+        width: 100%;
+        flex-shrink: 0;
       }
     }
     @media (max-width: 600px) {

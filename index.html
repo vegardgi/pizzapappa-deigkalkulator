@@ -1863,6 +1863,11 @@
       aspect-ratio: 320/480;
     }
     @media (min-width: 601px) {
+      .stack-close {
+        position: fixed;
+        top: 12px; right: 12px;
+        z-index: 300;
+      }
       .stack-container {
         width: calc(80vh * 9 / 16);
         gap: 0;
@@ -1981,7 +1986,9 @@
         border-radius: 0;
       }
       .runner-close {
-        z-index: 3;
+        position: fixed;
+        top: 12px; right: 12px;
+        z-index: 300;
       }
       .runner-btns {
         position: absolute;

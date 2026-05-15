@@ -1862,6 +1862,19 @@
       height: auto;
       aspect-ratio: 320/480;
     }
+    @media (min-width: 601px) {
+      .stack-container {
+        width: calc(80vh * 9 / 16);
+        gap: 0;
+      }
+      #stackCanvas {
+        width: calc(80vh * 9 / 16);
+        height: 80vh;
+        max-width: none;
+        aspect-ratio: unset;
+        border-radius: 14px;
+      }
+    }
     @media (max-width: 600px) {
       .stack-close {
         position: fixed;
@@ -1949,6 +1962,21 @@
       display: flex;
       width: min(360px, 96vw);
       gap: 4px;
+    }
+    @media (min-width: 601px) {
+      .runner-container {
+        width: calc(80vh * 9 / 16);
+      }
+      #runnerCanvas {
+        width: calc(80vh * 9 / 16);
+        height: auto;
+        max-width: none;
+        aspect-ratio: 360/320;
+        border-radius: 14px 14px 0 0;
+      }
+      .runner-btns {
+        width: calc(80vh * 9 / 16);
+      }
     }
     @media (max-width: 600px) {
       .runner-close {

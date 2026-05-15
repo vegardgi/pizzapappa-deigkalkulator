@@ -5659,8 +5659,8 @@ function closeGamePicker() {
 const RUNNER_HS_KEY = 'deigkalkulator_runner_hs';
 const RUN_W = 360, RUN_H = 640;
 const RUN_GROUND = 572;   // y where player feet stand
-const RUN_GRAVITY = 0.55;
-const RUN_JUMP_VY = -13;
+const RUN_GRAVITY = 0.82;
+const RUN_JUMP_VY = -16;
 const RUN_PLAYER_X = 70;
 const RUN_SPRITE_H  = 78;   // draw height of player sprite in px
 const RUN_ANIM_SPD  = 6;    // game frames per sprite frame
@@ -5799,7 +5799,7 @@ function runnerLoop() {
 
 function runnerUpdate() {
   _runFrames++;
-  const speed = 9.9 + _runFrames * 0.0028; // gradual acceleration
+  const speed = 7.9 + _runFrames * 0.0028; // gradual acceleration
 
   // Player physics
   const p = _runPlayer;

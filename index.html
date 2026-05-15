@@ -1967,15 +1967,18 @@
       .runner-container {
         width: calc(80vh * 9 / 16);
         height: 80vh;
-        justify-content: flex-end;
+        justify-content: space-between;
+        background: #1a0904;
+        border-radius: 16px;
+        overflow: hidden;
       }
       #runnerCanvas {
         width: 100%;
-        flex: 1;
-        height: 0;
         max-width: none;
-        aspect-ratio: unset;
-        border-radius: 14px 14px 0 0;
+        height: auto;
+        aspect-ratio: 360/320;
+        border-radius: 0;
+        flex-shrink: 0;
       }
       .runner-btns {
         width: 100%;
@@ -5650,6 +5653,9 @@ const RUN_JUMP_VY = -13;
 const RUN_PLAYER_X = 70;
 const RUN_SPRITE_H  = 78;   // draw height of player sprite in px
 const RUN_ANIM_SPD  = 6;    // game frames per sprite frame
+const RUN_STEP_W    = 160;  // platform top width
+const RUN_STEP_WALL = 12;   // wall thickness
+const RUN_STEP_HEIGHTS = [62, 95]; // small and large step heights
 
 // Load 5 running frames
 const _runSpriteFrames = Array.from({length: 5}, (_, i) => {
@@ -5673,6 +5679,8 @@ let _runLeftHeld  = false;
 let _runLeftTimer = null;  // distinguish tap(jump) vs hold(spade)
 let _runSpadeActive = false;
 let _runSpadeTimer  = 0;
+let _runPlatforms      = [];
+let _runPlatformSpawnIn = 320;
 let _runInvincible  = 0;   // invincibility frames after hit
 let _runHits        = 0;   // player has 3 lives
 
@@ -5706,6 +5714,8 @@ function runnerInit() {
   _runAnimTimer = 0;
   _runEnemies  = [];
   _runProj     = [];
+  _runPlatforms = [];
+  _runPlatformSpawnIn = 320;
   _runPlayer   = { x: RUN_PLAYER_X, y: RUN_GROUND, vy: 0, onGround: true, throwTimer: 0 };
 
   // Build parallax bg layers
@@ -5778,9 +5788,38 @@ function runnerUpdate() {
 
   // Player physics
   const p = _runPlayer;
+  p.onGround = false;
   p.vy += RUN_GRAVITY;
   p.y  += p.vy;
-  if (p.y >= RUN_GROUND) { p.y = RUN_GROUND; p.vy = 0; p.onGround = true; }
+
+  // Platform wall collision (player runs into step face → lose a life)
+  if (_runInvincible === 0) {
+    for (let i = _runPlatforms.length - 1; i >= 0; i--) {
+      const pl = _runPlatforms[i];
+      const hitsWall = p.x + 20 >= pl.x &&
+                       p.x - 10  <  pl.x + RUN_STEP_WALL &&
+                       p.y       >  pl.surfaceY + 6;
+      if (hitsWall) {
+        _runPlatforms.splice(i, 1);
+        _runHits++;
+        _runInvincible = 90;
+        if (_runHits >= 3) { runnerGameOver(); return; }
+        break;
+      }
+    }
+  }
+
+  // Platform top — player lands on surface
+  let onPlat = false;
+  for (const pl of _runPlatforms) {
+    const pastWall  = p.x + 20 > pl.x + RUN_STEP_WALL;
+    const beforeEnd = p.x - 10 < pl.x + RUN_STEP_WALL + RUN_STEP_W;
+    if (pastWall && beforeEnd && p.y >= pl.surfaceY && p.vy >= 0) {
+      p.y = pl.surfaceY; p.vy = 0; p.onGround = true; onPlat = true; break;
+    }
+  }
+  if (!onPlat && p.y >= RUN_GROUND) { p.y = RUN_GROUND; p.vy = 0; p.onGround = true; }
+
   if (p.throwTimer > 0) p.throwTimer--;
 
   // Sprite animation
@@ -5807,6 +5846,18 @@ function runnerUpdate() {
     _runEnemies.push({ x: RUN_W + ew, y: ey, w: ew, h: eh, flying, hp: 1 });
     _runSpawnIn = Math.max(38, 110 - Math.floor(_runFrames / 90));
   }
+
+  // Spawn platforms
+  _runPlatformSpawnIn--;
+  if (_runPlatformSpawnIn <= 0) {
+    const h = RUN_STEP_HEIGHTS[Math.random() < 0.4 ? 1 : 0];
+    _runPlatforms.push({ x: RUN_W + 20, surfaceY: RUN_GROUND - h });
+    _runPlatformSpawnIn = 380 + Math.floor(Math.random() * 200);
+  }
+
+  // Move platforms and remove off-screen
+  _runPlatforms.forEach(pl => { pl.x -= speed; });
+  _runPlatforms = _runPlatforms.filter(pl => pl.x + RUN_STEP_WALL + RUN_STEP_W > -10);
 
   // Move enemies
   _runEnemies.forEach(e => { e.x -= speed; });
@@ -5889,6 +5940,30 @@ function runnerDraw() {
   ctx.fillRect(0, RUN_GROUND + 2, RUN_W, RUN_H - RUN_GROUND - 2);
   ctx.fillStyle = '#8b3a00';
   ctx.fillRect(0, RUN_GROUND, RUN_W, 4);
+
+  // Platforms (step/trapp)
+  _runPlatforms.forEach(pl => {
+    const wallH = RUN_GROUND - pl.surfaceY + 6;
+    const topX  = pl.x + RUN_STEP_WALL;
+    // Step body (wall + base)
+    ctx.fillStyle = '#5a2800';
+    ctx.fillRect(pl.x, pl.surfaceY, RUN_STEP_WALL + RUN_STEP_W, wallH);
+    // Wall face highlight
+    ctx.fillStyle = '#7a3a0a';
+    ctx.fillRect(pl.x, pl.surfaceY, RUN_STEP_WALL, wallH);
+    // Top surface
+    ctx.fillStyle = '#c07030';
+    ctx.fillRect(topX, pl.surfaceY - 6, RUN_STEP_W, 6);
+    // Brick lines
+    ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+    ctx.lineWidth = 1;
+    for (let by = pl.surfaceY; by < RUN_GROUND; by += 18) {
+      ctx.beginPath(); ctx.moveTo(topX, by); ctx.lineTo(topX + RUN_STEP_W, by); ctx.stroke();
+    }
+    for (let bx = topX; bx < topX + RUN_STEP_W; bx += 32) {
+      ctx.beginPath(); ctx.moveTo(bx, pl.surfaceY); ctx.lineTo(bx, RUN_GROUND); ctx.stroke();
+    }
+  });
 
   // Projectiles
   const p = _runPlayer;

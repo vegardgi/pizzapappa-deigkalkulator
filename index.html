@@ -1953,14 +1953,14 @@
       display: block;
       border-radius: 14px 14px 0 0;
       touch-action: none;
-      max-width: min(360px, 96vw);
-      width: min(360px, 96vw);
+      max-width: min(315px, 96vw);
+      width: min(315px, 96vw);
       height: auto;
-      aspect-ratio: 360/320;
+      aspect-ratio: 360/560;
     }
     .runner-btns {
       display: flex;
-      width: min(360px, 96vw);
+      width: min(315px, 96vw);
       gap: 4px;
     }
     @media (min-width: 601px) {
@@ -1968,7 +1968,7 @@
         width: calc(80vh * 9 / 16);
         height: 80vh;
         justify-content: space-between;
-        background: #1a0904;
+        background: #050102;
         border-radius: 16px;
         overflow: hidden;
       }
@@ -1976,7 +1976,7 @@
         width: 100%;
         max-width: none;
         height: auto;
-        aspect-ratio: 360/320;
+        aspect-ratio: 360/560;
         border-radius: 0;
         flex-shrink: 0;
       }
@@ -1992,12 +1992,15 @@
         z-index: 1;
       }
       #runnerCanvas {
+        /* constrain by both width and available viewport height */
+        width: min(100vw, calc((100dvh - 72px) * 360 / 560));
         max-width: 100vw;
-        width: 100vw;
+        height: auto;
         border-radius: 0;
+        aspect-ratio: 360/560;
       }
       .runner-btns {
-        width: 100vw;
+        width: min(100vw, calc((100dvh - 72px) * 360 / 560));
       }
       .runner-btn {
         padding: 22px 0;
@@ -5646,8 +5649,8 @@ function closeGamePicker() {
 
 // ── Pizza Runner Game ─────────────────────────────────────────────────────────
 const RUNNER_HS_KEY = 'deigkalkulator_runner_hs';
-const RUN_W = 360, RUN_H = 320;
-const RUN_GROUND = 252;   // y where player feet stand
+const RUN_W = 360, RUN_H = 560;
+const RUN_GROUND = 492;   // y where player feet stand
 const RUN_GRAVITY = 0.55;
 const RUN_JUMP_VY = -13;
 const RUN_PLAYER_X = 70;
@@ -5718,10 +5721,11 @@ function runnerInit() {
   _runPlatformSpawnIn = 320;
   _runPlayer   = { x: RUN_PLAYER_X, y: RUN_GROUND, vy: 0, onGround: true, throwTimer: 0 };
 
-  // Build parallax bg layers
+  // Build parallax bg layers (distant → near, top → bottom)
   _runBg = [
-    { x: 0, speed: 0.3, color: '#2a0e06', rects: runBgRects(8, 20, 60, 40, 80) },
-    { x: 0, speed: 0.7, color: '#3d1508', rects: runBgRects(5, 60, 120, 50, 110) },
+    { x: 0, speed: 0.1, color: '#120502', rects: runBgRects(14, 40,  260, 20, 50,  60, 160) },
+    { x: 0, speed: 0.3, color: '#2a0e06', rects: runBgRects(10, 200, 380, 35, 90,  80, 220) },
+    { x: 0, speed: 0.7, color: '#3d1508', rects: runBgRects(7,  340, 460, 50, 130, 100, 260) },
   ];
 
   document.getElementById('runnerGameOver').style.display = 'none';
@@ -5729,14 +5733,14 @@ function runnerInit() {
   _runRaf = requestAnimationFrame(runnerLoop);
 }
 
-function runBgRects(n, yMin, yMax, wMin, wMax) {
+function runBgRects(n, yMin, yMax, wMin, wMax, hMin = 10, hMax = 30) {
   const arr = [];
   for (let i = 0; i < n; i++) {
     arr.push({
       x: Math.random() * RUN_W,
       y: yMin + Math.random() * (yMax - yMin),
       w: wMin + Math.random() * (wMax - wMin),
-      h: 8 + Math.random() * 14
+      h: hMin + Math.random() * (hMax - hMin)
     });
   }
   return arr;
@@ -5784,7 +5788,7 @@ function runnerLoop() {
 
 function runnerUpdate() {
   _runFrames++;
-  const speed = 3.8 + _runFrames * 0.0028; // gradual acceleration
+  const speed = 7.6 + _runFrames * 0.0028; // gradual acceleration
 
   // Player physics
   const p = _runPlayer;
@@ -5922,14 +5926,23 @@ function runnerDraw() {
   const ctx = _runCtx;
   ctx.clearRect(0, 0, RUN_W, RUN_H);
 
-  // Sky gradient
+  // Sky gradient (dark top → warm glow near ground)
   const sky = ctx.createLinearGradient(0, 0, 0, RUN_H);
-  sky.addColorStop(0, '#1a0904');
-  sky.addColorStop(1, '#3d1205');
+  sky.addColorStop(0,    '#050102');
+  sky.addColorStop(0.35, '#1a0904');
+  sky.addColorStop(0.75, '#3d1205');
+  sky.addColorStop(1,    '#6b2008');
   ctx.fillStyle = sky;
   ctx.fillRect(0, 0, RUN_W, RUN_H);
 
-  // Parallax bg
+  // Static stars in upper sky
+  ctx.fillStyle = 'rgba(255,220,180,0.55)';
+  const starSeed = [{x:18,y:12},{x:55,y:28},{x:90,y:8},{x:140,y:40},{x:185,y:15},
+    {x:220,y:35},{x:260,y:10},{x:305,y:50},{x:340,y:20},{x:70,y:55},{x:165,y:60},
+    {x:290,y:42},{x:330,y:65},{x:115,y:70},{x:240,y:78}];
+  starSeed.forEach(s => { ctx.beginPath(); ctx.arc(s.x, s.y, 1, 0, Math.PI*2); ctx.fill(); });
+
+  // Parallax bg (city silhouette layers)
   _runBg.forEach(layer => {
     ctx.fillStyle = layer.color;
     layer.rects.forEach(r => ctx.fillRect(r.x, r.y, r.w, r.h));
@@ -6132,7 +6145,7 @@ function runnerGameOver() {
 <div class="runner-overlay" id="runnerOverlay">
   <div class="runner-container">
     <button class="runner-close" onclick="closeRunner()">✕</button>
-    <canvas id="runnerCanvas" width="360" height="320"></canvas>
+    <canvas id="runnerCanvas" width="360" height="560"></canvas>
     <div class="runner-btns">
       <button class="runner-btn runner-btn-left"
               ontouchstart="runnerLeftDown()" ontouchend="runnerLeftUp()"

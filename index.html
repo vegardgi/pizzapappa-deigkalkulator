@@ -2060,6 +2060,28 @@
     .runner-go-title { font-size: 24px; font-weight: 800; color: #fff; }
     .runner-go-score { font-size: 52px; font-weight: 800; color: #F5C842; line-height: 1; }
     .runner-go-hs    { font-size: 14px; color: rgba(255,255,255,0.6); margin-bottom: 8px; }
+    .runner-key-hint {
+      display: none;
+      position: absolute;
+      top: 44%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0,0,0,0.82);
+      color: #fff;
+      padding: 14px 24px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 10;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    @media (min-width: 601px) {
+      .runner-key-hint { display: block; }
+    }
 
     /* ── Game picker ── */
     .gamepicker-overlay {
@@ -5708,11 +5730,30 @@ function openRunner() {
   document.getElementById('runnerOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
   if (!_runRunning) runnerInit();
+  if (window.matchMedia('(min-width: 601px)').matches) {
+    const hint = document.getElementById('runnerKeyHint');
+    hint.style.opacity = '1';
+    clearTimeout(window._runHintTimer);
+    window._runHintTimer = setTimeout(() => { hint.style.opacity = '0'; }, 3000);
+  }
+  if (!window._runKeyHandler) {
+    window._runKeyHandler = e => {
+      if (e.code === 'KeyK') { e.preventDefault(); if (e.type === 'keydown') runnerLeftDown(); else runnerLeftUp(); }
+      if (e.code === 'KeyL' && e.type === 'keydown') { e.preventDefault(); runnerThrow(); }
+    };
+    document.addEventListener('keydown', window._runKeyHandler);
+    document.addEventListener('keyup',   window._runKeyHandler);
+  }
 }
 function closeRunner() {
   document.getElementById('runnerOverlay').classList.remove('open');
   document.body.style.overflow = '';
   runnerStop();
+  if (window._runKeyHandler) {
+    document.removeEventListener('keydown', window._runKeyHandler);
+    document.removeEventListener('keyup',   window._runKeyHandler);
+    window._runKeyHandler = null;
+  }
 }
 function runnerStop() {
   _runRunning = false;
@@ -6194,6 +6235,7 @@ function runnerGameOver() {
   <div class="runner-container">
     <button class="runner-close" onclick="closeRunner()">✕</button>
     <canvas id="runnerCanvas" width="360" height="640"></canvas>
+    <div id="runnerKeyHint" class="runner-key-hint">⌨ &nbsp;K = Hopp &nbsp;·&nbsp; L = Kast</div>
     <div class="runner-btns">
       <button class="runner-btn runner-btn-left"
               ontouchstart="runnerLeftDown()" ontouchend="runnerLeftUp()"
